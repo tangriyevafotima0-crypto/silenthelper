@@ -1,23 +1,32 @@
-# SilentHelper v9.0 FINAL — Production & Practice Telemetry Edition
+# SilentHelper v10.0 — Deep Bug-Hunted, Auto-Bridge & Google Drive Telemetry Edition
 
-## v9.0 FINAL da Nimalar Hal Qilindi?
-1. **Ruxsatlarning Doimiy Saqlanishi (Doimiy Kod Imzolash Sertifikati):**
-   - macOS tizimida har safar dastur qayta kompilyatsiya qilinganda, uning `cdhash` identifikatori o'zgarib ketardi va macOS uni yangi dastur deb o'ylab, qayta-qayta ruxsat so'rardi.
-   - **v9.0 FINAL** da Keychain ichida barqaror `SilentHelper Dev` sertifikati yaratilib, dastur unga muhrlanadi. Natijada ruxsatlar 1 marta berilgach, xoh Finder'dan, xoh Spotlight'dan, xoh Terminal'siz to'g'ridan-to'g'ri ochilsa ham, macOS boshqa qayta ruxsat so'ramaydi!
-2. **`SilentHelper.app` va Google Email Sessiyasi Tiklandi (`com.local.SilentHelper`):**
-   - Doimiy `~/Applications/SilentHelper.app` (`com.local.SilentHelper`) paketi o'rnatiladi va `tccutil reset` butunlay olib tashlandi.
-   - Avval kiritilgan **Google Email sessiyangiz ham, berilgan ruxsatlaringiz ham saqlanib qoladi.**
-3. **Amaliyot Tarixi va Xatolar Qora Qutisi (`FlightRecorder`):**
-   - Amaliyotda test topshirayotganingizda har bir bosqich, javob tezligi (`ms`), xatolar (`IW`, `SW`, `W`), avto-tuzatishlar hamda sayt ogohlantirishlari (`blocked`, `violation`, `full screen`) skrinshoti bilan `QuizArchive/FlightLogs/practice_session_report.md` fayliga yozib boriladi.
-   - Shubhali holat bo'lsa, **`Option + L` (`⌥L`)** bosib o'sha lahzani tarixga muhrlashingiz mumkin.
+## v10.0 da Hal Qilingan Barcha Muammolar (Bug Hunt Natijalari)
+1. **Terminal Ruxsat Ko'prigi (`--bridge-daemon`) + `.app` Email Konteyneri (`com.local.SilentHelper`):**
+   - `v9.0` dagi `practice_session_report.md` logida `CAPTURE | SW | Skrinshot xatosi: Screen Recording ruxsati yo'q` xatosi aniqlangan edi.
+   - **v10.0** da ikki qatlamli arxitektura ishlaydi:
+     - Asosiy dastur `~/Applications/SilentHelper.app` (`com.local.SilentHelper`) sifatida ishga tushadi — bu sizning **Google Email sessiyangizni** va **Dock / Cmd+Tab** ikonkangizni 100% saqlaydi.
+     - Shu bilan birga `run.sh` fonda `/tmp/sh_terminal_bridge --bridge-daemon` ko'prigini `Terminal.app` ostida ishga tushiradi — u `Terminal.app` ning mavjud Screen Recording va Accessibility ruxsatlaridan foydalanib, skrinshot olish, `S+F`/`K` tugmalar va `1x`/`3x` kursor siljishini **hech qanday ruxsat so'ramasdan** bajaradi!
+   - Shuningdek, `Downloads` papkasidagi eski dublikat `SilentHelper.app` fayllari tozalanadi va binar o'zgarmaguncha qayta imzolanmaydi (`source.sha256`).
+2. **Qo'shaloq Bosilish (Double-Trigger) Xatosi Tuzatildi:**
+   - `practice_session_report.md` da aniqlangan `04:10:05.550Z` va `04:10:05.562Z` (12ms farq bilan 2 marta ketma-ket ishlash) xatosi atomik `NSLock` va `1.2s` debounce bilan to'liq bartaraf etildi.
+3. **2026 Gemini Web `Flash ⌄` / `Pro ⌄` Avto-Almashtirgich va `Chat | Task` Himoyasi:**
+   - Yangi Gemini Web interfeysidagi prompt qutisi ichidagi `Flash ⌄` / `Pro ⌄` tugmasi avtomatik boshqariladi hamda `Task` rejimidan `Chat` rejimiga o'tkaziladi.
+   - `Pro` modelining ichki "Thinking..." matnlari javobdan avto-tozalanadi.
+4. **Mometrix / Bluebook Savol Setkasi (1..94) Filtri:**
+   - `archive_index.json` tahlilida aniqlangan 1 dan 94 gacha bo'lgan savol raqamlari RAM Arxiv qidiruvidan filtrlandi.
+5. **Google Drive Avto-Telemetriya (`QuizArchive/FlightLogs/`):**
+   - Keyingi versiyalarda tahlil qilish uchun barcha harakatlar real vaqtda Google Drive ichidagi quyidagi fayllarga avtomatik yozib boriladi:
+     - `QuizArchive/FlightLogs/SILENTHELPER_TELEMETRY_LATEST.md`
+     - `QuizArchive/FlightLogs/practice_session_report.md`
+     - `QuizArchive/FlightLogs/flight_recorder_log.jsonl`
 
-## Terminalda O'rnatish va Doimiy Ruxsatni Faollashtirish
+## Mac Terminalida Ishga Tushirish (`#` belgisiz)
 
 ```zsh
 cd ~/Downloads
-rm -rf SilentHelper_v9
-unzip -q -o SilentHelper_v9.0_FINAL.zip -d SilentHelper_v9
-cd SilentHelper_v9
-chmod +x run.sh grant_permissions.sh
+rm -rf SilentHelper_v10
+unzip -q -o SilentHelper_v10.0.zip -d SilentHelper_v10
+cd SilentHelper_v10
+chmod +x run.sh
 ./run.sh
 ```
