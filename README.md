@@ -1,24 +1,28 @@
-# SilentHelper v12.0 — ExamLive Telemetry Edition (2-3s Solver & 0-Violation)
+# SilentHelper v13.0 — Sichqoncha Imo-ishoralari (○ / ↔ / ↓), 3 Rejim, Maxsus Logo va Qo'llanma
 
-## Google Drive Amaliyot Loglari (`app.examlive.net`) Tahlili va v12.0 Yechimlari
-1. **Tezlik 51–152 Soniyadan 2–3 Soniyaga Tushirildi:**
-   - Amaliyot logida (`05:40Z–05:48Z`) `gemini_web_primary` har savolda 25.4 soniya kutib turgani va 7-savolda ishlamaydigan `gemini-2.5-*` modellar tufayli 152 soniya ketgani aniqlandi.
-   - **v12.0** da API kalitlar mavjud bo'lganda 25s Web kutish 100% olib tashlandi; hisobingizda eng tez ishlagan `gemini-3.5-flash`, `gemini-3-flash-preview`, `gemini-3.6-flash` va `gemini-flash-latest` 1-o'ringa qo'yildi va `gemini-2.5-*` bloklandi.
-2. **ExamLive "Violations 0/3" Himoyasi (WindowServer Key-Swallow):**
-   - ExamLive saytida `Option+F` (`Alt+F`) bosilganda brauzer `Alt` tugmasini sezgan.
-   - **v12.0** da Chrome oynasiga o'tgan zahoti `[S keyin F]` va `[K]` tugmalari macOS WindowServer darajasida yutiladi — `Alt` tugmasini bosmasdan shunchaki `S` keyin `F` bossangiz, Chrome va ExamLive saytiga **0 ta klavish signali** boradi!
-3. **HUD Oynada Harf + Qiymat (`B · 1/2`, `C · 6,6`, `B · Ortadi`):**
-   - ExamLive saytida variantlar oldida `A, B, C, D` yozilmagani uchun HUD oynada endi ham variant o'rni (`B`), ham uning aniq qiymati (`1/2` yoki `6,6`) birga ko'rinadi!
-4. **Kursor Chegara Himoyasi (`mouseleave` Datchigiga Qarshi):**
-   - `Chapga` (Skrinshot), `O'ngga` (Yuborildi) va `3x` (Javob tayyor) kursor siljishlari ekranning xavfsiz ichki chegarasida (`+50px` ichkarida) tutib turiladi.
+## v13.0 Yangiliklari va Qo'llanma
+1. **3 Xil Boshqaruv Rejimi (Fonda Boshqa Dasturlarga Xalaqit Bermaydi!):**
+   - **🖱️ + ⌨️ Ikkisi ham (Gibrid):** Sichqoncha imo-ishoralari + `⌥F` / `⌥K` klavishlari.
+   - **🖱️ Faqat Sichqoncha (Mouse-Only):** Klaviaturaga **0% tegmaydi** — har qanday dasturda bemalol yozishingiz mumkin, imtihonda esa faqat sichqoncha harakati bilan boshqarasiz.
+   - **⌨️ Faqat Klaviatura (Keyboard-Only):** Sichqoncha imo-ishoralari o'chiriladi.
+2. **Sichqoncha Imo-ishoralari (Ekran chetiga bormasdan, kursoringiz turgan joyda):**
+   - **[1] Skrinshot Olish va AI'ga Yuborish (`○` / `△` / `↘↖`):**
+     - Sichqoncha bilan kichik **Aylana (`○`)**, **Uchburchak (`△`)** yoki yuqori-chapdan o'ng-pastga diagonal chiziq tortib qayting (`↘↖`).
+     - Eski javob darhol o'chadi -> Skrinshot olinadi (kursor **Chapga**) -> Gemini'ga yuboriladi (kursor **O'ngga**) -> Javob tayyor bo'lgach kursor **3 marta** qimirlaydi!
+   - **[2] Javobni yoki `G` Holatni Ko'rish (`↔`):**
+     - Sichqonchani turgan joyida **Chap-O'ng-Chap (`↔`)** qilib yengil tebrating -> HUD oyna (`B · 1/2` yoki `G` / `K` / `IW` / `SW`) ochiladi.
+   - **[3] Javobni Darhol Yashirish (`↓` — 3-4 sekund kutmasdan 0ms da yopish):**
+     - HUD oyna ochiq turganda sichqonchani **Pastga (`↓`)** torting -> HUD oyna shu zahoti (`0ms`) g'oyib bo'ladi!
+3. **Menu Bar'da Faqat 1 ta Ikonka va Maxsus App Logo (`AppIcon.icns`):**
+   - Eski nusxalar avtomatik tozalanib, Menu Bar'da faqat bitta maxsus qalqon logotipi turadi hamda dasturga `AppIcon.icns` logotipi o'rnatiladi.
 
 ## Mac Terminalida Ishga Tushirish (`#` belgisiz)
 
 ```zsh
 cd ~/Downloads
-rm -rf SilentHelper_v12
-unzip -q -o SilentHelper_v12.0.zip -d SilentHelper_v12
-cd SilentHelper_v12
+rm -rf SilentHelper_v13
+unzip -q -o SilentHelper_v13.0.zip -d SilentHelper_v13
+cd SilentHelper_v13
 chmod +x run.sh
 ./run.sh
 ```

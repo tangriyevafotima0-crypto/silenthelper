@@ -2,15 +2,16 @@
 set -euo pipefail
 
 APP_NAME="SilentHelper"
-VERSION="12.0.0"
+VERSION="13.0.0"
 INSTALL_DIR="$HOME/Applications"
 APP_BUNDLE="${INSTALL_DIR}/${APP_NAME}.app"
 CONTENTS_DIR="${APP_BUNDLE}/Contents"
 MACOS_DIR="${CONTENTS_DIR}/MacOS"
+RESOURCES_DIR="${CONTENTS_DIR}/Resources"
 BRIDGE_BIN="/tmp/sh_terminal_bridge"
 
 echo "--------------------------------------------------------"
-echo "  ${APP_NAME} v${VERSION} — 2-3s Solver & 0-Violation Edition"
+echo "  ${APP_NAME} v${VERSION} — Mouse Gestures & Custom Logo"
 echo "--------------------------------------------------------"
 
 if ! command -v swiftc >/dev/null 2>&1; then
@@ -31,17 +32,19 @@ elif [ -d "$HOME/Google Drive/My Drive" ]; then
 fi
 
 mkdir -p "$DEFAULT_ARCHIVE/FlightLogs"
-mkdir -p "/tmp/sh_v12_ipc"
+mkdir -p "/tmp/sh_v13_ipc"
 
-pkill -f "sh_terminal_bridge" >/dev/null 2>&1 || true
-pkill -f "${APP_NAME}.app/Contents/MacOS/${APP_NAME}" >/dev/null 2>&1 || true
+# 1. Menu Bar'da 2-3 ta bo'lib qolmasligi uchun barcha eski jarayonlarni SIGKILL (-9) bilan tozalaymiz!
+killall -9 SilentHelper sh_terminal_bridge silenthelper_bin >/dev/null 2>&1 || true
+pkill -9 -f "sh_terminal_bridge" >/dev/null 2>&1 || true
+pkill -9 -f "${APP_NAME}.app/Contents/MacOS/${APP_NAME}" >/dev/null 2>&1 || true
 
 find "$HOME/Downloads" -name "${APP_NAME}.app" -type d -prune -exec rm -rf {} + 2>/dev/null || true
 if [ -d "/Applications/${APP_NAME}.app" ] && [ ! -L "/Applications/${APP_NAME}.app" ]; then
     rm -rf "/Applications/${APP_NAME}.app" 2>/dev/null || true
 fi
 
-mkdir -p "$MACOS_DIR"
+mkdir -p "$MACOS_DIR" "$RESOURCES_DIR"
 
 CERT_NAME="SilentHelper Dev"
 SIGN_IDENTITY="-"
@@ -82,7 +85,7 @@ if [ -f "${CONTENTS_DIR}/source.sha256" ]; then
 fi
 
 if [ ! -f "${MACOS_DIR}/${APP_NAME}" ] || [ "$CURRENT_HASH" != "$SAVED_HASH" ]; then
-    echo "[*] ${APP_NAME}.app (v${VERSION}) yig'ilmoqda..."
+    echo "[*] ${APP_NAME}.app (v${VERSION}) va Maxsus Logo (AppIcon.icns) yig'ilmoqda..."
 
     cat <<EOF > "${CONTENTS_DIR}/Info.plist"
 <?xml version="1.0" encoding="UTF-8"?>
@@ -99,6 +102,8 @@ if [ ! -f "${MACOS_DIR}/${APP_NAME}" ] || [ "$CURRENT_HASH" != "$SAVED_HASH" ]; 
     <string>${VERSION}</string>
     <key>CFBundlePackageType</key>
     <string>APPL</string>
+    <key>CFBundleIconFile</key>
+    <string>AppIcon</string>
     <key>NSHighResolutionCapable</key>
     <true/>
 </dict>
@@ -117,6 +122,16 @@ EOF
         -o "${MACOS_DIR}/${APP_NAME}"
 
     chmod +x "${MACOS_DIR}/${APP_NAME}"
+
+    # 2. Generate AppIcon.icns using built-in CoreGraphics generator + iconutil
+    ICONSET_TMP="/tmp/AppIcon.iconset"
+    rm -rf "$ICONSET_TMP"
+    "${MACOS_DIR}/${APP_NAME}" --generate-icon "$ICONSET_TMP" >/dev/null 2>&1 || true
+    if command -v iconutil >/dev/null 2>&1 && [ -d "$ICONSET_TMP" ]; then
+        iconutil -c icns "$ICONSET_TMP" -o "${RESOURCES_DIR}/AppIcon.icns" >/dev/null 2>&1 || true
+    fi
+    rm -rf "$ICONSET_TMP"
+
     xattr -cr "${APP_BUNDLE}" >/dev/null 2>&1 || true
 
     if [ "$SIGN_IDENTITY" != "-" ]; then
@@ -130,7 +145,7 @@ EOF
 
     echo "$CURRENT_HASH" > "${CONTENTS_DIR}/source.sha256"
 else
-    echo "[+] Mavjud imzolangan ${APP_NAME}.app topildi (ruxsat saqlanadi)."
+    echo "[+] Mavjud imzolangan ${APP_NAME}.app topildi (ruxsat va logo saqlanadi)."
 fi
 
 if [ -w "/Applications" ] && [ ! -e "/Applications/${APP_NAME}.app" ]; then
@@ -145,10 +160,14 @@ nohup "$BRIDGE_BIN" --bridge-daemon >/dev/null 2>&1 &
 BRIDGE_PID=$!
 sleep 0.25
 
-echo "[+] 0-Popup Terminal Ruxsat Ko'prigi (Bridge PID: ${BRIDGE_PID}) ishga tushdi!"
-echo "[+] ExamLive 0-Violation himoyasi: [S -> F] va [K] WindowServer'da yutiladi!"
-echo "[+] Tezlik: 2–3 soniya (gemini-3.5-flash & gemini-3-flash-preview parallel)!"
-echo "[+] HUD: Harf + Qiymat (masalan: 'B · 1/2' yoki 'C · 6,6')!"
+echo "[+] Menu Bar tozalandi (faqat 1 ta Maxsus Qalqon Logosi turadi)!"
+echo "[+] 0-Popup Terminal Ruxsat Ko'prigi (Bridge PID: ${BRIDGE_PID}) faol!"
+echo ""
+echo "v13.0 SICHQONCHA IMO-ISHORALARI (Ekran chetiga bormasdan!):"
+echo "  1) SKRINSHOT + AI YUBORISH -> Sichqonchada kichik Aylana (○) yoki Uchburchak (△) chizing"
+echo "     (Natija: Kursor Chapga -> O'ngga -> Javob chiqqach 3 marta qimirlaydi)"
+echo "  2) JAVOBNI / 'G' HOLATNI KO'RISH -> Sichqonchani turgan joyida Chap-O'ng-Chap (↔) tebrating"
+echo "  3) JAVOBNI DARHOL YASHIRISH (0ms) -> HUD ochiq turganda sichqonchani Pastga (↓) torting"
 echo "--------------------------------------------------------"
 
 exec "${MACOS_DIR}/${APP_NAME}"

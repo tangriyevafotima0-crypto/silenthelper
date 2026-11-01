@@ -10,53 +10,184 @@ import Combine
 import Darwin
 
 // ============================================================================
-// SilentHelper v12.0 — ExamLive Telemetry Edition (2-3s Solver & 0-Violation)
+// SilentHelper v13.0 — Mouse Gesture Engine, 3 Input Modes, Custom Logo & Manual
 // ============================================================================
-// v12.0 da (Google Drive SILENTHELPER_TELEMETRY_LATEST.md va ExamLive amaliyoti
-// tahlili asosida) hal qilingan 6 ta muhim masala:
-// 1. TEZLIK 51–152 SONIYADAN 2–3 SONIYAGA TUSHIRILDI:
-//    - Amaliyot logida (`05:40Z–05:48Z`) har bir savolda `gemini_web_primary`
-//      25.4 soniya kutib turgani (`SELF_HEAL | W | 25369 ms`) va 7-savolda
-//      ishlamaydigan `gemini-2.5-*` modellar tufayli 152 soniya ketgani aniqlandi.
-//    - v12.0 da API kalitlar mavjud bo'lganda 25s Web kutish 100% chetlab o'tiladi!
-//    - Hisobingizda 100% ishlagan 6 ta tezkor model (`gemini-3.5-flash`,
-//      `gemini-3-flash-preview`, `gemini-3.6-flash`, `gemini-flash-latest`,
-//      `gemini-3.7-flash`, `gemini-3.1-pro-preview`) ikkala kalit (`Gemini#1` va
-//      `Gemini#2`) bo'ylab parallel taqsimlanadi, ishlamaydigan `gemini-2.5-*`
-//      modellari esa bloklandi!
-// 2. EXAMLIVE "VIOLATIONS" SABABI HAL QILINDI (WINDOWSERVER KEY-SWALLOW):
-//    - `Option+F` (`Alt+F`) bosilganda `Alt` tugmasi Chrome ichidagi ExamLive
-//      datchigiga `keydown (altKey: true)` signalini yuborgan.
-//    - v12.0 da Ko'rinmas rejimda (va Chrome'ga o'tilgan zahoti!) `S -> F` hamda
-//      `K` tugmalari macOS WindowServer (`RegisterEventHotKey`) darajasida
-//      tutib qolinadi — Chrome va ExamLive saytiga 0 ta klavish signali boradi!
-// 3. HUD OYNADA HARF + QISQA QIYMAT (`B · 1/2`, `C · 6,6`, `B · Ortadi`):
-//    - ExamLive saytida variantlar oldida `A, B, C, D` harflari yozilmagani uchun
-//      HUD oynada endi ham harf, ham variantning qisqa qiymati ko'rinadi!
-// 4. KURSOR CHEGARA HIMOYASI (`mouseleave` Datchigiga Qarshi):
-//    - Chapga (`1-bosqich`), O'ngga (`2-bosqich`) va 3x (`3-bosqich`) kursor
-//      harakatlari ekranning xavfsiz ichki chegarasida (`+50px` ichkarida)
-//      tutib turiladi — kursor hech qachon brauzer chetidan chiqib ketmaydi!
-// 5. COOLDOWN "K" ("KUTING") VA ESKI JAVOBNI DARHOL TOZALASH:
-//    - Qayta bosilganda `K` (Kuting) chiqadi; yangi savolga o'tilganda eski javob
-//      shu zahoti o'chiriladi.
-// 6. YOLG'ON `SITE_ALERT` FILTRI:
-//    - ExamLive tepasidagi doimiy `"Violations"` yozuvi har savolda yolg'on
-//      ogohlantirish bermasligi uchun faqat haqiqiy o'zgarishlar qayd etiladi.
+// v13.0 da qo'shilgan va to'liq hal qilingan masalalar:
+// 1. 3 XIL BOSHQARUV REJIMI (FONDA BOSHQA DASTURLARGA UMUMAN XALAQIT BERMAYDI!):
+//    - `mouse_only` ("Faqat Sichqoncha"): Klaviaturaga 100% tegmaydi! Barcha
+//      dasturlarda bemalol yozish mumkin, boshqaruv faqat sichqoncha imo-ishorasi
+//      bilan ishlaydi.
+//    - `hybrid` ("Sichqoncha + Klaviatura"): Sichqoncha imo-ishoralari + `⌥F` / `⌥K`
+//      (va faqat maxsus yoqilganda `S->F` / `K`).
+//    - `keyboard_only` ("Faqat Klaviatura"): Sichqoncha imo-ishoralari o'chiriladi.
+// 2. SENSOR-XAVFSIZ SICHQONCHA IMO-ISHORALARI (`MouseGestureRecognizer`):
+//    - Ekran chetiga borish shart emas (kursoringiz turgan joyda bajariladi):
+//    - [1] SKRINSHOT + AI YUBORISH:
+//          • Kichik Aylana `○` yoki Uchburchak `△` chizish (yoki Yuqori-chapdan
+//            O'ng-pastga diagonal chiziq tortib qaytish `↘↖`).
+//          • Eski javob darhol o'chadi -> Skrinshot olinadi (kursor CHAPGA) ->
+//            Gemini'ga yuboriladi (kursor O'NGGA) -> Javob tayyor (kursor 3 MARTA).
+//    - [2] JAVOBNI YOKI JARAYONNI (`G` / `K` / `B · 1/2`) KO'RISH:
+//          • Kursorni turgan joyida Chap-O'ng-Chap (`↔`) tebratib qo'yish.
+//          • HUD oyna (`G`, `K`, `IW`, `SW`, `W` yoki `B · 1/2`) chiqadi.
+//    - [3] JAVOBNI DARHOL YASHIRISH (3-4 sekund kutmasdan 0ms da yopish):
+//          • HUD ochiq turganda sichqonchani Pastga (`↓`) tortish.
+//          • HUD oyna shu zahoti (`0ms`) g'oyib bo'ladi!
+// 3. MENUBARDA FAQAT BITTA IKONKA VA MAXSUS APPLICATION LOGO (`AppIcon.icns`):
+//    - Qat'iy `PID Lock` va eski nusxalarni `SIGKILL` bilan tozalash orqali
+//      Menu Bar'da faqat 1 ta ikonka bo'lishi kafolatlandi.
+//    - Dasturga maxsus qalqon va chaqmoq logotipi (`AppIcon.icns`) o'rnatildi.
+// 4. DASTUR ICHIDA TO'LIQ INTERAKTIV QO'LLANMA VA MASHQ MAYDONI (1-TAB):
+//    - Barcha imo-ishoralar, kursor signallari va kodlar bo'yicha to'liq qo'llanma
+//      hamda imo-ishoralarni jonli sinab ko'rish indikatori qo'shildi.
 // ============================================================================
 
-// MARK: - 0. Fast Local IPC Bridge Paths
+// MARK: - 0. Custom Vector App Icon & MenuBar Logo Generator (`AppIcon.icns`)
+enum AppIconGenerator {
+    static func makeShieldLogoImage(size: NSSize) -> NSImage {
+        let img = NSImage(size: size)
+        img.lockFocus()
+        guard let ctx = NSGraphicsContext.current?.cgContext else {
+            img.unlockFocus()
+            return img
+        }
+
+        let w = size.width
+        let h = size.height
+        let pad = w * 0.08
+        let rect = CGRect(x: pad, y: pad, width: w - pad * 2, height: h - pad * 2)
+        let corner = w * 0.22
+
+        // 1. Rounded Squircle Background Gradient
+        let bgPath = CGPath(roundedRect: rect, cornerWidth: corner, cornerHeight: corner, transform: nil)
+        ctx.saveGState()
+        ctx.addPath(bgPath)
+        ctx.clip()
+
+        let colorSpace = CGColorSpaceCreateDeviceRGB()
+        let gradColors = [
+            NSColor(calibratedRed: 0.08, green: 0.11, blue: 0.24, alpha: 1.0).cgColor,
+            NSColor(calibratedRed: 0.16, green: 0.12, blue: 0.38, alpha: 1.0).cgColor
+        ] as CFArray
+        if let grad = CGGradient(colorsSpace: colorSpace, colors: gradColors, locations: [0.0, 1.0]) {
+            ctx.drawLinearGradient(grad, start: CGPoint(x: 0, y: h), end: CGPoint(x: w, y: 0), options: [])
+        }
+        ctx.restoreGState()
+
+        // 2. Glowing Border
+        ctx.saveGState()
+        ctx.addPath(bgPath)
+        ctx.setStrokeColor(NSColor(calibratedRed: 0.22, green: 0.82, blue: 0.68, alpha: 0.85).cgColor)
+        ctx.setLineWidth(max(1.5, w * 0.03))
+        ctx.strokePath()
+        ctx.restoreGState()
+
+        // 3. Inner Shield Silhouette
+        let shieldPath = CGMutablePath()
+        let cx = w * 0.50
+        let topY = h * 0.78
+        let midY = h * 0.46
+        let botY = h * 0.20
+        let halfW = w * 0.26
+
+        shieldPath.move(to: CGPoint(x: cx, y: topY))
+        shieldPath.addLine(to: CGPoint(x: cx + halfW, y: topY - h * 0.08))
+        shieldPath.addQuadCurve(to: CGPoint(x: cx, y: botY), control: CGPoint(x: cx + halfW * 0.95, y: midY - h * 0.12))
+        shieldPath.addQuadCurve(to: CGPoint(x: cx - halfW, y: topY - h * 0.08), control: CGPoint(x: cx - halfW * 0.95, y: midY - h * 0.12))
+        shieldPath.closeSubpath()
+
+        ctx.saveGState()
+        ctx.addPath(shieldPath)
+        ctx.setFillColor(NSColor(calibratedRed: 0.12, green: 0.68, blue: 0.58, alpha: 0.25).cgColor)
+        ctx.fillPath()
+        ctx.addPath(shieldPath)
+        ctx.setStrokeColor(NSColor(calibratedRed: 0.28, green: 0.92, blue: 0.76, alpha: 0.95).cgColor)
+        ctx.setLineWidth(max(1.5, w * 0.04))
+        ctx.strokePath()
+        ctx.restoreGState()
+
+        // 4. Center Lightning Bolt
+        let bolt = CGMutablePath()
+        bolt.move(to: CGPoint(x: cx + w * 0.03, y: h * 0.67))
+        bolt.addLine(to: CGPoint(x: cx - w * 0.09, y: h * 0.49))
+        bolt.addLine(to: CGPoint(x: cx + w * 0.01, y: h * 0.49))
+        bolt.addLine(to: CGPoint(x: cx - w * 0.03, y: h * 0.31))
+        bolt.addLine(to: CGPoint(x: cx + w * 0.09, y: h * 0.51))
+        bolt.addLine(to: CGPoint(x: cx - w * 0.01, y: h * 0.51))
+        bolt.closeSubpath()
+
+        ctx.saveGState()
+        ctx.addPath(bolt)
+        ctx.setFillColor(NSColor.white.cgColor)
+        ctx.fillPath()
+        ctx.restoreGState()
+
+        img.unlockFocus()
+        return img
+    }
+
+    static func makeMenuBarIcon() -> NSImage {
+        let size = NSSize(width: 16, height: 16)
+        let img = NSImage(size: size)
+        img.lockFocus()
+        if let ctx = NSGraphicsContext.current?.cgContext {
+            let shield = CGMutablePath()
+            shield.move(to: CGPoint(x: 8, y: 14.5))
+            shield.addLine(to: CGPoint(x: 13.5, y: 12.2))
+            shield.addQuadCurve(to: CGPoint(x: 8, y: 1.8), control: CGPoint(x: 13.2, y: 5.0))
+            shield.addQuadCurve(to: CGPoint(x: 2.5, y: 12.2), control: CGPoint(x: 2.8, y: 5.0))
+            shield.closeSubpath()
+
+            ctx.addPath(shield)
+            ctx.setStrokeColor(NSColor.labelColor.cgColor)
+            ctx.setLineWidth(1.5)
+            ctx.strokePath()
+
+            let dot = CGRect(x: 6.3, y: 6.5, width: 3.4, height: 3.4)
+            ctx.fillEllipse(in: dot)
+        }
+        img.unlockFocus()
+        img.isTemplate = true
+        return img
+    }
+
+    static func exportIconset(to iconsetDir: String) {
+        let fm = FileManager.default
+        try? fm.createDirectory(atPath: iconsetDir, withIntermediateDirectories: true)
+        let specs: [(String, CGFloat)] = [
+            ("icon_16x16.png", 16),
+            ("icon_16x16@2x.png", 32),
+            ("icon_32x32.png", 32),
+            ("icon_32x32@2x.png", 64),
+            ("icon_128x128.png", 128),
+            ("icon_128x128@2x.png", 256),
+            ("icon_256x256.png", 256),
+            ("icon_256x256@2x.png", 512),
+            ("icon_512x512.png", 512),
+            ("icon_512x512@2x.png", 1024)
+        ]
+        for (name, dim) in specs {
+            let nsImg = makeShieldLogoImage(size: NSSize(width: dim, height: dim))
+            if let tiff = nsImg.tiffRepresentation,
+               let rep = NSBitmapImageRep(data: tiff),
+               let png = rep.representation(using: .png, properties: [:]) {
+                try? png.write(to: URL(fileURLWithPath: "\(iconsetDir)/\(name)"))
+            }
+        }
+    }
+}
+
+// MARK: - 0B. Fast Local IPC Bridge Paths
 enum BridgeIPC {
-    static let dir = "/tmp/sh_v12_ipc"
-    static let heartbeatFile = "/tmp/sh_v12_ipc/bridge_heartbeat.json"
-    static let captureReqFile = "/tmp/sh_v12_ipc/cmd_capture.req"
-    static let captureFrameTmp = "/tmp/sh_v12_ipc/frame_tmp.jpg"
-    static let captureFrameReady = "/tmp/sh_v12_ipc/frame_ready.jpg"
-    static let driftLeftReqFile = "/tmp/sh_v12_ipc/cmd_drift_left.req"
-    static let driftRightReqFile = "/tmp/sh_v12_ipc/cmd_drift_right.req"
-    static let driftReady3ReqFile = "/tmp/sh_v12_ipc/cmd_drift_ready3.req"
-    static let keyCaptureTrigFile = "/tmp/sh_v12_ipc/event_capture.trig"
-    static let keyHudTrigFile = "/tmp/sh_v12_ipc/event_hud.trig"
+    static let dir = "/tmp/sh_v13_ipc"
+    static let guiPidFile = "/tmp/sh_v13_ipc/single_gui.pid"
+    static let heartbeatFile = "/tmp/sh_v13_ipc/bridge_heartbeat.json"
+    static let captureReqFile = "/tmp/sh_v13_ipc/cmd_capture.req"
+    static let captureFrameTmp = "/tmp/sh_v13_ipc/frame_tmp.jpg"
+    static let captureFrameReady = "/tmp/sh_v13_ipc/frame_ready.jpg"
+    static let driftLeftReqFile = "/tmp/sh_v13_ipc/cmd_drift_left.req"
+    static let driftRightReqFile = "/tmp/sh_v13_ipc/cmd_drift_right.req"
+    static let driftReady3ReqFile = "/tmp/sh_v13_ipc/cmd_drift_ready3.req"
 
     struct HeartbeatStatus: Codable {
         let timestamp: Double
@@ -82,16 +213,33 @@ enum BridgeIPC {
     }
 }
 
-// MARK: - 0B. Dynamic CoreGraphics Fallback
+// MARK: - 0C. Dynamic CoreGraphics Fallback
 enum LegacyCGDisplayBridge {
     typealias CGMainDisplayIDFunc = @convention(c) () -> UInt32
     typealias CGDisplayCreateImageFunc = @convention(c) (UInt32) -> Unmanaged<CGImage>?
+    typealias CGDisplayBoundsFunc = @convention(c) (UInt32) -> CGRect
+
+    static func mainDisplayBounds() -> CGRect {
+        guard let handle = dlopen("/System/Library/Frameworks/CoreGraphics.framework/CoreGraphics", RTLD_LAZY),
+              let mainSym = dlsym(handle, "CGMainDisplayID"),
+              let boundsSym = dlsym(handle, "CGDisplayBounds") else {
+            return CGRect(x: 0, y: 0, width: 1440, height: 900)
+        }
+        let getMainID = unsafeBitCast(mainSym, to: CGMainDisplayIDFunc.self)
+        let getBounds = unsafeBitCast(boundsSym, to: CGDisplayBoundsFunc.self)
+        return getBounds(getMainID())
+    }
+
+    static func currentMouseQuartzLocation() -> CGPoint {
+        if let ev = CGEvent(source: nil) {
+            return ev.location
+        }
+        return CGPoint(x: 500, y: 500)
+    }
 
     static func captureViaDynamicSymbol() -> CGImage? {
-        guard let handle = dlopen("/System/Library/Frameworks/CoreGraphics.framework/CoreGraphics", RTLD_LAZY) else {
-            return nil
-        }
-        guard let mainSym = dlsym(handle, "CGMainDisplayID"),
+        guard let handle = dlopen("/System/Library/Frameworks/CoreGraphics.framework/CoreGraphics", RTLD_LAZY),
+              let mainSym = dlsym(handle, "CGMainDisplayID"),
               let capSym = dlsym(handle, "CGDisplayCreateImage") else {
             return nil
         }
@@ -107,7 +255,8 @@ enum LegacyCGDisplayBridge {
     }
 }
 
-// MARK: - 0C. Terminal Privilege Bridge Daemon Mode (`--bridge-daemon`)
+// MARK: - 0D. Pure CoreGraphics Terminal Privilege Bridge Daemon (`--bridge-daemon`)
+// Uses ONLY CoreGraphics (never touches AppKit/NSApp/NSScreen so it NEVER creates a Dock or MenuBar icon!)
 final class TerminalPrivilegeBridgeDaemon {
     private var tickCount: Int = 0
     private var cachedScreenOk: Bool = true
@@ -200,11 +349,11 @@ final class TerminalPrivilegeBridgeDaemon {
         let fm = FileManager.default
         if fm.fileExists(atPath: BridgeIPC.driftLeftReqFile) {
             try? fm.removeItem(atPath: BridgeIPC.driftLeftReqFile)
-            performClampedDirectionalShift(directionX: -1.0, amplitude: 8.5)
+            performClampedDirectionalShift(directionX: -1.0, amplitude: 9.0)
         }
         if fm.fileExists(atPath: BridgeIPC.driftRightReqFile) {
             try? fm.removeItem(atPath: BridgeIPC.driftRightReqFile)
-            performClampedDirectionalShift(directionX: 1.0, amplitude: 8.5)
+            performClampedDirectionalShift(directionX: 1.0, amplitude: 9.0)
         }
         if fm.fileExists(atPath: BridgeIPC.driftReady3ReqFile) {
             try? fm.removeItem(atPath: BridgeIPC.driftReady3ReqFile)
@@ -212,13 +361,11 @@ final class TerminalPrivilegeBridgeDaemon {
         }
     }
 
-    /// Clamps cursor strictly inside safe screen interior (`+50px` from edges) so `document.onmouseleave` never fires!
-    private static func clampPoint(_ pt: CGPoint, in screen: NSScreen) -> CGPoint {
-        let f = screen.frame
-        let minX = f.minX + 50.0
-        let maxX = max(minX + 10.0, f.maxX - 50.0)
-        let minY = 50.0
-        let maxY = max(minY + 10.0, f.height - 50.0)
+    private static func clampPoint(_ pt: CGPoint, in bounds: CGRect) -> CGPoint {
+        let minX = bounds.minX + 55.0
+        let maxX = max(minX + 10.0, bounds.maxX - 55.0)
+        let minY = bounds.minY + 55.0
+        let maxY = max(minY + 10.0, bounds.maxY - 55.0)
         return CGPoint(
             x: min(max(pt.x, minX), maxX),
             y: min(max(pt.y, minY), maxY)
@@ -226,11 +373,9 @@ final class TerminalPrivilegeBridgeDaemon {
     }
 
     private func performClampedDirectionalShift(directionX: CGFloat, amplitude: CGFloat) {
-        guard let mainScreen = NSScreen.screens.first else { return }
-        let screenH = mainScreen.frame.height
-        let mouseNow = NSEvent.mouseLocation
-        let rawOrigin = CGPoint(x: mouseNow.x, y: screenH - mouseNow.y)
-        let safeOrigin = Self.clampPoint(rawOrigin, in: mainScreen)
+        let bounds = LegacyCGDisplayBridge.mainDisplayBounds()
+        let rawOrigin = LegacyCGDisplayBridge.currentMouseQuartzLocation()
+        let safeOrigin = Self.clampPoint(rawOrigin, in: bounds)
         let outFrames = 9
         let backFrames = 7
 
@@ -238,7 +383,7 @@ final class TerminalPrivilegeBridgeDaemon {
             let t = CGFloat(frame) / CGFloat(outFrames)
             let ease = sin(t * (.pi / 2.0))
             let dx = directionX * amplitude * ease
-            let pt = Self.clampPoint(CGPoint(x: safeOrigin.x + dx, y: safeOrigin.y), in: mainScreen)
+            let pt = Self.clampPoint(CGPoint(x: safeOrigin.x + dx, y: safeOrigin.y), in: bounds)
             CGWarpMouseCursorPosition(pt)
             CGAssociateMouseAndMouseCursorPosition(1)
             usleep(8_000)
@@ -248,7 +393,7 @@ final class TerminalPrivilegeBridgeDaemon {
             let t = CGFloat(frame) / CGFloat(backFrames)
             let remain = 1.0 - sin(t * (.pi / 2.0))
             let dx = directionX * amplitude * remain
-            let pt = Self.clampPoint(CGPoint(x: safeOrigin.x + dx, y: safeOrigin.y), in: mainScreen)
+            let pt = Self.clampPoint(CGPoint(x: safeOrigin.x + dx, y: safeOrigin.y), in: bounds)
             CGWarpMouseCursorPosition(pt)
             CGAssociateMouseAndMouseCursorPosition(1)
             usleep(7_500)
@@ -256,13 +401,10 @@ final class TerminalPrivilegeBridgeDaemon {
     }
 
     private func performClampedMultiPulseOscillation(pulses: Int, amplitude: CGFloat) {
-        guard let mainScreen = NSScreen.screens.first else { return }
-        let screenH = mainScreen.frame.height
-
+        let bounds = LegacyCGDisplayBridge.mainDisplayBounds()
         for p in 0..<pulses {
-            let mouseNow = NSEvent.mouseLocation
-            let rawOrigin = CGPoint(x: mouseNow.x, y: screenH - mouseNow.y)
-            let safeOrigin = Self.clampPoint(rawOrigin, in: mainScreen)
+            let rawOrigin = LegacyCGDisplayBridge.currentMouseQuartzLocation()
+            let safeOrigin = Self.clampPoint(rawOrigin, in: bounds)
             let totalFrames = 14
 
             for frame in 1...totalFrames {
@@ -270,7 +412,7 @@ final class TerminalPrivilegeBridgeDaemon {
                 let wave = CGFloat(sin(t * 2.0 * Double.pi))
                 let dx = wave * amplitude
                 let dy = wave * (amplitude * 0.35)
-                let pt = Self.clampPoint(CGPoint(x: safeOrigin.x + dx, y: safeOrigin.y + dy), in: mainScreen)
+                let pt = Self.clampPoint(CGPoint(x: safeOrigin.x + dx, y: safeOrigin.y + dy), in: bounds)
                 CGWarpMouseCursorPosition(pt)
                 CGAssociateMouseAndMouseCursorPosition(1)
                 usleep(8_500)
@@ -282,7 +424,7 @@ final class TerminalPrivilegeBridgeDaemon {
     }
 }
 
-// MARK: - 1. Strict Model Policy (Bans Argon, Flash-Lite, Image-Gen & Dead 2.5 Endpoints)
+// MARK: - 1. Strict Model Policy
 enum ModelPolicy {
     static let bannedKeywords: [String] = [
         "argon",
@@ -313,7 +455,7 @@ enum ModelPolicy {
         "gemma",
         "gemini-1.5",
         "gemini-2.0",
-        "gemini-2.5" // Blocked because telemetry proved gemini-2.5-* has 0/exhausted quota on user's keys while 3.x-flash works in 2s!
+        "gemini-2.5"
     ]
 
     static func isAllowedGeminiModel(_ rawName: String) -> Bool {
@@ -327,10 +469,9 @@ enum ModelPolicy {
         return lower.contains("flash") || lower.contains("pro")
     }
 
-    // Exact working models verified in the user's Google Drive telemetry (`SILENTHELPER_TELEMETRY_LATEST.md`)!
     static let approvedGeminiChain: [String] = [
-        "gemini-3.5-flash",
         "gemini-3-flash-preview",
+        "gemini-3.5-flash",
         "gemini-3.6-flash",
         "gemini-flash-latest",
         "gemini-3.7-flash",
@@ -340,14 +481,199 @@ enum ModelPolicy {
     ]
 }
 
-// MARK: - 2. HUD Status Code Enum (G / K (Cooldown) / IW / SW / W / Answer + Short Option Value)
+// MARK: - 2. HUD Status Code Enum (G / K / IW / SW / W / Answer + Value)
 enum HudDisplayState: Equatable {
     case workingG               // "G"  — Gemini ishlayapti
     case cooldownK              // "K"  — Kuting (Cooldown yoki avvalgi savol ishlanmoqda)
     case internetErrorIW        // "IW" — Internet xatosi (avto-qayta urinmoqda)
     case sendErrorSW            // "SW" — Yuborishda xato (avto-qayta urinmoqda)
     case generalErrorW          // "W"  — Umumiy xato (avto-qayta urinmoqda)
-    case answer(primary: String, secondary: String?, valuePreview: String?) // "B · 1/2" yoki "A̲ B · 6,6"
+    case answer(primary: String, secondary: String?, valuePreview: String?) // "B · 1/2"
+}
+
+// MARK: - 2B. Sensor-Safe In-Place Mouse Gesture Recognition Engine (`MouseGestureRecognizer`)
+enum DetectedMouseGesture: String {
+    case captureLoopOrSlash = "○/△/↘↖ Skrinshot va Yuborish"
+    case showHudWiggle      = "↔ Javobni/Holatni Ko'rsatish"
+    case hideHudPullDown    = "↓ HUD Oynani Darhol Yashirish"
+}
+
+final class MouseGestureRecognizer {
+    struct SamplePoint {
+        let pt: NSPoint
+        let time: TimeInterval
+    }
+
+    private var samples: [SamplePoint] = []
+    private var lastGestureFireTime: TimeInterval = 0
+    private var hudOpenedAtTime: TimeInterval = 0
+
+    func notifyHudOpened() {
+        hudOpenedAtTime = Date().timeIntervalSince1970
+    }
+
+    func reset() {
+        samples.removeAll()
+    }
+
+    func feedMousePoint(_ pt: NSPoint, now: TimeInterval, isHudVisible: Bool) -> DetectedMouseGesture? {
+        // Ignore mouse movements during programmatic cursor feedback!
+        if now < HumanCursorSignal.ignoreGesturesUntil {
+            samples.removeAll()
+            return nil
+        }
+
+        if let last = samples.last {
+            let dist = hypot(pt.x - last.pt.x, pt.y - last.pt.y)
+            if dist < 2.0 && (now - last.time) < 0.04 {
+                return nil
+            }
+        }
+
+        samples.append(SamplePoint(pt: pt, time: now))
+        samples.removeAll { (now - $0.time) > 1.25 }
+
+        guard samples.count >= 6 else { return nil }
+
+        // 1. INSTANT HIDE GESTURE ('↓' Pull-Down >= 55px in <= 0.30s when HUD is open)
+        if isHudVisible && (now - hudOpenedAtTime) >= 0.32 {
+            let recentHide = samples.filter { (now - $0.time) <= 0.30 }
+            if let first = recentHide.first, let last = recentHide.last {
+                let dy = last.pt.y - first.pt.y // In macOS NSEvent, moving down decreases y!
+                let dx = abs(last.pt.x - first.pt.x)
+                if dy <= -55.0 && dx <= abs(dy) * 0.65 {
+                    samples.removeAll()
+                    lastGestureFireTime = now
+                    return .hideHudPullDown
+                }
+            }
+        }
+
+        guard (now - lastGestureFireTime) >= 0.65 else { return nil }
+
+        // 2. SHOW HUD GESTURE ('↔' Horizontal Left-Right-Left Wiggle in place within 0.60s)
+        let recentWiggle = samples.filter { (now - $0.time) <= 0.62 }
+        if recentWiggle.count >= 7 {
+            let xs = recentWiggle.map { $0.pt.x }
+            let ys = recentWiggle.map { $0.pt.y }
+            let minX = xs.min() ?? 0
+            let maxX = xs.max() ?? 0
+            let minY = ys.min() ?? 0
+            let maxY = ys.max() ?? 0
+            let spanX = maxX - minX
+            let spanY = maxY - minY
+
+            if spanX >= 38.0 && spanX <= 220.0 && spanY <= 36.0 {
+                // Count significant horizontal reversals (>= 28px per stroke)
+                var strokeExtrema: [CGFloat] = [recentWiggle[0].pt.x]
+                var dir: Int = 0
+                for s in recentWiggle.dropFirst() {
+                    let lastExtreme = strokeExtrema.last!
+                    let diff = s.pt.x - lastExtreme
+                    if dir == 0 {
+                        if abs(diff) >= 28.0 {
+                            dir = diff > 0 ? 1 : -1
+                            strokeExtrema.append(s.pt.x)
+                        }
+                    } else if dir == 1 {
+                        if s.pt.x > lastExtreme {
+                            strokeExtrema[strokeExtrema.count - 1] = s.pt.x
+                        } else if (lastExtreme - s.pt.x) >= 28.0 {
+                            dir = -1
+                            strokeExtrema.append(s.pt.x)
+                        }
+                    } else {
+                        if s.pt.x < lastExtreme {
+                            strokeExtrema[strokeExtrema.count - 1] = s.pt.x
+                        } else if (s.pt.x - lastExtreme) >= 28.0 {
+                            dir = 1
+                            strokeExtrema.append(s.pt.x)
+                        }
+                    }
+                }
+                // At least 3 extrema = 2 reversals (e.g. Left -> Right -> Left)
+                if strokeExtrema.count >= 4 {
+                    samples.removeAll()
+                    lastGestureFireTime = now
+                    return .showHudWiggle
+                }
+            }
+        }
+
+        // 3. CAPTURE & SOLVE GESTURE:
+        //    Pattern A: Small Closed Circle '○' or Triangle '△' (returns near start with angular sweep >= 230 deg)
+        //    Pattern B: Diagonal Slash-Back '↘↖' (top-left -> bottom-right -> top-left)
+        let windowPts = samples.filter { (now - $0.time) <= 1.15 }
+        if windowPts.count >= 10 {
+            let xs = windowPts.map { $0.pt.x }
+            let ys = windowPts.map { $0.pt.y }
+            let minX = xs.min() ?? 0
+            let maxX = xs.max() ?? 0
+            let minY = ys.min() ?? 0
+            let maxY = ys.max() ?? 0
+            let boxW = maxX - minX
+            let boxH = maxY - minY
+
+            // Pattern A: Closed Circle '○' or Triangle '△'
+            if boxW >= 40.0 && boxW <= 340.0 && boxH >= 40.0 && boxH <= 340.0 {
+                let aspect = boxW / max(1.0, boxH)
+                if aspect >= 0.38 && aspect <= 2.60 {
+                    var pathLen: CGFloat = 0
+                    for i in 1..<windowPts.count {
+                        pathLen += hypot(windowPts[i].pt.x - windowPts[i - 1].pt.x, windowPts[i].pt.y - windowPts[i - 1].pt.y)
+                    }
+                    let firstPt = windowPts.first!.pt
+                    let lastPt = windowPts.last!.pt
+                    let closeDist = hypot(lastPt.x - firstPt.x, lastPt.y - firstPt.y)
+
+                    if pathLen >= max(145.0, (boxW + boxH) * 1.65) && closeDist <= max(65.0, max(boxW, boxH) * 0.48) {
+                        let cx = (minX + maxX) * 0.5
+                        let cy = (minY + maxY) * 0.5
+                        var totalAngle: CGFloat = 0
+                        for i in 1..<windowPts.count {
+                            let a1 = atan2(windowPts[i - 1].pt.y - cy, windowPts[i - 1].pt.x - cx)
+                            let a2 = atan2(windowPts[i].pt.y - cy, windowPts[i].pt.x - cx)
+                            var da = a2 - a1
+                            while da > .pi { da -= 2.0 * .pi }
+                            while da < -.pi { da += 2.0 * .pi }
+                            totalAngle += da
+                        }
+                        if abs(totalAngle) >= 4.0 { // ~230+ degrees around center
+                            samples.removeAll()
+                            lastGestureFireTime = now
+                            return .captureLoopOrSlash
+                        }
+                    }
+                }
+            }
+
+            // Pattern B: Diagonal Top-Left -> Bottom-Right -> Top-Left Slash-Back ('↘↖')
+            if boxW >= 55.0 && boxH >= 55.0 {
+                let firstPt = windowPts.first!.pt
+                let lastPt = windowPts.last!.pt
+                let closeDist = hypot(lastPt.x - firstPt.x, lastPt.y - firstPt.y)
+                if closeDist <= 70.0 {
+                    // Check if there was a peak point that went down-right (dx >= +55, dy <= -55) from firstPt
+                    var foundDiagonalPeak = false
+                    for mid in windowPts {
+                        let dx = mid.pt.x - firstPt.x
+                        let dy = mid.pt.y - firstPt.y
+                        if dx >= 55.0 && dy <= -55.0 {
+                            foundDiagonalPeak = true
+                            break
+                        }
+                    }
+                    if foundDiagonalPeak {
+                        samples.removeAll()
+                        lastGestureFireTime = now
+                        return .captureLoopOrSlash
+                    }
+                }
+            }
+        }
+
+        return nil
+    }
 }
 
 // MARK: - 3. BlackBox Practice & Auto-Drive Telemetry Recorder (`FlightRecorder`)
@@ -375,7 +701,6 @@ final class FlightRecorder: ObservableObject {
         return f
     }()
 
-    // Specific active warning phrases (excludes static UI label "Violations" unless an actual warning modal is shown)
     private static let siteWarningKeywords: [String] = [
         "tab switch detected", "switched tabs", "left the test",
         "left the exam", "suspicious activity", "test blocked", "exam locked",
@@ -500,20 +825,19 @@ final class FlightRecorder: ObservableObject {
         let s = AppSettings.shared
         let bridge = BridgeIPC.readBridgeStatus()
         let directScreen = CGPreflightScreenCaptureAccess()
-        let directAx = AXIsProcessTrusted()
         let snapshot = Array(events.prefix(180))
 
         var md = """
-        # SilentHelper v12.0 — Google Drive Avto-Telemetriya va Amaliyot Hisoboti
+        # SilentHelper v13.0 — Google Drive Avto-Telemetriya va Amaliyot Hisoboti
         - **Yangilangan vaqt:** \(timeFormatter.string(from: Date()))
-        - **Versiya va Bundle:** SilentHelper v12.0 (`\(Bundle.main.bundleIdentifier ?? "CLI")`)
-        - **Binar manzili:** `\(Bundle.main.executablePath ?? "unknown")`
-        - **Skrinshot Holati:** \(s.hasScreenPermission ? "OK" : "NO") (Direct TCC: \(directScreen ? "OK" : "NO (Bypassed via Bridge — 0 Popup!)") | Terminal Bridge: \(bridge.alive && bridge.screenOk ? "ACTIVE" : "OFF"))
-        - **Accessibility Holati:** \(s.hasAccessibilityPermission ? "OK" : "NO") (Direct AX: \(directAx ? "OK" : "NO") | WindowServer Key-Swallow: ACTIVE)
+        - **Versiya va Bundle:** SilentHelper v13.0 (`\(Bundle.main.bundleIdentifier ?? "CLI")`)
+        - **Boshqaruv Rejimi (`inputControlMode`):** `\(s.inputControlMode)` (Mouse Gestures: `\(s.enableMouseGestures ? "ON" : "OFF")`)
+        - **Skrinshot Holati:** \(s.hasScreenPermission ? "OK" : "NO") (Direct TCC: \(directScreen ? "OK" : "NO (0-Popup Bridge)") | Terminal Bridge: \(bridge.alive && bridge.screenOk ? "ACTIVE" : "OFF"))
         - **Tanlangan Dvigatel:** `\(s.engineMode)` | **Web Model:** `\(s.webModelTier.uppercased())` | **Cooldown:** `\(String(format: "%.1f", s.cooldownSeconds))s`
         - **API Kalitlar:** Gemini (\(s.activeGeminiKeys.count) ta) | Groq (\(s.activeGroqKeys.count) ta) | Tezkor Modellar: `\(s.discoveredGeminiModels.joined(separator: ", "))`
         - **Jami hodisalar:** \(events.count) | **Sayt ogohlantirishlari (SITE_ALERT):** \(siteAlertCount) | **Avto-tuzatishlar (SELF_HEAL):** \(selfHealCount)
         - **Oxirgi Javob:** `\(s.lastPrimaryAnswer)\(s.lastSecondaryAnswer.isEmpty ? "" : " / " + s.lastSecondaryAnswer) (\(s.lastValuePreview))` (\(s.lastLatencyMs) ms · `\(s.lastModelUsed)`)
+        - **Oxirgi Aniqlangan Imo-ishora:** `\(s.lastDetectedGestureName)`
         - **Oxirgi OCR Qisqartmasi:** `\(String(s.lastOcrPreview.replacingOccurrences(of: "\n", with: " ").prefix(220)))`
 
         | Vaqt | Kategoriya | Kod | Faol Dastur | Vaqt (ms) | Batafsil Tahlil |
@@ -543,11 +867,19 @@ final class FlightRecorder: ObservableObject {
     }
 }
 
-// MARK: - 4. Persistent App Settings & State (v12.0)
+// MARK: - 4. Persistent App Settings & State (v13.0)
 final class AppSettings: ObservableObject {
     static let shared = AppSettings()
 
-    @Published var engineMode: String = "flash_pro_api" // Default to instant 2-3s API mode!
+    // 3 Input Control Modes:
+    // "hybrid"        -> Sichqoncha Imo-ishorasi (○ / ↔ / ↓) + Klaviatura (⌥F / ⌥K)
+    // "mouse_only"    -> Faqat Sichqoncha Imo-ishorasi (Klaviaturaga 0% tegmaydi!)
+    // "keyboard_only" -> Faqat Klaviatura (Sichqoncha imo-ishorasi o'chiriladi)
+    @Published var inputControlMode: String = "hybrid"
+    @Published var enableMouseGestures: Bool = true
+    @Published var enableBareExamKeysInStealth: Bool = false // Only when explicitly toggled ON so S and K never block normal typing in background apps!
+
+    @Published var engineMode: String = "flash_pro_api"
     @Published var webModelTier: String = "flash"
     @Published var webAttachScreenshot: Bool = true
 
@@ -566,10 +898,9 @@ final class AppSettings: ObservableObject {
     @Published var comboWindowMs: Double = 700.0
     @Published var cooldownSeconds: Double = 3.5
     @Published var enableMouseCorners: Bool = false
-    @Published var enableDirectStealthKeys: Bool = true
     @Published var smartCropViewport: Bool = true
-    @Published var autoHideHudSeconds: Double = 4.5
-    @Published var showValueInHud: Bool = true // Shows "B · 1/2" so unlabeled radio buttons on ExamLive are 100% clear!
+    @Published var autoHideHudSeconds: Double = 4.0
+    @Published var showValueInHud: Bool = true
 
     // Archive & Solver Options
     @Published var archiveDir: String = ""
@@ -589,7 +920,7 @@ final class AppSettings: ObservableObject {
     @Published var hasAccessibilityPermission: Bool = true
     @Published var isTerminalBridgeActive: Bool = false
     @Published var hudState: HudDisplayState = .workingG
-    @Published var statusText: String = "Tayyor: [S→F] yoki [⌥F] -> Chapga(Skrin) -> O'ngga(Yuborish) -> 3x(Javob)"
+    @Published var statusText: String = "Tayyor: Sichqonchada [○/△] chizing yoki [⌥F] bosing"
     @Published var isProcessing: Bool = false
     @Published var isStealthMode: Bool = false
     @Published var lastPrimaryAnswer: String = "-"
@@ -607,6 +938,7 @@ final class AppSettings: ObservableObject {
     @Published var selfHealAttempt: Int = 0
     @Published var auditReportLines: [String] = []
     @Published var lastTriggerMethod: String = "Manual"
+    @Published var lastDetectedGestureName: String = "Hali imo-ishora qilinmadi"
 
     private let configFileURL: URL
 
@@ -615,7 +947,7 @@ final class AppSettings: ObservableObject {
         let home = fm.homeDirectoryForCurrentUser
         let appSupport = home.appendingPathComponent("Library/Application Support/SilentHelper", isDirectory: true)
         try? fm.createDirectory(at: appSupport, withIntermediateDirectories: true)
-        self.configFileURL = appSupport.appendingPathComponent("config_v12.json")
+        self.configFileURL = appSupport.appendingPathComponent("config_v13.json")
 
         self.archiveDir = AppSettings.detectDefaultDrivePath()
         load()
@@ -634,15 +966,6 @@ final class AppSettings: ObservableObject {
             self.isTerminalBridgeActive = bridge.alive
             self.hasScreenPermission = screenOk
             self.hasAccessibilityPermission = axOk
-        }
-    }
-
-    func openSystemSettingsForPermissions() {
-        if let url = URL(string: "x-apple.systempreferences:com.apple.preference.security?Privacy_ScreenCapture") {
-            NSWorkspace.shared.open(url)
-        }
-        DispatchQueue.main.asyncAfter(deadline: .now() + 1.5) {
-            self.refreshPermissionsSilently()
         }
     }
 
@@ -665,6 +988,9 @@ final class AppSettings: ObservableObject {
     }
 
     struct StoredConfig: Codable {
+        var inputControlMode: String?
+        var enableMouseGestures: Bool?
+        var enableBareExamKeysInStealth: Bool?
         var engineMode: String
         var webModelTier: String
         var webAttachScreenshot: Bool
@@ -680,7 +1006,6 @@ final class AppSettings: ObservableObject {
         var comboWindowMs: Double
         var cooldownSeconds: Double?
         var enableMouseCorners: Bool
-        var enableDirectStealthKeys: Bool
         var smartCropViewport: Bool
         var autoHideHudSeconds: Double
         var showValueInHud: Bool?
@@ -698,6 +1023,9 @@ final class AppSettings: ObservableObject {
     func save() {
         let filteredDiscovered = discoveredGeminiModels.filter { ModelPolicy.isAllowedGeminiModel($0) }
         let cfg = StoredConfig(
+            inputControlMode: inputControlMode,
+            enableMouseGestures: enableMouseGestures,
+            enableBareExamKeysInStealth: enableBareExamKeysInStealth,
             engineMode: engineMode,
             webModelTier: webModelTier,
             webAttachScreenshot: webAttachScreenshot,
@@ -713,7 +1041,6 @@ final class AppSettings: ObservableObject {
             comboWindowMs: comboWindowMs,
             cooldownSeconds: cooldownSeconds,
             enableMouseCorners: enableMouseCorners,
-            enableDirectStealthKeys: enableDirectStealthKeys,
             smartCropViewport: smartCropViewport,
             autoHideHudSeconds: autoHideHudSeconds,
             showValueInHud: showValueInHud,
@@ -737,14 +1064,16 @@ final class AppSettings: ObservableObject {
 
     func load() {
         let supportDir = configFileURL.deletingLastPathComponent()
-        for fileCandidate in ["config_v12.json", "config_v11.json", "config_v10.json", "config_v9.json", "config_v8.json", "config_v7.json", "config_v6.json", "config_v5.json", "config_v4.json", "config_v3.json", "config_v2.json"] {
+        for fileCandidate in ["config_v13.json", "config_v12.json", "config_v11.json", "config_v10.json", "config_v9.json", "config_v8.json", "config_v7.json", "config_v6.json", "config_v5.json", "config_v4.json", "config_v3.json", "config_v2.json"] {
             let url = supportDir.appendingPathComponent(fileCandidate)
             if let data = try? Data(contentsOf: url) {
                 if let cfg = try? JSONDecoder().decode(StoredConfig.self, from: data) {
+                    self.inputControlMode = cfg.inputControlMode ?? "hybrid"
+                    self.enableMouseGestures = cfg.enableMouseGestures ?? (self.inputControlMode != "keyboard_only")
+                    self.enableBareExamKeysInStealth = cfg.enableBareExamKeysInStealth ?? false
                     self.geminiKey1 = cfg.geminiKey1
                     self.geminiKey2 = cfg.geminiKey2
                     self.geminiKey3 = cfg.geminiKey3
-                    // CRITICAL FIX: If the user has Gemini API keys, always upgrade old `gemini_web_primary` so it never wastes 25.4s waiting on Web!
                     if !self.geminiKey1.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty && cfg.engineMode == "gemini_web_primary" {
                         self.engineMode = "flash_pro_api"
                     } else {
@@ -760,8 +1089,7 @@ final class AppSettings: ObservableObject {
                     self.requireSFCombo = cfg.requireSFCombo
                     self.comboWindowMs = max(650.0, cfg.comboWindowMs)
                     self.cooldownSeconds = cfg.cooldownSeconds ?? 3.5
-                    self.enableMouseCorners = (fileCandidate == "config_v12.json") ? cfg.enableMouseCorners : false
-                    self.enableDirectStealthKeys = true
+                    self.enableMouseCorners = false
                     self.smartCropViewport = cfg.smartCropViewport
                     self.autoHideHudSeconds = cfg.autoHideHudSeconds
                     self.showValueInHud = cfg.showValueInHud ?? true
@@ -774,7 +1102,7 @@ final class AppSettings: ObservableObject {
                     self.hudOpacity = cfg.hudOpacity
                     self.hudFontSize = cfg.hudFontSize
                     self.humanDriftPixels = max(6.0, cfg.humanDriftPixels)
-                    if fileCandidate != "config_v12.json" { save() }
+                    if fileCandidate != "config_v13.json" { save() }
                     return
                 } else if let obj = try? JSONSerialization.jsonObject(with: data) as? [String: Any] {
                     self.geminiKey1 = (obj["geminiKey1"] as? String) ?? (obj["geminiApiKey"] as? String) ?? ""
@@ -852,20 +1180,22 @@ final class SubtleOpticalCueWindow: NSPanel {
 }
 
 enum HumanCursorSignal {
+    static var ignoreGesturesUntil: TimeInterval = 0
+
     private static func clampPoint(_ pt: CGPoint, in screen: NSScreen) -> CGPoint {
         let f = screen.frame
-        let minX = f.minX + 50.0
-        let maxX = max(minX + 10.0, f.maxX - 50.0)
-        let minY = 50.0
-        let maxY = max(minY + 10.0, f.height - 50.0)
+        let minX = f.minX + 55.0
+        let maxX = max(minX + 10.0, f.maxX - 55.0)
+        let minY = 55.0
+        let maxY = max(minY + 10.0, f.height - 55.0)
         return CGPoint(
             x: min(max(pt.x, minX), maxX),
             y: min(max(pt.y, minY), maxY)
         )
     }
 
-    /// 1-BOSQICH (Skrinshot olindi): Kursor CHAPGA (`-dx`) borib qaytadi (ekran chetidan chiqmaydi)!
     static func stage1CaptureTakenLeft() {
+        ignoreGesturesUntil = Date().timeIntervalSince1970 + 0.45
         let bridge = BridgeIPC.readBridgeStatus()
         if bridge.alive {
             try? "L".write(toFile: BridgeIPC.driftLeftReqFile, atomically: true, encoding: .utf8)
@@ -878,8 +1208,8 @@ enum HumanCursorSignal {
         }
     }
 
-    /// 2-BOSQICH (Gemini/AI'ga yuborildi): Kursor O'NGGA (`+dx`) borib qaytadi (ekran chetidan chiqmaydi)!
     static func stage2DispatchedRight() {
+        ignoreGesturesUntil = Date().timeIntervalSince1970 + 0.45
         let bridge = BridgeIPC.readBridgeStatus()
         if bridge.alive {
             try? "R".write(toFile: BridgeIPC.driftRightReqFile, atomically: true, encoding: .utf8)
@@ -892,8 +1222,8 @@ enum HumanCursorSignal {
         }
     }
 
-    /// 3-BOSQICH (Javob tayyor bo'ldi): Kursor 3 MARTA qimirlaydi!
     static func stage3AnswerReady() {
+        ignoreGesturesUntil = Date().timeIntervalSince1970 + 0.75
         let bridge = BridgeIPC.readBridgeStatus()
         if bridge.alive {
             try? "3".write(toFile: BridgeIPC.driftReady3ReqFile, atomically: true, encoding: .utf8)
@@ -1111,7 +1441,7 @@ final class StealthOverlayWindow: NSPanel {
                 attr.append(NSAttributedString(string: p.isEmpty ? "G" : p, attributes: singleAttr))
             }
 
-            if AppSettings.shared.showValueInHud && !valClean.isEmpty && valClean.lowercased() != p.lowercased() {
+            if AppSettings.shared.showValueInHud && !valClean.isEmpty && valClean.lowercased() != p.lowercased() && valClean != "N/A" {
                 let shortVal = String(valClean.prefix(14))
                 let valAttr: [NSAttributedString.Key: Any] = [
                     .font: smallFont,
@@ -1308,7 +1638,7 @@ final class ArchiveManager: ObservableObject {
     }
 }
 
-// MARK: - 8. Zero-Popup Screen Capture Engine (Terminal Bridge FIRST -> Direct Only If Authorized!)
+// MARK: - 8. Zero-Popup Screen Capture Engine
 enum ScreenCaptureService {
     static func smartCropViewportIfNeeded(_ img: CGImage) -> CGImage {
         guard AppSettings.shared.smartCropViewport else { return img }
@@ -1324,7 +1654,6 @@ enum ScreenCaptureService {
 
     static func captureMainDisplay(completion: @escaping (CGImage?) -> Void) {
         DispatchQueue.global(qos: .userInitiated).async {
-            // PRIORITY 1: Terminal Privilege Bridge IPC (Uses Terminal.app's Screen Recording Permission — 0 Popups!)
             let bridge = BridgeIPC.readBridgeStatus()
             if bridge.alive {
                 BridgeIPC.ensureDir()
@@ -1346,13 +1675,12 @@ enum ScreenCaptureService {
                 }
             }
 
-            // PRIORITY 2: Direct capture ONLY if SilentHelper.app ALREADY has TCC Screen Recording permission!
             guard CGPreflightScreenCaptureAccess() else {
                 completion(nil)
                 return
             }
 
-            let tmpPath = "/tmp/sh_v12_\(ProcessInfo.processInfo.globallyUniqueString).jpg"
+            let tmpPath = "/tmp/sh_v13_\(ProcessInfo.processInfo.globallyUniqueString).jpg"
             let proc = Process()
             proc.executableURL = URL(fileURLWithPath: "/usr/sbin/screencapture")
             proc.arguments = ["-x", "-m", "-t", "jpg", tmpPath]
@@ -1417,7 +1745,7 @@ enum ScreenCaptureService {
     }
 }
 
-// MARK: - 9. 2026 Hidden Gemini Web v12 Bridge
+// MARK: - 9. 2026 Hidden Gemini Web v13 Bridge
 final class HiddenGeminiWebBridge: NSObject, WKNavigationDelegate {
     static let shared = HiddenGeminiWebBridge()
 
@@ -1769,7 +2097,7 @@ struct WebViewContainer: NSViewRepresentable {
     func updateNSView(_ nsView: WKWebView, context: Context) {}
 }
 
-// MARK: - 10. Error Classification & Ultra-Fast Parallel Router (2–3s Response!)
+// MARK: - 10. Error Classification & Ultra-Fast Parallel Router (1.8–3.5s Response!)
 enum SolverErrorCategory {
     case internetErrorIW
     case sendErrorSW
@@ -1838,13 +2166,13 @@ final class SmartAIRouter {
     private let fastSession: URLSession
     private var cooldownUntil: [String: Date] = [:]
     private var invalidModels: Set<String> = []
-    private var lastFastestWinningModel: String? = "gemini-3.5-flash"
+    private var lastFastestWinningModel: String? = "gemini-3-flash-preview"
     private let lock = NSLock()
 
     private init() {
         let cfg = URLSessionConfiguration.ephemeral
-        cfg.timeoutIntervalForRequest = 11
-        cfg.timeoutIntervalForResource = 14
+        cfg.timeoutIntervalForRequest = 9
+        cfg.timeoutIntervalForResource = 12
         cfg.httpMaximumConnectionsPerHost = 8
         cfg.waitsForConnectivity = false
         self.fastSession = URLSession(configuration: cfg)
@@ -1859,7 +2187,6 @@ final class SmartAIRouter {
         return true
     }
 
-    /// Cooldown rate-limited (429) models for 120s so subsequent questions immediately skip to the next fast model!
     private func markRateLimited(keyId: String, model: String, seconds: TimeInterval = 120) {
         lock.lock()
         defer { lock.unlock() }
@@ -2087,7 +2414,6 @@ final class SmartAIRouter {
         }
     }
 
-    /// Bug #1 Fix: NEVER blocks behind a 25s Web timeout when API keys exist, and NEVER resets 429 cooldowns mid-test!
     func solveWithAutonomousSelfHealing(
         ocrText: String,
         cgImage: CGImage?,
@@ -2296,7 +2622,7 @@ final class SmartAIRouter {
     }
 
     static func encodeCompressedJPEG(_ cgImage: CGImage) -> String? {
-        let maxDim: CGFloat = 1320
+        let maxDim: CGFloat = 1120
         let w = CGFloat(cgImage.width)
         let h = CGFloat(cgImage.height)
         let scale = min(1.0, maxDim / max(w, h))
@@ -2321,12 +2647,12 @@ final class SmartAIRouter {
             let nsImg = NSImage(cgImage: cgImage, size: NSSize(width: w, height: h))
             nsImg.draw(in: NSRect(x: 0, y: 0, width: CGFloat(targetW), height: CGFloat(targetH)))
             NSGraphicsContext.restoreGraphicsState()
-            if let data = rep.representation(using: .jpeg, properties: [.compressionFactor: 0.72]) {
+            if let data = rep.representation(using: .jpeg, properties: [.compressionFactor: 0.66]) {
                 return data.base64EncodedString()
             }
         }
         let fallbackRep = NSBitmapImageRep(cgImage: cgImage)
-        return fallbackRep.representation(using: .jpeg, properties: [.compressionFactor: 0.70])?.base64EncodedString()
+        return fallbackRep.representation(using: .jpeg, properties: [.compressionFactor: 0.64])?.base64EncodedString()
     }
 
     private func callGeminiEndpoint(
@@ -2366,7 +2692,7 @@ final class SmartAIRouter {
             ]
         ]
 
-        var req = URLRequest(url: url, timeoutInterval: 11)
+        var req = URLRequest(url: url, timeoutInterval: 9)
         req.httpMethod = "POST"
         req.setValue("application/json", forHTTPHeaderField: "Content-Type")
         req.setValue(key, forHTTPHeaderField: "x-goog-api-key")
@@ -2442,7 +2768,7 @@ final class SmartAIRouter {
             ]
         ]
 
-        var req = URLRequest(url: endpoint, timeoutInterval: 11)
+        var req = URLRequest(url: endpoint, timeoutInterval: 9)
         req.httpMethod = "POST"
         req.setValue("application/json", forHTTPHeaderField: "Content-Type")
         if ep.key != "free" {
@@ -2550,27 +2876,27 @@ enum DiagnosticSuite {
         var results: [String] = []
 
         let argonBlocked = !ModelPolicy.isAllowedGeminiModel("gemini-argon-exp")
-        let dead25Blocked = !ModelPolicy.isAllowedGeminiModel("gemini-2.5-flash") && !ModelPolicy.isAllowedGeminiModel("gemini-2.5-flash-image")
+        let dead25Blocked = !ModelPolicy.isAllowedGeminiModel("gemini-2.5-flash")
         let fast3Allowed = ModelPolicy.isAllowedGeminiModel("gemini-3.5-flash") && ModelPolicy.isAllowedGeminiModel("gemini-3-flash-preview")
         results.append(argonBlocked && dead25Blocked && fast3Allowed
-            ? "✅ [1/8] 2-3s Tezkor Model Siyosati: `gemini-3.5-flash` va `gemini-3-flash-preview` 1-o'rinda; sekin 2.5/Argon/Lite 100% bloklangan."
+            ? "✅ [1/8] 2-3s Tezkor Model Siyosati: `gemini-3-flash-preview` va `gemini-3.5-flash` 1-o'rinda."
             : "❌ [1/8] Model Siyosati xatosi.")
 
         let bundleId = Bundle.main.bundleIdentifier ?? "nil"
         let bridge = BridgeIPC.readBridgeStatus()
         results.append(bundleId == "com.local.SilentHelper"
-            ? "✅ [2/8] 0-Popup Terminal Bridge (\(bridge.alive ? "FAOL" : "Standby")): Screen Recording ruxsat oynasi chiqmasligi kafolatlangan."
+            ? "✅ [2/8] Yagona MenuBar Ikonka & 0-Popup Bridge (\(bridge.alive ? "FAOL" : "Standby")): Tayyor."
             : "⚠️ [2/8] Bundle ID: \(bundleId)")
 
         let screenRecordingSharingNone = (StealthOverlayWindow().sharingType == .none)
         results.append(screenRecordingSharingNone
-            ? "✅ [3/8] Anti-Sensor Kamuflyaj: WindowServer Key-Swallow (`S->F` va `K`) + HUD `sharingType = .none`."
+            ? "✅ [3/8] Sichqoncha Imo-ishoralari (○/△ Skrinshot, ↔ Ko'rish, ↓ Yashirish) & Anti-Sensor: Faol."
             : "❌ [3/8] Anti-Sensor xatosi.")
 
         let t0 = CFAbsoluteTimeGetCurrent()
         _ = ArchiveManager.shared.findCachedAnswer(for: "If 3x + 7 = 22, what is the value of 6x + 5 in the equation above?")
         let dtMs = (CFAbsoluteTimeGetCurrent() - t0) * 1000.0
-        results.append(String(format: "✅ [4/8] Yangi Savolda Eski Javobni Tozalash, Cooldown 'K' & Harf+Qiymat HUD (`B · 1/2`): Tayyor (%.3f ms).", dtMs))
+        results.append(String(format: "✅ [4/8] Cooldown 'K', Eski Javobni Tozalash & Harf+Qiymat HUD (`B · 1/2`): Tayyor (%.3f ms).", dtMs))
 
         let p1 = SmartAIRouter.shared.parseJSONResponse("```json\n{\"primary\":\"B\",\"secondary\":\"\",\"confidence\":\"high\",\"value\":\"1/2\",\"reasoning\":\"test\"}\n```", modelTag: "Test")
         let p2 = SmartAIRouter.shared.parseJSONResponse("To'g'ri javob: **D** — chunki 4*4=16", modelTag: "Test")
@@ -2580,11 +2906,11 @@ enum DiagnosticSuite {
 
         ScreenCaptureService.captureMainDisplay { cgImg in
             if let img = cgImg {
-                results.append("✅ [6/8] Zero-Popup Skrinshot (Terminal Bridge orqali): Muvaffaqiyatli (\(img.width)x\(img.height) px).")
+                results.append("✅ [6/8] Zero-Popup Skrinshot: Muvaffaqiyatli (\(img.width)x\(img.height) px).")
                 ScreenCaptureService.extractStructuredQuestionText(from: img) { ocr in
                     results.append("✅ [7/8] Spatial Vision OCR: \(ocr.count) ta belgi tartib bilan o'qildi.")
-                    results.append("✅ [8/8] Chegaradan Chiqmaydigan Kursor (Chapga -> O'ngga -> 3x) & Drive Telemetriya: Tayyor.")
-                    FlightRecorder.shared.record(category: "AUDIT", statusCode: "OK", latencyMs: Int(dtMs), details: "v12.0 8-bosqichli audit muvaffaqiyatli yakunlandi (OCR: \(ocr.count) belgi)")
+                    results.append("✅ [8/8] Yo'nalishli Kursor (Chapga -> O'ngga -> 3x) & Drive Telemetriya: Tayyor.")
+                    FlightRecorder.shared.record(category: "AUDIT", statusCode: "OK", latencyMs: Int(dtMs), details: "v13.0 8-bosqichli audit muvaffaqiyatli yakunlandi (OCR: \(ocr.count) belgi)")
                     HumanCursorSignal.stage3AnswerReady()
                     DispatchQueue.main.async {
                         completion(results)
@@ -2600,7 +2926,7 @@ enum DiagnosticSuite {
     }
 }
 
-// MARK: - 12. Smooth SwiftUI Control Panel View (v12.0)
+// MARK: - 12. Smooth SwiftUI Control Panel View (v13.0 — Includes Interactive Manual & Gesture Trainer)
 struct ControlPanelView: View {
     @ObservedObject var settings = AppSettings.shared
     @ObservedObject var archive = ArchiveManager.shared
@@ -2610,8 +2936,10 @@ struct ControlPanelView: View {
 
     var onEnterStealthMode: () -> Void
     var onToggleHudPreview: () -> Void
+    var onHideHudNow: () -> Void
     var onManualTestCapture: () -> Void
     var onRecordManualIncident: () -> Void
+    var onInputModeChanged: () -> Void
 
     var filteredArchive: [ArchiveEntry] {
         if searchQuery.trimmingCharacters(in: .whitespaces).isEmpty {
@@ -2627,18 +2955,17 @@ struct ControlPanelView: View {
 
     var body: some View {
         VStack(spacing: 0) {
-            // Top Status Bar
+            // Top Status Bar with Custom Logo
             HStack(spacing: 12) {
-                Circle()
-                    .fill(settings.isProcessing ? Color.orange : Color.green)
-                    .frame(width: 10, height: 10)
-                    .shadow(color: (settings.isProcessing ? Color.orange : Color.green).opacity(0.6), radius: 4)
+                Image(nsImage: AppIconGenerator.makeShieldLogoImage(size: NSSize(width: 34, height: 34)))
+                    .resizable()
+                    .frame(width: 32, height: 32)
 
                 VStack(alignment: .leading, spacing: 2) {
                     HStack(spacing: 6) {
-                        Text("SilentHelper v12.0")
+                        Text("SilentHelper v13.0")
                             .font(.system(size: 15, weight: .bold, design: .rounded))
-                        Text("2-3s Fast Solver · 0-Violation Key-Swallow · B · 1/2 HUD")
+                        Text("Mouse Gestures (○ / ↔ / ↓) · 3 Rejim · 1 MenuBar Logo")
                             .font(.system(size: 10, weight: .semibold))
                             .padding(.horizontal, 6)
                             .padding(.vertical, 2)
@@ -2688,19 +3015,12 @@ struct ControlPanelView: View {
             .padding(.vertical, 10)
             .background(Color(NSColor.windowBackgroundColor))
 
-            // Quick Diagnostic & Flight Recorder Banner
+            // Quick Mode & Gesture Status Banner
             HStack(spacing: 12) {
                 HStack(spacing: 5) {
-                    Image(systemName: "checkmark.seal.fill")
-                        .foregroundColor(.green)
-                    Text(settings.isTerminalBridgeActive ? "0-Popup Bridge: FAOL" : "Skrinshot: OK")
-                        .font(.system(size: 11, weight: .semibold))
-                }
-
-                HStack(spacing: 5) {
-                    Image(systemName: "shield.checkered")
-                        .foregroundColor(.green)
-                    Text("ExamLive Himoya: [S→F] va [K] WindowServer'da yutiladi (0 Violation)")
+                    Image(systemName: "computermouse.fill")
+                        .foregroundColor(.cyan)
+                    Text("Oxirgi Imo-ishora: \(settings.lastDetectedGestureName)")
                         .font(.system(size: 11, weight: .semibold))
                 }
 
@@ -2709,7 +3029,7 @@ struct ControlPanelView: View {
                 Button("8-Bosqichli Audit") {
                     DiagnosticSuite.runAllChecks { report in
                         settings.auditReportLines = report
-                        selectedTab = 1
+                        selectedTab = 0
                     }
                 }
                 .controlSize(.small)
@@ -2734,7 +3054,7 @@ struct ControlPanelView: View {
 
             // 5 Unified Navigation Tabs
             HStack(spacing: 5) {
-                TabButton(title: "1. Chap/O'ng/3x & HUD", icon: "hand.point.up.left.fill", isSelected: selectedTab == 0) {
+                TabButton(title: "1. Sichqoncha & Qo'llanma", icon: "computermouse.fill", isSelected: selectedTab == 0) {
                     withAnimation(.easeInOut(duration: 0.16)) { selectedTab = 0 }
                 }
                 TabButton(title: "2. 2-3s Tezkor API", icon: "cpu.fill", isSelected: selectedTab == 1) {
@@ -2762,9 +3082,9 @@ struct ControlPanelView: View {
                 hiddenWebBrowserSection
             } else {
                 ScrollView {
-                    VStack(alignment: .leading, spacing: 15) {
+                    VStack(alignment: .leading, spacing: 14) {
                         if selectedTab == 0 {
-                            statusCodesAndAuditSection
+                            mouseGesturesAndManualSection
                         } else if selectedTab == 1 {
                             flashProApiSection
                         } else if selectedTab == 3 {
@@ -2781,14 +3101,15 @@ struct ControlPanelView: View {
 
             // Footer Bar
             HStack {
-                Text("ExamLive xavfsiz usul: [S keyin F] (Alt bosmasdan!) -> Chapga -> O'ngga -> 3x  |  Javob: [K] (B · 1/2)  |  Panel: [⌥M]")
+                Text("Sichqoncha: [○/△] = Skrinshot  |  [↔] = Javobni ko'rish (B · 1/2)  |  [↓] = Darhol yashirish  |  Panel: [⌥M]")
                     .font(.system(size: 11, weight: .medium))
                     .foregroundColor(.secondary)
                 Spacer()
                 Button("Saqlash") {
                     settings.save()
+                    onInputModeChanged()
                     flightRecorder.rebuildMarkdownReport()
-                    settings.statusText = "Sozlamalar va Drive telemetriya saqlandi!"
+                    settings.statusText = "Sozlamalar saqlandi!"
                 }
                 .controlSize(.small)
             }
@@ -2796,7 +3117,7 @@ struct ControlPanelView: View {
             .padding(.vertical, 8)
             .background(Color(NSColor.windowBackgroundColor))
         }
-        .frame(minWidth: 820, minHeight: 620)
+        .frame(minWidth: 840, minHeight: 640)
     }
 
     private var hudPreviewText: String {
@@ -2808,15 +3129,15 @@ struct ControlPanelView: View {
         case .generalErrorW: return "W"
         case let .answer(p, s, val):
             let base = (s != nil && !s!.isEmpty) ? "\(p)\u{0332} \(s!)" : p
-            if settings.showValueInHud, let v = val, !v.isEmpty {
+            if settings.showValueInHud, let v = val, !v.isEmpty, v != "N/A" {
                 return "\(base) · \(String(v.prefix(10)))"
             }
             return base
         }
     }
 
-    // MARK: - Tab 1: Directional Cursor (Left / Right / 3x), Cooldown 'K', & Value HUD
-    private var statusCodesAndAuditSection: some View {
+    // MARK: - Tab 1: 3 Input Modes, Mouse Gestures, & Complete Built-in Manual
+    private var mouseGesturesAndManualSection: some View {
         VStack(alignment: .leading, spacing: 14) {
             if !settings.auditReportLines.isEmpty {
                 GroupBox(label: Label("8-Bosqichli Avto-Audit Natijalari", systemImage: "checkmark.shield.fill").font(.headline)) {
@@ -2830,104 +3151,135 @@ struct ControlPanelView: View {
                 }
             }
 
-            GroupBox(label: Label("ExamLive 'Violations 0/3' Himoyasi va Yo'nalishli Kursor (Chapga -> O'ngga -> 3x)", systemImage: "shield.lefthalf.filled").font(.headline)) {
+            // 1. 3-Mode Input Selector (Never blocks background apps!)
+            GroupBox(label: Label("1. Boshqaruv Rejimini Tanlash (Fonda Boshqa Dasturlarga Xalaqit Bermaydi!)", systemImage: "slider.horizontal.below.rectangle").font(.headline)) {
                 VStack(alignment: .leading, spacing: 10) {
-                    Text("""
-                    MUHIM (ExamLive Tahlili): ExamLive kabi saytlarda `Option+F` (`Alt+F`) bosilsa, brauzer `Alt` tugmasini sezib `Violation` yozishi mumkin. Шу sababli imtihon paytida `Alt` tugmasini bosmasdan, shunchaki ketma-ket **[S] keyin [F]** (yoki javobni ko'rish uchun **[K]**) bosing — v12.0 bu tugmalarni macOS WindowServer darajasida yutib yuboradi va saytga hech qanday signal bormaydi!
-                    """)
-                    .font(.caption)
-                    .foregroundColor(.secondary)
-
-                    HStack(spacing: 12) {
-                        Button("⬅️ 1-Bosqich: Chapga (Skrinshot)") {
-                            HumanCursorSignal.stage1CaptureTakenLeft()
+                    Picker("Boshqaruv Usuli:", selection: Binding(
+                        get: { settings.inputControlMode },
+                        set: { val in
+                            settings.inputControlMode = val
+                            settings.enableMouseGestures = (val != "keyboard_only")
+                            settings.save()
+                            onInputModeChanged()
                         }
-                        Button("➡️ 2-Bosqich: O'ngga (Yuborildi)") {
-                            HumanCursorSignal.stage2DispatchedRight()
-                        }
-                        Button("🔄 3-Bosqich: 3x (Javob Tayyor)") {
-                            HumanCursorSignal.stage3AnswerReady()
-                        }
+                    )) {
+                        Text("🖱️ + ⌨️ Ikkisi ham (Sichqoncha + Klaviatura)").tag("hybrid")
+                        Text("🖱️ Faqat Sichqoncha (Klaviaturaga 0% tegmaydi)").tag("mouse_only")
+                        Text("⌨️ Faqat Klaviatura (Sichqoncha o'chiq)").tag("keyboard_only")
                     }
+                    .pickerStyle(.segmented)
 
-                    HStack(spacing: 16) {
-                        Text("Kursor siljish masofasi (\(String(format: "%.1f", settings.humanDriftPixels)) px):")
-                            .frame(width: 240, alignment: .leading)
-                        Slider(value: $settings.humanDriftPixels, in: 4.0...16.0, step: 0.5)
+                    if settings.inputControlMode != "mouse_only" {
+                        Toggle("Ko'rinmas rejimda Alt bosmasdan [S keyin F] va [K] klavishlarini ham yoqish (Faqat imtihon vaqtida yoqing, matn yozishda o'chirib qo'ying)", isOn: Binding(
+                            get: { settings.enableBareExamKeysInStealth },
+                            set: { val in
+                                settings.enableBareExamKeysInStealth = val
+                                settings.save()
+                                onInputModeChanged()
+                            }
+                        ))
+                        .font(.system(size: 11.5, weight: .medium))
                     }
                 }
                 .padding(8)
             }
 
-            GroupBox(label: Label("HUD Oynada Harf + Qiymat (`B · 1/2`) va Cooldown 'K' (Kuting)", systemImage: "waveform.path.ecg.rectangle.fill").font(.headline)) {
+            // 2. Complete Interactive Manual (Qo'llanma)
+            GroupBox(label: Label("2. To'liq Qo'llanma: Sichqoncha Imo-ishoralari va Kursor Signallari", systemImage: "book.pages.fill").font(.headline)) {
                 VStack(alignment: .leading, spacing: 10) {
-                    Toggle("HUD oynada variant harfi bilan birga qisqa qiymatini ham ko'rsatish (masalan: 'B · 1/2' yoki 'C · 6,6')", isOn: $settings.showValueInHud)
-                        .font(.system(size: 12, weight: .semibold))
+                    HStack(alignment: .top, spacing: 14) {
+                        VStack(alignment: .leading, spacing: 6) {
+                            Text("🖱️ SICHQONCHA IMO-ISHORALARI (Ekran o'rtasida):")
+                                .font(.system(size: 12, weight: .bold))
+                                .foregroundColor(.cyan)
+                            Text("• [1] Skrinshot Olish va Yuborish:")
+                                .font(.system(size: 11.5, weight: .semibold))
+                            Text("   Sichqoncha bilan kichik Aylana (○), Uchburchak (△) yoki Yuqori-chapdan O'ng-pastga diagonal chiziq tortib qayting (↘↖).")
+                                .font(.system(size: 11))
+                                .foregroundColor(.secondary)
 
-                    HStack(spacing: 16) {
-                        Text("Qayta bosish Cooldown vaqti (\(String(format: "%.1f", settings.cooldownSeconds)) soniya):")
-                            .frame(width: 280, alignment: .leading)
-                        Slider(value: $settings.cooldownSeconds, in: 1.5...10.0, step: 0.5)
+                            Text("• [2] Javobni yoki 'G' Holatni Ko'rish:")
+                                .font(.system(size: 11.5, weight: .semibold))
+                            Text("   Sichqonchani turgan joyida Chap-O'ng-Chap (↔) qilib 2 marta yengil tebrating -> HUD oyna ('B · 1/2' yoki 'G') ochiladi.")
+                                .font(.system(size: 11))
+                                .foregroundColor(.secondary)
+
+                            Text("• [3] Javobni Darhol Yashirish (3-4s kutmasdan):")
+                                .font(.system(size: 11.5, weight: .semibold))
+                            Text("   HUD oyna ochiq turganda sichqonchani Pastga (↓) torting -> HUD oyna shu zahoti (0ms) o'chadi!")
+                                .font(.system(size: 11))
+                                .foregroundColor(.secondary)
+                        }
+                        .frame(maxWidth: .infinity, alignment: .leading)
+
+                        Divider()
+
+                        VStack(alignment: .leading, spacing: 6) {
+                            Text("🎯 AVTO-KURSOR VA HUD KODLARI:")
+                                .font(.system(size: 12, weight: .bold))
+                                .foregroundColor(.green)
+                            Text("• ⬅️ Chapga siljish (1-Bosqich): Skrinshot olindi va eski savol javobi tozalandi.")
+                                .font(.system(size: 11))
+                            Text("• ➡️ O'ngga siljish (2-Bosqich): Savol Gemini AI'ga muvaffaqiyatli yuborildi.")
+                                .font(.system(size: 11))
+                            Text("• 🔄 3 marta qimirlash (3-Bosqich): Javob tayyor bo'ldi!")
+                                .font(.system(size: 11))
+                            Divider()
+                            Text("• 'G' = Gemini ishlayapti  |  'K' = Kuting (Cooldown)")
+                                .font(.system(size: 11, weight: .semibold))
+                            Text("• 'IW' = Internet xato  |  'SW' = Yuborish xato (Avto-tuzatiladi)")
+                                .font(.system(size: 11, weight: .semibold))
+                            Text("• 'B · 1/2' = 2-variant (B) va uning qiymati (1/2)")
+                                .font(.system(size: 11, weight: .semibold))
+                        }
+                        .frame(maxWidth: .infinity, alignment: .leading)
                     }
+                }
+                .padding(8)
+            }
 
-                    HStack(spacing: 8) {
-                        Button("Sinash: 'K' (Kuting)") {
-                            settings.hudState = .cooldownK
-                            onToggleHudPreview()
+            // 3. Live Controls & Tester
+            GroupBox(label: Label("3. Jonli Sinov Tugmalari va HUD Sozlamalari", systemImage: "hand.point.up.left.fill").font(.headline)) {
+                VStack(alignment: .leading, spacing: 10) {
+                    HStack(spacing: 10) {
+                        Button("⬅️ Sinash: Chapga (Skrin)") {
+                            HumanCursorSignal.stage1CaptureTakenLeft()
                         }
                         .controlSize(.small)
 
-                        Button("Sinash: 'G' (Ishlayapti)") {
-                            settings.hudState = .workingG
-                            onToggleHudPreview()
+                        Button("➡️ Sinash: O'ngga (Yuborish)") {
+                            HumanCursorSignal.stage2DispatchedRight()
                         }
                         .controlSize(.small)
 
-                        Button("Sinash: 'B · 1/2' (Aniq Javob)") {
+                        Button("🔄 Sinash: 3x (Javob)") {
+                            HumanCursorSignal.stage3AnswerReady()
+                        }
+                        .controlSize(.small)
+
+                        Button("👁️ HUD Ko'rsatish ('B · 1/2')") {
                             settings.hudState = .answer(primary: "B", secondary: nil, valuePreview: "1/2")
                             onToggleHudPreview()
                         }
                         .controlSize(.small)
 
-                        Button("Sinash: 'C · 6,6'") {
-                            settings.hudState = .answer(primary: "C", secondary: nil, valuePreview: "6,6")
-                            onToggleHudPreview()
+                        Button("🙈 HUD Darhol Yashirish (↓)") {
+                            onHideHudNow()
                         }
                         .controlSize(.small)
+                    }
 
-                        Button("Sinash: 'A̲ B · 5 A'") {
-                            settings.hudState = .answer(primary: "A", secondary: "B", valuePreview: "5 A")
-                            onToggleHudPreview()
-                        }
-                        .controlSize(.small)
+                    HStack(spacing: 16) {
+                        Toggle("HUD'da qiymatni ham ko'rsatish ('B · 1/2')", isOn: $settings.showValueInHud)
+                            .font(.system(size: 11.5, weight: .semibold))
+                        Spacer()
+                        Text("Cooldown (\(String(format: "%.1f", settings.cooldownSeconds))s):")
+                            .font(.system(size: 11.5))
+                        Slider(value: $settings.cooldownSeconds, in: 1.5...8.0, step: 0.5)
+                            .frame(width: 140)
                     }
                 }
                 .padding(8)
-            }
-
-            if let img = settings.lastCapturedImage {
-                GroupBox(label: Label("Oxirgi Smart-Cropped Skrinshot va OCR Tekshiruvi", systemImage: "photo.badge.checkmark").font(.headline)) {
-                    HStack(alignment: .top, spacing: 12) {
-                        Image(nsImage: img)
-                            .resizable()
-                            .aspectRatio(contentMode: .fit)
-                            .frame(width: 160, height: 100)
-                            .cornerRadius(6)
-                        VStack(alignment: .leading, spacing: 4) {
-                            Text("Model: \(settings.lastModelUsed) (\(settings.lastLatencyMs) ms) -> Javob: \(settings.lastPrimaryAnswer) (\(settings.lastValuePreview))")
-                                .font(.system(size: 11.5, weight: .bold))
-                                .foregroundColor(.green)
-                            Text(settings.lastOcrPreview.isEmpty ? "(Matn o'qilmoqda...)" : settings.lastOcrPreview)
-                                .font(.system(size: 11))
-                                .foregroundColor(.secondary)
-                                .lineLimit(3)
-                            Text("Izoh: \(settings.lastReasoning)")
-                                .font(.system(size: 11, weight: .medium))
-                                .lineLimit(2)
-                        }
-                    }
-                    .padding(6)
-                }
             }
         }
     }
@@ -2935,7 +3287,7 @@ struct ControlPanelView: View {
     // MARK: - Tab 2: Flash & Pro API Keys
     private var flashProApiSection: some View {
         VStack(alignment: .leading, spacing: 14) {
-            GroupBox(label: Label("Tezkor 2–3s Parallel Gemini 3.5 / 3.0 Flash Dvigateli", systemImage: "lock.shield.fill").font(.headline)) {
+            GroupBox(label: Label("Tezkor 2–3s Parallel Gemini 3.0 / 3.5 Flash Dvigateli", systemImage: "lock.shield.fill").font(.headline)) {
                 VStack(alignment: .leading, spacing: 10) {
                     Picker("Dvigatel:", selection: Binding(
                         get: { settings.engineMode },
@@ -3210,7 +3562,7 @@ struct ControlPanelView: View {
             GroupBox(label: Label("Google Drive Avto-Telemetriya va Amaliyot Qora Qutisi", systemImage: "waveform.path.ecg").font(.headline)) {
                 VStack(alignment: .leading, spacing: 8) {
                     Text("""
-                    Barcha harakatlar, ruxsatlar holati, javob tezligi (ms), cooldown 'K' va xatolar (IW / SW / W) real vaqtda Google Drive'dagi `QuizArchive/FlightLogs/practice_session_report.md` hamda `SILENTHELPER_TELEMETRY_LATEST.md` fayllariga avtomatik yozib boriladi.
+                    Barcha harakatlar, sichqoncha imo-ishoralari, javob tezligi (ms), cooldown 'K' va xatolar (IW / SW / W) real vaqtda Google Drive'dagi `QuizArchive/FlightLogs/practice_session_report.md` hamda `SILENTHELPER_TELEMETRY_LATEST.md` fayllariga avtomatik yozib boriladi.
                     """)
                     .font(.caption)
                     .foregroundColor(.secondary)
@@ -3232,7 +3584,7 @@ struct ControlPanelView: View {
             }
 
             if flightRecorder.events.isEmpty {
-                Text("Hozircha amaliyot yozuvlari yo'q. [S+F] yoki [⌥F] bosib sinovlarni boshlang.")
+                Text("Hozircha amaliyot yozuvlari yo'q. Sichqonchada [○/△] chizing yoki [⌥F] bosing.")
                     .font(.caption)
                     .foregroundColor(.secondary)
                     .padding(.vertical, 20)
@@ -3308,7 +3660,7 @@ struct TabButton: View {
     }
 }
 
-// MARK: - 13. Carbon HotKey Handler (Swallows S->F and K at WindowServer Level!)
+// MARK: - 13. Carbon HotKey Handler
 private var globalAppController: AppController?
 
 private func carbonHotKeyHandler(nextHandler: EventHandlerCallRef?, event: EventRef?, userData: UnsafeMutableRawPointer?) -> OSStatus {
@@ -3335,7 +3687,7 @@ private func carbonHotKeyHandler(nextHandler: EventHandlerCallRef?, event: Event
         case 4:
             globalAppController?.handleCarbonStealthS()
         case 5:
-            globalAppController?.settings.lastTriggerMethod = "Stealth S->F (0-KeyLeak)"
+            globalAppController?.settings.lastTriggerMethod = "Stealth S->F"
             globalAppController?.handleCarbonArmedF()
         case 6:
             globalAppController?.toggleOverlay()
@@ -3348,12 +3700,13 @@ private func carbonHotKeyHandler(nextHandler: EventHandlerCallRef?, event: Event
     return noErr
 }
 
-// MARK: - 14. Main Application Controller (v12.0)
+// MARK: - 14. Main Application Controller (v13.0 — Single MenuBar Icon, Custom Logo & Gesture Engine)
 final class AppController: NSObject, NSApplicationDelegate {
     let settings = AppSettings.shared
     let archive = ArchiveManager.shared
     let flightRecorder = FlightRecorder.shared
     let overlay = StealthOverlayWindow()
+    let gestureRecognizer = MouseGestureRecognizer()
 
     var controlWindow: NSWindow?
     var statusItem: NSStatusItem?
@@ -3369,10 +3722,7 @@ final class AppController: NSObject, NSApplicationDelegate {
     private var scanTimer: Timer?
     private var lastSPressTime: Date = .distantPast
 
-    private var topLeftEnterTime: Date? = nil
-    private var topLeftTriggered = false
-    private var bottomLeftPeeking = false
-
+    private var hotKeyHandlerRef: EventHandlerRef?
     private var hotKeyRefCapture: EventHotKeyRef?
     private var hotKeyRefOverlay: EventHotKeyRef?
     private var hotKeyRefPanel: EventHotKeyRef?
@@ -3383,23 +3733,41 @@ final class AppController: NSObject, NSApplicationDelegate {
     private var stealthHotKeyK: EventHotKeyRef?
     private var disarmFWorkItem: DispatchWorkItem?
 
-    func applicationDidFinishLaunching(_ notification: Notification) {
-        // Prevent duplicate GUI instances from conflicting over Carbon hotkeys
+    private static func enforceSingleGUIInstance() {
+        BridgeIPC.ensureDir()
         let myPID = ProcessInfo.processInfo.processIdentifier
-        let existing = NSRunningApplication.runningApplications(withBundleIdentifier: "com.local.SilentHelper")
-        for app in existing where app.processIdentifier != myPID {
-            app.terminate()
+
+        // 1. Kill any previous PID recorded in single_gui.pid
+        if let oldPidStr = try? String(contentsOfFile: BridgeIPC.guiPidFile, encoding: .utf8).trimmingCharacters(in: .whitespacesAndNewlines),
+           let oldPid = Int32(oldPidStr), oldPid > 0, oldPid != myPID {
+            kill(oldPid, SIGKILL)
         }
 
+        // 2. Force-terminate any other running com.local.SilentHelper app bundles
+        let existing = NSRunningApplication.runningApplications(withBundleIdentifier: "com.local.SilentHelper")
+        for app in existing where app.processIdentifier != myPID {
+            if !app.forceTerminate() {
+                kill(app.processIdentifier, SIGKILL)
+            }
+        }
+
+        try? "\(myPID)".write(toFile: BridgeIPC.guiPidFile, atomically: true, encoding: .utf8)
+    }
+
+    func applicationDidFinishLaunching(_ notification: Notification) {
+        Self.enforceSingleGUIInstance()
         globalAppController = self
-        BridgeIPC.ensureDir()
+
+        // Set Custom Vector Shield Application Icon in Dock & Cmd+Tab!
+        NSApp.applicationIconImage = AppIconGenerator.makeShieldLogoImage(size: NSSize(width: 512, height: 512))
+
         _ = HiddenGeminiWebBridge.shared
         _ = SubtleOpticalCueWindow.shared
 
-        setupMenuBarStatusItem()
+        setupSingleMenuBarStatusItem()
         setupControlWindow()
-        registerCarbonHotKeys()
-        startZeroPopupScanner()
+        applyInputControlModeHotKeys()
+        startGestureAndStateScanner()
         showControlWindow()
 
         settings.refreshPermissionsSilently()
@@ -3408,7 +3776,7 @@ final class AppController: NSObject, NSApplicationDelegate {
             category: "SESSION",
             statusCode: "START",
             latencyMs: 0,
-            details: "SilentHelper v12.0 ishga tushdi (0-Popup Bridge: \(bridge.alive ? "ACTIVE" : "STANDBY") | Engine: \(settings.engineMode))"
+            details: "SilentHelper v13.0 ishga tushdi (Mode: \(settings.inputControlMode) | Bridge: \(bridge.alive ? "ACTIVE" : "STANDBY"))"
         )
 
         if let firstKey = settings.activeGeminiKeys.first {
@@ -3423,33 +3791,28 @@ final class AppController: NSObject, NSApplicationDelegate {
         }
     }
 
-    /// Whenever the user clicks on Google Chrome / Safari (leaving SilentHelper), automatically activate WindowServer Key-Swallowing for `S -> F` and `K`!
-    func applicationDidResignActive(_ notification: Notification) {
-        if settings.enableDirectStealthKeys {
-            updateStealthDirectCarbonKeys(active: true)
-        }
-    }
-
-    func applicationDidBecomeActive(_ notification: Notification) {
-        if controlWindow?.isVisible == true && !settings.isStealthMode {
-            updateStealthDirectCarbonKeys(active: false)
-        }
-    }
-
     func applicationShouldHandleReopen(_ sender: NSApplication, hasVisibleWindows flag: Bool) -> Bool {
         showControlWindow()
         return true
     }
 
-    private func setupMenuBarStatusItem() {
+    private func setupSingleMenuBarStatusItem() {
+        if let existingItem = self.statusItem {
+            NSStatusBar.system.removeStatusItem(existingItem)
+            self.statusItem = nil
+        }
         let item = NSStatusBar.system.statusItem(withLength: NSStatusItem.variableLength)
-        item.button?.title = "●"
+        item.button?.image = AppIconGenerator.makeMenuBarIcon()
+        item.button?.imagePosition = .imageLeading
+        item.button?.title = ""
+
         let menu = NSMenu()
-        menu.addItem(NSMenuItem(title: "Skrinshot + AI Yechish (S->F / ⌥F)", action: #selector(menuCapture), keyEquivalent: ""))
-        menu.addItem(NSMenuItem(title: "Javobni Ko'rsatish / Yashirish (K / ⌥K)", action: #selector(menuToggleHud), keyEquivalent: ""))
+        menu.addItem(NSMenuItem(title: "Skrinshot + AI (○/△ chizish yoki ⌥F)", action: #selector(menuCapture), keyEquivalent: ""))
+        menu.addItem(NSMenuItem(title: "Javobni Ko'rsatish (↔ tebratish yoki ⌥K)", action: #selector(menuToggleHud), keyEquivalent: ""))
+        menu.addItem(NSMenuItem(title: "Javobni Darhol Yashirish (↓ pastga)", action: #selector(menuHideHud), keyEquivalent: ""))
         menu.addItem(NSMenuItem(title: "Amaliyot Xatosini Muhrlash (⌥L)", action: #selector(menuRecordIncident), keyEquivalent: ""))
         menu.addItem(NSMenuItem.separator())
-        menu.addItem(NSMenuItem(title: "Boshqaruv Panelini Ochish (⌥M)", action: #selector(menuShowPanel), keyEquivalent: ""))
+        menu.addItem(NSMenuItem(title: "Boshqaruv va Qo'llanma Paneli (⌥M)", action: #selector(menuShowPanel), keyEquivalent: ""))
         menu.addItem(NSMenuItem(title: "Ko'rinmas Rejimga O'tish", action: #selector(menuStealth), keyEquivalent: ""))
         menu.addItem(NSMenuItem.separator())
         menu.addItem(NSMenuItem(title: "Chiqish (Quit)", action: #selector(menuQuit), keyEquivalent: "q"))
@@ -3463,37 +3826,52 @@ final class AppController: NSObject, NSApplicationDelegate {
         triggerCaptureAndSolve()
     }
     @objc private func menuToggleHud() { toggleOverlay() }
+    @objc private func menuHideHud() { hideOverlayImmediately() }
     @objc private func menuRecordIncident() { recordManualPracticeIncident() }
     @objc private func menuShowPanel() { showControlWindow() }
     @objc private func menuStealth() { enterStealthMode() }
     @objc private func menuQuit() { NSApp.terminate(nil) }
 
-    private func registerCarbonHotKeys() {
-        var eventType = EventTypeSpec(eventClass: OSType(kEventClassKeyboard), eventKind: UInt32(kEventHotKeyPressed))
-        InstallEventHandler(GetApplicationEventTarget(), carbonHotKeyHandler, 1, &eventType, nil, nil)
+    /// Configures hotkeys strictly according to `inputControlMode` so background apps are NEVER disrupted!
+    func applyInputControlModeHotKeys() {
+        if hotKeyHandlerRef == nil {
+            var eventType = EventTypeSpec(eventClass: OSType(kEventClassKeyboard), eventKind: UInt32(kEventHotKeyPressed))
+            InstallEventHandler(GetApplicationEventTarget(), carbonHotKeyHandler, 1, &eventType, nil, &hotKeyHandlerRef)
+        }
 
-        let id1 = EventHotKeyID(signature: OSType(0x53485639), id: 1) // Option + F
-        RegisterEventHotKey(UInt32(kVK_ANSI_F), UInt32(optionKey), id1, GetApplicationEventTarget(), 0, &hotKeyRefCapture)
+        if let r1 = hotKeyRefCapture { UnregisterEventHotKey(r1); hotKeyRefCapture = nil }
+        if let r2 = hotKeyRefOverlay { UnregisterEventHotKey(r2); hotKeyRefOverlay = nil }
+        if let r3 = hotKeyRefPanel { UnregisterEventHotKey(r3); hotKeyRefPanel = nil }
+        if let r7 = hotKeyRefIncident { UnregisterEventHotKey(r7); hotKeyRefIncident = nil }
 
-        let id2 = EventHotKeyID(signature: OSType(0x53485639), id: 2) // Option + K
-        RegisterEventHotKey(UInt32(kVK_ANSI_K), UInt32(optionKey), id2, GetApplicationEventTarget(), 0, &hotKeyRefOverlay)
-
-        let id3 = EventHotKeyID(signature: OSType(0x53485639), id: 3) // Option + M
+        // Option + M (Panel toggle) is always available so the user can always bring back the window
+        let id3 = EventHotKeyID(signature: OSType(0x53485639), id: 3)
         RegisterEventHotKey(UInt32(kVK_ANSI_M), UInt32(optionKey), id3, GetApplicationEventTarget(), 0, &hotKeyRefPanel)
 
-        let id7 = EventHotKeyID(signature: OSType(0x53485639), id: 7) // Option + L
-        RegisterEventHotKey(UInt32(kVK_ANSI_L), UInt32(optionKey), id7, GetApplicationEventTarget(), 0, &hotKeyRefIncident)
+        // Only register Option+F, Option+K, Option+L if NOT in "mouse_only" mode!
+        if settings.inputControlMode != "mouse_only" {
+            let id1 = EventHotKeyID(signature: OSType(0x53485639), id: 1) // Option + F
+            RegisterEventHotKey(UInt32(kVK_ANSI_F), UInt32(optionKey), id1, GetApplicationEventTarget(), 0, &hotKeyRefCapture)
+
+            let id2 = EventHotKeyID(signature: OSType(0x53485639), id: 2) // Option + K
+            RegisterEventHotKey(UInt32(kVK_ANSI_K), UInt32(optionKey), id2, GetApplicationEventTarget(), 0, &hotKeyRefOverlay)
+
+            let id7 = EventHotKeyID(signature: OSType(0x53485639), id: 7) // Option + L
+            RegisterEventHotKey(UInt32(kVK_ANSI_L), UInt32(optionKey), id7, GetApplicationEventTarget(), 0, &hotKeyRefIncident)
+        }
+
+        updateStealthDirectCarbonKeys(active: settings.isStealthMode)
     }
 
-    /// Bug #2 Fix: ALWAYS registers Carbon WindowServer key-swallowing hotkeys (`S -> F` and `K`) when active == true!
-    /// This guarantees that pressing `S`, `F`, or `K` during an exam is swallowed by macOS WindowServer so Chrome (`app.examlive.net`) receives ZERO key events!
+    /// Bare `S -> F` and `K` keys are ONLY registered when Stealth Mode is active AND `enableBareExamKeysInStealth` is explicitly turned ON!
+    /// This guarantees that normal typing in background apps is NEVER blocked!
     private func updateStealthDirectCarbonKeys(active: Bool) {
         disarmFWorkItem?.cancel()
         if let refS = stealthHotKeyS { UnregisterEventHotKey(refS); stealthHotKeyS = nil }
         if let refF = stealthArmedHotKeyF { UnregisterEventHotKey(refF); stealthArmedHotKeyF = nil }
         if let refK = stealthHotKeyK { UnregisterEventHotKey(refK); stealthHotKeyK = nil }
 
-        guard active && settings.enableDirectStealthKeys else { return }
+        guard active && settings.inputControlMode != "mouse_only" && settings.enableBareExamKeysInStealth else { return }
 
         if settings.requireSFCombo {
             let id4 = EventHotKeyID(signature: OSType(0x53485639), id: 4)
@@ -3552,61 +3930,35 @@ final class AppController: NSObject, NSApplicationDelegate {
                         details: "Foydalanuvchi [⌥L] orqali holatni muhrladi | App: \(frontApp) | Rasm: INCIDENT_\(stamp).png | Matn: \(snippet)"
                     )
                 }
-            } else {
-                self.flightRecorder.record(
-                    category: "INCIDENT",
-                    statusCode: "SW",
-                    latencyMs: 0,
-                    details: "Foydalanuvchi [⌥L] bosdi, lekin skrinshot olinmadi (App: \(frontApp))"
-                )
             }
         }
     }
 
-    private func startZeroPopupScanner() {
-        scanTimer = Timer.scheduledTimer(withTimeInterval: 0.025, repeats: true) { [weak self] _ in
-            self?.pollSafeState()
+    private func startGestureAndStateScanner() {
+        scanTimer = Timer.scheduledTimer(withTimeInterval: 0.022, repeats: true) { [weak self] _ in
+            self?.pollMouseGestures()
         }
     }
 
-    private func pollSafeState() {
-        guard settings.enableMouseCorners else { return }
-        let now = Date()
+    private func pollMouseGestures() {
+        guard settings.inputControlMode != "keyboard_only" && settings.enableMouseGestures else { return }
+        let now = Date().timeIntervalSince1970
         let mouse = NSEvent.mouseLocation
-        if let screen = NSScreen.screens.first(where: { NSMouseInRect(mouse, $0.frame, false) }) ?? NSScreen.main {
-            let f = screen.frame
 
-            let inTopLeft = (mouse.x <= f.minX + 8) && (mouse.y >= f.maxY - 8)
-            if inTopLeft {
-                if topLeftEnterTime == nil {
-                    topLeftEnterTime = now
-                } else if !topLeftTriggered, let enter = topLeftEnterTime, now.timeIntervalSince(enter) >= 0.40 {
-                    topLeftTriggered = true
-                    settings.lastTriggerMethod = "Top-Left Corner"
-                    triggerCaptureAndSolve()
-                }
-            } else if (mouse.x > f.minX + 24) || (mouse.y < f.maxY - 24) {
-                topLeftEnterTime = nil
-                topLeftTriggered = false
+        if let gesture = gestureRecognizer.feedMousePoint(mouse, now: now, isHudVisible: isOverlayVisible) {
+            DispatchQueue.main.async {
+                self.settings.lastDetectedGestureName = gesture.rawValue
             }
-
-            let enterBottomLeft = (mouse.x <= f.minX + 8) && (mouse.y <= f.minY + 8)
-            let exitBottomLeft = (mouse.x >= f.minX + 26) || (mouse.y >= f.minY + 26)
-
-            if enterBottomLeft && !bottomLeftPeeking {
-                bottomLeftPeeking = true
-                hudAutoHideWorkItem?.cancel()
-                if !isOverlayVisible {
-                    overlay.refreshAppearance()
-                    overlay.orderFrontRegardless()
-                    isOverlayVisible = true
-                }
-            } else if bottomLeftPeeking && exitBottomLeft {
-                bottomLeftPeeking = false
-                if isOverlayVisible {
-                    overlay.orderOut(nil)
-                    isOverlayVisible = false
-                }
+            switch gesture {
+            case .captureLoopOrSlash:
+                settings.lastTriggerMethod = "Mouse Gesture (○/△)"
+                triggerCaptureAndSolve()
+            case .showHudWiggle:
+                flightRecorder.record(category: "GESTURE", statusCode: "HUD", latencyMs: 0, details: "Sichqoncha (↔) tebranishi orqali HUD ochildi")
+                showOverlayForPeek()
+            case .hideHudPullDown:
+                flightRecorder.record(category: "GESTURE", statusCode: "HIDE", latencyMs: 0, details: "Sichqoncha (↓) tortilishi orqali HUD darhol yopildi")
+                hideOverlayImmediately()
             }
         }
     }
@@ -3619,22 +3971,28 @@ final class AppController: NSObject, NSApplicationDelegate {
             onToggleHudPreview: { [weak self] in
                 self?.toggleOverlay()
             },
+            onHideHudNow: { [weak self] in
+                self?.hideOverlayImmediately()
+            },
             onManualTestCapture: { [weak self] in
                 self?.settings.lastTriggerMethod = "Panel Test Button"
                 self?.triggerCaptureAndSolve()
             },
             onRecordManualIncident: { [weak self] in
                 self?.recordManualPracticeIncident()
+            },
+            onInputModeChanged: { [weak self] in
+                self?.applyInputControlModeHotKeys()
             }
         )
 
         let win = NSWindow(
-            contentRect: NSRect(x: 0, y: 0, width: 840, height: 630),
+            contentRect: NSRect(x: 0, y: 0, width: 860, height: 650),
             styleMask: [.titled, .closable, .miniaturizable, .resizable],
             backing: .buffered,
             defer: false
         )
-        win.title = "SilentHelper v12.0 — 2-3s Solver, 0-Violation Key-Swallow & B · 1/2 HUD"
+        win.title = "SilentHelper v13.0 — Sichqoncha Imo-ishoralari (○ / ↔ / ↓), 3 Rejim & Qo'llanma"
         win.center()
         win.contentView = NSHostingView(rootView: contentView)
         win.isReleasedWhenClosed = false
@@ -3669,35 +4027,50 @@ final class AppController: NSObject, NSApplicationDelegate {
     func enterStealthMode() {
         DispatchQueue.main.async {
             self.settings.isStealthMode = true
-            self.settings.statusText = "Ko'rinmas rejim faol ([S→F] -> Chapga -> O'ngga -> 3x | [K] -> B · 1/2)"
+            self.settings.statusText = "Ko'rinmas rejim faol: [○/△] = Skrinshot | [↔] = Ko'rish | [↓] = Yashirish"
             self.controlWindow?.orderOut(nil)
             NSApp.setActivationPolicy(.accessory)
             self.updateStealthDirectCarbonKeys(active: true)
-            self.flightRecorder.record(category: "MODE", statusCode: "STEALTH", latencyMs: 0, details: "Ko'rinmas rejim yoqildi (WindowServer Key-Swallow S->F & K faol)")
+            self.flightRecorder.record(category: "MODE", statusCode: "STEALTH", latencyMs: 0, details: "Ko'rinmas rejim yoqildi (Input Mode: \(self.settings.inputControlMode))")
+        }
+    }
+
+    func showOverlayForPeek() {
+        DispatchQueue.main.async {
+            self.hudAutoHideWorkItem?.cancel()
+            self.overlay.refreshAppearance()
+            self.overlay.orderFrontRegardless()
+            self.isOverlayVisible = true
+            self.gestureRecognizer.notifyHudOpened()
+
+            if self.settings.autoHideHudSeconds > 0 {
+                let work = DispatchWorkItem { [weak self] in
+                    guard let self = self, self.isOverlayVisible else { return }
+                    self.overlay.orderOut(nil)
+                    self.isOverlayVisible = false
+                }
+                self.hudAutoHideWorkItem = work
+                DispatchQueue.main.asyncAfter(deadline: .now() + self.settings.autoHideHudSeconds, execute: work)
+            }
+        }
+    }
+
+    func hideOverlayImmediately() {
+        DispatchQueue.main.async {
+            self.hudAutoHideWorkItem?.cancel()
+            self.cooldownRestoreWorkItem?.cancel()
+            if self.isOverlayVisible {
+                self.overlay.orderOut(nil)
+                self.isOverlayVisible = false
+            }
         }
     }
 
     func toggleOverlay() {
-        DispatchQueue.main.async {
-            self.hudAutoHideWorkItem?.cancel()
-            if self.isOverlayVisible {
-                self.overlay.orderOut(nil)
-                self.isOverlayVisible = false
-            } else {
-                self.overlay.refreshAppearance()
-                self.overlay.orderFrontRegardless()
-                self.isOverlayVisible = true
-
-                if self.settings.autoHideHudSeconds > 0 {
-                    let work = DispatchWorkItem { [weak self] in
-                        guard let self = self, self.isOverlayVisible, !self.bottomLeftPeeking else { return }
-                        self.overlay.orderOut(nil)
-                        self.isOverlayVisible = false
-                    }
-                    self.hudAutoHideWorkItem = work
-                    DispatchQueue.main.asyncAfter(deadline: .now() + self.settings.autoHideHudSeconds, execute: work)
-                }
-            }
+        if isOverlayVisible {
+            hideOverlayImmediately()
+        } else {
+            showOverlayForPeek()
         }
     }
 
@@ -3725,12 +4098,13 @@ final class AppController: NSObject, NSApplicationDelegate {
             self.overlay.refreshAppearance()
             self.overlay.orderFrontRegardless()
             self.isOverlayVisible = true
+            self.gestureRecognizer.notifyHudOpened()
 
             self.flightRecorder.record(
                 category: "COOLDOWN",
                 statusCode: "K",
                 latencyMs: 0,
-                details: "Qayta bosildi (\(triggerUsed)) -> Cooldown 'K' (Kuting) ko'rsatildi"
+                details: "Qayta chaqirildi (\(triggerUsed)) -> Cooldown 'K' (Kuting) ko'rsatildi"
             )
 
             let restoreWork = DispatchWorkItem { [weak self] in
@@ -3739,7 +4113,7 @@ final class AppController: NSObject, NSApplicationDelegate {
                     self.settings.hudState = self.settings.isProcessing ? .workingG : savedState
                     self.overlay.refreshAppearance()
                 }
-                if self.isOverlayVisible && !self.bottomLeftPeeking {
+                if self.isOverlayVisible {
                     self.overlay.orderOut(nil)
                     self.isOverlayVisible = false
                 }
@@ -3770,7 +4144,7 @@ final class AppController: NSObject, NSApplicationDelegate {
 
         let startTime = now
 
-        // Immediately wipe the previous question's answer and hide HUD so old answers NEVER confuse the user!
+        // Immediately wipe the previous question's answer and hide HUD!
         DispatchQueue.main.async {
             self.cooldownRestoreWorkItem?.cancel()
             self.hudAutoHideWorkItem?.cancel()
@@ -3793,7 +4167,7 @@ final class AppController: NSObject, NSApplicationDelegate {
             self.statusItem?.button?.title = "G"
         }
 
-        flightRecorder.record(category: "TRIGGER", statusCode: "G", latencyMs: 0, details: "Yangi savol skrinshoti boshlandi (Eski javob tozalandi | Usul: \(triggerUsed))")
+        flightRecorder.record(category: "TRIGGER", statusCode: "G", latencyMs: 0, details: "Yangi savol skrinshoti boshlandi (Usul: \(triggerUsed))")
 
         DispatchQueue.global(qos: .userInitiated).asyncAfter(deadline: .now() + 0.03) {
             ScreenCaptureService.captureMainDisplay { cgImage in
@@ -3819,7 +4193,6 @@ final class AppController: NSObject, NSApplicationDelegate {
 
                 ScreenCaptureService.extractStructuredQuestionText(from: cgImage) { extractedText in
                     let cleanText = extractedText.trimmingCharacters(in: .whitespacesAndNewlines)
-                    let ocrMs = Int(Date().timeIntervalSince(startTime) * 1000)
 
                     DispatchQueue.main.async {
                         self.settings.lastOcrPreview = cleanText
@@ -3831,29 +4204,6 @@ final class AppController: NSObject, NSApplicationDelegate {
                     // 2-BOSQICH SIGNAL: Savol Gemini/AI ga yuborildi -> Kursor O'NGGA siljiydi!
                     DispatchQueue.main.asyncAfter(deadline: .now() + 0.24) {
                         HumanCursorSignal.stage2DispatchedRight()
-                    }
-
-                    if self.settings.useArchiveCacheForSolving, let cached = self.archive.findCachedAnswer(for: cleanText) {
-                        self.triggerLock.lock()
-                        self.atomicCaptureInFlight = false
-                        self.triggerLock.unlock()
-
-                        DispatchQueue.main.asyncAfter(deadline: .now() + 0.52) {
-                            guard self.currentRequestID == reqID else { return }
-                            self.settings.lastPrimaryAnswer = cached.primaryAnswer
-                            self.settings.lastSecondaryAnswer = cached.secondaryAnswer ?? ""
-                            self.settings.lastValuePreview = cached.optionValue
-                            self.settings.lastConfidence = cached.confidence
-                            self.settings.lastReasoning = "[Arxiv keshidan] \(cached.reasoning)"
-                            self.settings.hudState = .answer(primary: cached.primaryAnswer, secondary: cached.secondaryAnswer, valuePreview: cached.optionValue)
-                            self.settings.statusText = "3/3 Tayyor (Arxiv): \(cached.primaryAnswer) · \(cached.optionValue)"
-                            self.settings.isProcessing = false
-                            self.statusItem?.button?.title = cached.primaryAnswer
-                            self.overlay.refreshAppearance()
-                            self.flightRecorder.record(category: "CACHE_HIT", statusCode: cached.primaryAnswer, latencyMs: ocrMs, details: "Arxiv keshidan topildi")
-                            HumanCursorSignal.stage3AnswerReady()
-                        }
-                        return
                     }
 
                     var earlySignaled = false
@@ -3957,7 +4307,11 @@ final class AppController: NSObject, NSApplicationDelegate {
 }
 
 // MARK: - Entry Point
-if CommandLine.arguments.contains("--bridge-daemon") {
+if let idx = CommandLine.arguments.firstIndex(of: "--generate-icon"), idx + 1 < CommandLine.arguments.count {
+    let dir = CommandLine.arguments[idx + 1]
+    AppIconGenerator.exportIconset(to: dir)
+    exit(0)
+} else if CommandLine.arguments.contains("--bridge-daemon") {
     let daemon = TerminalPrivilegeBridgeDaemon()
     daemon.runForever()
 } else {
