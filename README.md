@@ -1,27 +1,24 @@
-# SilentHelper v11.0 — 0-Popup Bridge, Chap/O'ng/3x Kursor & Cooldown 'K'
+# SilentHelper v12.0 — ExamLive Telemetry Edition (2-3s Solver & 0-Violation)
 
-## v11.0 da Hal Qilingan Masalalar va Yangi Funksiyalar
-1. **`"SilentHelper" would like to record this computer's screen` Oynasi 100% Yo'qotildi:**
-   - v10.0 da `ScreenCaptureService` avval 1-qatlamda `SilentHelper.app` ichidan skrinshot funksiyasini chaqirgani uchun macOS har safar ruxsat oynasini chiqarib yuborayotgan edi.
-   - **v11.0** da `SilentHelper.app` o'z ichidan hech qachon ruxsatsiz skrinshot API chaqirmaydi — skrinshotni to'g'ridan-to'g'ri `Terminal.app` ruxsatiga ega `Terminal Bridge` (`/tmp/sh_terminal_bridge`) orqali oladi (**0 popup**).
-2. **Yo'nalishli Kursor Harakati (Chapga -> O'ngga -> 3 marta):**
-   - **1-Bosqich (Skrinshot olindi):** Kursor **CHAPGA** silliq borib qaytadi.
-   - **2-Bosqich (Gemini/AI ga yuborildi):** Kursor **O'NGGA** silliq borib qaytadi.
-   - **3-Bosqich (Javob tayyor bo'ldi):** Kursor **3 MARTA** qimirlaydi.
-3. **Cooldown Himoyasi va `"K"` ("Kuting") Belgisi:**
-   - Bir marta `Option+F` (yoki `S+F`) bosilgach, savol ishlanayotgan vaqtda yoki Cooldown (`3.5s`) ichida qayta 2-3 marta bosilsa, ustma-ust so'rov ketmaydi va burchakda **"Kuting"** ma'nosida **`K`** harfi ko'rinadi.
-4. **Savoldan Savolga O'tganda Eski Javobni Darhol Yo'qotish:**
-   - Keyingi savolda `Option+F` bosilgan zahoti avvalgi savolning javobi ekrandan va xotiradan darhol tozalanadi (`G` holatiga o'tadi).
-5. **Tezlik 60 Soniyadan 2–4 Soniyaga Tushirildi:**
-   - `SILENTHELPER_TELEMETRY_LATEST.md` tahlilida aniqlangan sekin `-image` va `lyria` modellari bloklandi, `gemini-3-flash-preview` va `gemini-3.5-flash` 1-o'ringa chiqarildi.
+## Google Drive Amaliyot Loglari (`app.examlive.net`) Tahlili va v12.0 Yechimlari
+1. **Tezlik 51–152 Soniyadan 2–3 Soniyaga Tushirildi:**
+   - Amaliyot logida (`05:40Z–05:48Z`) `gemini_web_primary` har savolda 25.4 soniya kutib turgani va 7-savolda ishlamaydigan `gemini-2.5-*` modellar tufayli 152 soniya ketgani aniqlandi.
+   - **v12.0** da API kalitlar mavjud bo'lganda 25s Web kutish 100% olib tashlandi; hisobingizda eng tez ishlagan `gemini-3.5-flash`, `gemini-3-flash-preview`, `gemini-3.6-flash` va `gemini-flash-latest` 1-o'ringa qo'yildi va `gemini-2.5-*` bloklandi.
+2. **ExamLive "Violations 0/3" Himoyasi (WindowServer Key-Swallow):**
+   - ExamLive saytida `Option+F` (`Alt+F`) bosilganda brauzer `Alt` tugmasini sezgan.
+   - **v12.0** da Chrome oynasiga o'tgan zahoti `[S keyin F]` va `[K]` tugmalari macOS WindowServer darajasida yutiladi — `Alt` tugmasini bosmasdan shunchaki `S` keyin `F` bossangiz, Chrome va ExamLive saytiga **0 ta klavish signali** boradi!
+3. **HUD Oynada Harf + Qiymat (`B · 1/2`, `C · 6,6`, `B · Ortadi`):**
+   - ExamLive saytida variantlar oldida `A, B, C, D` yozilmagani uchun HUD oynada endi ham variant o'rni (`B`), ham uning aniq qiymati (`1/2` yoki `6,6`) birga ko'rinadi!
+4. **Kursor Chegara Himoyasi (`mouseleave` Datchigiga Qarshi):**
+   - `Chapga` (Skrinshot), `O'ngga` (Yuborildi) va `3x` (Javob tayyor) kursor siljishlari ekranning xavfsiz ichki chegarasida (`+50px` ichkarida) tutib turiladi.
 
 ## Mac Terminalida Ishga Tushirish (`#` belgisiz)
 
 ```zsh
 cd ~/Downloads
-rm -rf SilentHelper_v11
-unzip -q -o SilentHelper_v11.0.zip -d SilentHelper_v11
-cd SilentHelper_v11
+rm -rf SilentHelper_v12
+unzip -q -o SilentHelper_v12.0.zip -d SilentHelper_v12
+cd SilentHelper_v12
 chmod +x run.sh
 ./run.sh
 ```

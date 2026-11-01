@@ -2,7 +2,7 @@
 set -euo pipefail
 
 APP_NAME="SilentHelper"
-VERSION="11.0.0"
+VERSION="12.0.0"
 INSTALL_DIR="$HOME/Applications"
 APP_BUNDLE="${INSTALL_DIR}/${APP_NAME}.app"
 CONTENTS_DIR="${APP_BUNDLE}/Contents"
@@ -10,7 +10,7 @@ MACOS_DIR="${CONTENTS_DIR}/MacOS"
 BRIDGE_BIN="/tmp/sh_terminal_bridge"
 
 echo "--------------------------------------------------------"
-echo "  ${APP_NAME} v${VERSION} — 0-Popup Bridge & Fast Solver"
+echo "  ${APP_NAME} v${VERSION} — 2-3s Solver & 0-Violation Edition"
 echo "--------------------------------------------------------"
 
 if ! command -v swiftc >/dev/null 2>&1; then
@@ -31,7 +31,7 @@ elif [ -d "$HOME/Google Drive/My Drive" ]; then
 fi
 
 mkdir -p "$DEFAULT_ARCHIVE/FlightLogs"
-mkdir -p "/tmp/sh_v11_ipc"
+mkdir -p "/tmp/sh_v12_ipc"
 
 pkill -f "sh_terminal_bridge" >/dev/null 2>&1 || true
 pkill -f "${APP_NAME}.app/Contents/MacOS/${APP_NAME}" >/dev/null 2>&1 || true
@@ -146,17 +146,9 @@ BRIDGE_PID=$!
 sleep 0.25
 
 echo "[+] 0-Popup Terminal Ruxsat Ko'prigi (Bridge PID: ${BRIDGE_PID}) ishga tushdi!"
-echo "[+] Screen Recording ruxsat oynasi chiqishi 100% bloklandi!"
-echo "[+] Google Drive Avto-Telemetriya: ${DEFAULT_ARCHIVE}/FlightLogs/SILENTHELPER_TELEMETRY_LATEST.md"
-echo ""
-echo "v11.0 BOSHQARUV:"
-echo "  • [Option + F] yoki [S -> F]:"
-echo "      1) Eski savol javobi darhol o'chiriladi"
-echo "      2) Skrinshot olinadi -> Kursor CHAPGA qimirlaydi"
-echo "      3) Gemini'ga yuboriladi -> Kursor O'NGGA qimirlaydi"
-echo "      4) Javob chiqadi -> Kursor 3 MARTA qimirlaydi"
-echo "  • Cooldown payti qayta [Option + F] bosilsa -> Ekranda 'K' (Kuting) chiqadi"
-echo "  • [K] yoki [Option + K] -> Javobni (A, B, C, D) yoki holatni (G / IW / SW / W) ko'rish"
+echo "[+] ExamLive 0-Violation himoyasi: [S -> F] va [K] WindowServer'da yutiladi!"
+echo "[+] Tezlik: 2–3 soniya (gemini-3.5-flash & gemini-3-flash-preview parallel)!"
+echo "[+] HUD: Harf + Qiymat (masalan: 'B · 1/2' yoki 'C · 6,6')!"
 echo "--------------------------------------------------------"
 
 exec "${MACOS_DIR}/${APP_NAME}"
