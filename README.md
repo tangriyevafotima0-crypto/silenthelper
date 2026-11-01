@@ -1,24 +1,23 @@
-# SilentHelper v14.0 — Always-Alive Gemini Web Engine, Anti-SW Failover & 0/3 Sensor Violations
+# SilentHelper v9.0 FINAL — Production & Practice Telemetry Edition
 
-## v14.0 da Hal Qilingan Muammolar (Drive Telemetriya Tahlili Asosida)
-1. **Faqat Gemini Web (`gemini_web_primary`) Endi 100% Asosiy Dvigatel Sifatida Ishlaydi:**
-   - v13.0 da sozlamalarda eski API kalitlar saqlanib qolgan bo'lsa (`activeGeminiKeys.isEmpty == false`), dastur `Faqat Gemini Web` tanlangan bo'lsa ham Gemini Web'ni chetlab o'tib, tugab qolgan API kalitlarga urilgan edi.
-   - v14.0 da bu cheklov butunlay olib tashlandi: **`Faqat Gemini Web`** yoki **`Gibrid (Web + API)`** tanlanganda dastur **100% birinchi navbatda Gemini Web (`gemini.google.com`)** orqali savolni yechadi!
-2. **Ko'rinmas Rejimda (Stealth Mode) Gemini Web Uxlab Qolmasligi (`StealthWebHostWindow` + Anti-AppNap):**
-   - Asosiy oyna yashirilganda (`Ko'rinmas Rejim`) macOS WebKit brauzerni to'xtatib qo'ymasligi uchun `HiddenGeminiWebBridge` maxsus ko'rinmas `StealthWebHostWindow` va `NSProcessInfo` (`latencyCritical`) himoyasi bilan ta'minlandi.
-3. **`SW` (`HTTP 402 FREE_LIMIT` / Rate Limit) Xatosi To'liq Bartaraf Etildi:**
-   - API kalitlarda `gemini-3-flash` kunlik limiti tugaganda, zaxira sifatida `gemini-omni-flash-preview`, `gemini-omni-1.1-flash`, `gemini-2.5-flash` va `gemini-2.0-flash` modellari hamda `Gemini Web` avtomatik ulanadi (`Argon` va `Flash-Lite` qat'iy bloklangan).
-   - Bepul bulut (`AutoHealCloud`) parallel oqimlarda bir vaqtda chaqirilishi to'xtatildi (30s IP limit himoyasi).
-4. **`app.examlive.net` da `Violations 0/3` Natijasi Saqlab Qolindi:**
-   - Sichqoncha imo-ishoralari (`○/△` skrinshot, `↔` javobni ko'rish, `↓` darhol yashirish) va `mouse_only` rejimi imtihon sensorlarida **0/3 Violations** bilan ishlashi amaliyotda tasdiqlandi.
+## v9.0 FINAL da Nimalar Hal Qilindi?
+1. **Ruxsatlarning Doimiy Saqlanishi (Doimiy Kod Imzolash Sertifikati):**
+   - macOS tizimida har safar dastur qayta kompilyatsiya qilinganda, uning `cdhash` identifikatori o'zgarib ketardi va macOS uni yangi dastur deb o'ylab, qayta-qayta ruxsat so'rardi.
+   - **v9.0 FINAL** da Keychain ichida barqaror `SilentHelper Dev` sertifikati yaratilib, dastur unga muhrlanadi. Natijada ruxsatlar 1 marta berilgach, xoh Finder'dan, xoh Spotlight'dan, xoh Terminal'siz to'g'ridan-to'g'ri ochilsa ham, macOS boshqa qayta ruxsat so'ramaydi!
+2. **`SilentHelper.app` va Google Email Sessiyasi Tiklandi (`com.local.SilentHelper`):**
+   - Doimiy `~/Applications/SilentHelper.app` (`com.local.SilentHelper`) paketi o'rnatiladi va `tccutil reset` butunlay olib tashlandi.
+   - Avval kiritilgan **Google Email sessiyangiz ham, berilgan ruxsatlaringiz ham saqlanib qoladi.**
+3. **Amaliyot Tarixi va Xatolar Qora Qutisi (`FlightRecorder`):**
+   - Amaliyotda test topshirayotganingizda har bir bosqich, javob tezligi (`ms`), xatolar (`IW`, `SW`, `W`), avto-tuzatishlar hamda sayt ogohlantirishlari (`blocked`, `violation`, `full screen`) skrinshoti bilan `QuizArchive/FlightLogs/practice_session_report.md` fayliga yozib boriladi.
+   - Shubhali holat bo'lsa, **`Option + L` (`⌥L`)** bosib o'sha lahzani tarixga muhrlashingiz mumkin.
 
-## Mac Terminalida Ishga Tushirish (`#` belgisiz)
+## Terminalda O'rnatish va Doimiy Ruxsatni Faollashtirish
 
 ```zsh
 cd ~/Downloads
-rm -rf SilentHelper_v14
-unzip -q -o SilentHelper_v14.0.zip -d SilentHelper_v14
-cd SilentHelper_v14
-chmod +x run.sh
+rm -rf SilentHelper_v9
+unzip -q -o SilentHelper_v9.0_FINAL.zip -d SilentHelper_v9
+cd SilentHelper_v9
+chmod +x run.sh grant_permissions.sh
 ./run.sh
 ```
