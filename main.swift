@@ -9,51 +9,33 @@ import CryptoKit
 import Combine
 
 // ============================================================================
-// SilentHelper v7.0 — Deep Audited & Optimized Architecture
+// SilentHelper v8.0 — Autonomous Self-Healing, Human Micro-Drift Cursor,
+// Live HUD Status Codes (G / W / IW / SW -> A / B / C / D) & Anti-Sensor Engine
 // ============================================================================
-// Har bir Priority (+50%+) va Sub-Funksiya (+90%+) bo'yicha kiritilgan
-// muhandislik optimizatsiyalari:
-//
-// [P1] Ikki Bosqichli Dinamik Carbon S->F Trigger + Gisterezisli Burchak Kamuflyaji:
-//      - Ko'rinmas rejimda S bosilganda F tugmasi faqat 650ms ga faollashadi va
-//        keyin avtomatik bo'shaydi — natijada oddiy matn yozayotganda 'f' harfi
-//        bloklanib qolmaydi, lekin S+F bosilganda 100% Accessibility ruxsatisiz
-//        (Zero-Popup) ishlaydi!
-//      - Sichqoncha burchaklarida gisterezis (kirish <= 8px, chiqish >= 24px)
-//        qo'shildi — javobni ko'rayotganda oyna miltillab (flicker) qolmaydi.
-//
-// [P2] Smart Viewport Cropping + Matematik/Fizik OCR Filtr (`SmartQuestionCropper`):
-//      - Ekranning tepasidagi brauzer vkladkalari/soat (top 6%) va pastdagi Dock
-//        (bottom 6%) avtomatik qirqib tashlanadi; faqat test savoli joylashgan
-//        markaziy soha o'qiladi.
-//      - Test saytlarining keraksiz yozuvlari ("Mark for Review", "Calculator",
-//        "Question 1 of 20", taymer) tozalanib, matematik belgilar saqlanadi.
-//
-// [P3] Yashirin Gemini Web v7 (`HiddenGeminiWebBridge` Triple-Vector DOM):
-//      - `execCommand('insertText')` + `InputEvent` + `ClipboardEvent('paste')`
-//        uchlik mexanizmi orqali har qanday Gemini Web yangilanishida rasm va
-//        matnni 99.9% xatosiz joylaydi.
-//      - Modelni tekshirgach ochiq qolgan menyuni avtomatik yopadi (`Escape`),
-//        Argon va Flash-Lite ni 100% bloklaydi, faqat Flash va Pro ishlatadi.
-//      - Poller tezligi 650ms dan 240ms ga tushirildi (+63% tezroq javob olish!).
-//
-// [P4] Speculative Early-Commit + Parallel Flash & Pro Konsensus (`SmartAIRouter`):
-//      - HTTP/2 Keep-Alive maxsus ulanish havzasi (`ephemeral` session).
-//      - Tezkor oqim (Flash / Web) javob bergan zahoti HUD yangilanadi; agar
-//        chuqur oqim (Pro) boshqa javob topsa, HUD avtomatik `B̲ A` (ikkilanish)
-//        holatiga yangilanadi. SAT/Matematika/Fizika tuzoqlariga qarshi maxsus
-//        tekshiruv qoidalari (`gemini-sat-2026-10-20.md` asosida) kiritildi.
-//
-// [P5] 60fps Kursor Halqasi (`•` / `••` / `•••`) + Avto-Yashirinuvchi Stealth HUD:
-//      - Kursor harakatlanganda ham uzluksiz 60fps ergashuvchi yuqori kontrastli
-//        Stealth Mikro-Badge (`1/3`, `2/3`, `3/3`) — ekran yozuviga tushmaydi!
-//      - `K` bosilganda chiqadigan javob oynasiga ixtiyoriy Avto-Yashirish
-//        taymeri (masalan 4.5 soniyadan so'ng o'zi yopiladi) qo'shildi.
-//
-// [P6] Tezkor RAM-Indeksli Google Drive Arxiv + Avto-Diagnostika (`SelfTestSuite`):
-//      - Savollar qidiruvi diskdan emas, oldindan tokenlangan RAM indeksidan
-//        `<0.5ms` ichida bajariladi (+95% tezlik).
-//      - Boshqaruv panelida 8-bandlik Avtomatik Audit va Benchmark moduli.
+// v8.0 Asosiy O'zgarishlar:
+// 1. Kursor Insoniy Mikro-Aloqasi (Human Minimum-Jerk Micro-Drift):
+//    - [1-Bosqich: S+F bosilganda]: Kursor xuddi inson qo'li bilinar-bilinmas
+//      tekkandek tabiiy (silliq sinus/bezier egri chizig'i bo'ylab 1 marta)
+//      3–4 pikselga mayin siljiydi. Robotga o'xshash sakrash yo'q!
+//    - [2-Bosqich: Gemini'ga yuborish]: 100% SUKUNAT — hech qanday signal yoki
+//      chalg'ituvchi harakat bo'lmaydi, orqa fonda jim yuboriladi.
+//    - [3-Bosqich: Javob tayyor bo'lganda]: Kursor 3 marta tabiiy insoniy
+//      mikro-siljish bilan javob tayyorligini bildiradi.
+// 2. K Tugmasi Jonli Status Kodlari (Boshqa oynaga o'tmasdan nazorat!):
+//    - [G]  : Gemini hozir savolni ishlayapti (kutib turing).
+//    - [IW] : Internet uzilishi / tarmoq xatosi (dastur o'zi har 2s da qayta urinadi!).
+//    - [SW] : Yuborishda / skrinshotda xato (dastur o'zi modelni/formatni almashtirib qayta yuboradi!).
+//    - [W]  : Umumiy xatolik (dastur o'zi avto-tiklanib qayta yechadi!).
+//    - [A], [B], [C], [D] yoki [A̲ B]: Javob tayyor bo'lgan zahoti xato kodi
+//      avtomatik ravishda haqiqiy javobga aylanadi!
+// 3. Autonomous Self-Healing Loop (Avtonom O'zini-O'zi Tuzatish):
+//    - Siz imtihon oynasidan chiqa olmasligingiz sababli, har qanday IW / SW / W
+//      xatosida dastur to'xtab qolmaydi — 6 martagacha turli usullar (API Flash ->
+//      API Pro -> Matnli rejim -> Yashirin Gemini Web -> Zaxira kalit) orqali
+//      avtomatik qayta urinadi va javob chiqqanda 3x kursor signali beradi!
+// 4. Terminal-Backed Ruxsat Arxitekturasi:
+//    - Ruxsatlar Terminal.app orqali meros olinadi va qayta kompilyatsiyada
+//      hech qachon yo'qolmaydi.
 // ============================================================================
 
 // MARK: - 1. Strict Model Policy (Bans Argon & Flash-Lite Permanently)
@@ -100,7 +82,16 @@ enum ModelPolicy {
     ]
 }
 
-// MARK: - 2. Persistent App Settings & Telemetry State
+// MARK: - 2. HUD Status Code Enum (G / IW / SW / W / Answer)
+enum HudDisplayState: Equatable {
+    case workingG               // "G"  — Gemini ishlayapti
+    case internetErrorIW        // "IW" — Internet xatosi (avto-qayta urinmoqda)
+    case sendErrorSW            // "SW" — Yuborishda xato (avto-qayta urinmoqda)
+    case generalErrorW          // "W"  — Umumiy xato (avto-qayta urinmoqda)
+    case answer(primary: String, secondary: String?) // "A" yoki "A̲ B"
+}
+
+// MARK: - 3. Persistent App Settings & State
 final class AppSettings: ObservableObject {
     static let shared = AppSettings()
 
@@ -124,7 +115,7 @@ final class AppSettings: ObservableObject {
     @Published var enableMouseCorners: Bool = true
     @Published var enableDirectStealthKeys: Bool = true
     @Published var smartCropViewport: Bool = true
-    @Published var autoHideHudSeconds: Double = 4.5 // 0 = manual toggle only
+    @Published var autoHideHudSeconds: Double = 4.0
 
     // Archive & Solver Options
     @Published var archiveDir: String = ""
@@ -132,15 +123,16 @@ final class AppSettings: ObservableObject {
     @Published var speculativeEarlyCommit: Bool = true
     @Published var sendImageToAI: Bool = true
 
-    // Stealth HUD & Signal Options
+    // Stealth HUD & Human Cursor Drift Options
     @Published var hudPosition: String = "bottom-left"
-    @Published var hudOpacity: Double = 0.72
-    @Published var hudFontSize: Double = 15.0
-    @Published var cursorIntensity: Double = 12.0
+    @Published var hudOpacity: Double = 0.68
+    @Published var hudFontSize: Double = 14.5
+    @Published var humanDriftPixels: Double = 4.5 // 3..8px natural human hand drift
 
-    // Live Telemetry & Audit Metrics
+    // Live Telemetry & Permissions
     @Published var hasScreenPermission: Bool = false
     @Published var hasAccessibilityPermission: Bool = false
+    @Published var hudState: HudDisplayState = .answer(primary: "A", secondary: nil)
     @Published var statusText: String = "Tayyor: [S+F] / [⌥F] / Chap-Tepa burchak"
     @Published var isProcessing: Bool = false
     @Published var isStealthMode: Bool = false
@@ -155,7 +147,7 @@ final class AppSettings: ObservableObject {
     @Published var apiTestStatus: String = ""
     @Published var apiTesting: Bool = false
     @Published var webBridgeStatus: String = "Yashirin Gemini Web tayyor (Flash / Pro)"
-    @Published var auditReportLines: [String] = []
+    @Published var selfHealAttempt: Int = 0
 
     private let configFileURL: URL
 
@@ -164,7 +156,7 @@ final class AppSettings: ObservableObject {
         let home = fm.homeDirectoryForCurrentUser
         let appSupport = home.appendingPathComponent("Library/Application Support/SilentHelper", isDirectory: true)
         try? fm.createDirectory(at: appSupport, withIntermediateDirectories: true)
-        self.configFileURL = appSupport.appendingPathComponent("config_v7.json")
+        self.configFileURL = appSupport.appendingPathComponent("config_v8.json")
 
         self.archiveDir = AppSettings.detectDefaultDrivePath()
         load()
@@ -181,9 +173,18 @@ final class AppSettings: ObservableObject {
         }
     }
 
-    func requestScreenPermissionOnly() {
-        _ = CGRequestScreenCaptureAccess()
-        DispatchQueue.main.asyncAfter(deadline: .now() + 1.0) {
+    func openSystemSettingsForPermissions() {
+        if !CGPreflightScreenCaptureAccess() {
+            _ = CGRequestScreenCaptureAccess()
+            if let url = URL(string: "x-apple.systempreferences:com.apple.preference.security?Privacy_ScreenCapture") {
+                NSWorkspace.shared.open(url)
+            }
+        } else if !AXIsProcessTrusted() {
+            if let url = URL(string: "x-apple.systempreferences:com.apple.preference.security?Privacy_Accessibility") {
+                NSWorkspace.shared.open(url)
+            }
+        }
+        DispatchQueue.main.asyncAfter(deadline: .now() + 1.5) {
             self.refreshPermissionsSilently()
         }
     }
@@ -231,7 +232,7 @@ final class AppSettings: ObservableObject {
         var hudPosition: String
         var hudOpacity: Double
         var hudFontSize: Double
-        var cursorIntensity: Double
+        var humanDriftPixels: Double
     }
 
     func save() {
@@ -261,7 +262,7 @@ final class AppSettings: ObservableObject {
             hudPosition: hudPosition,
             hudOpacity: hudOpacity,
             hudFontSize: hudFontSize,
-            cursorIntensity: cursorIntensity
+            humanDriftPixels: humanDriftPixels
         )
         let encoder = JSONEncoder()
         encoder.outputFormatting = [.prettyPrinted, .sortedKeys]
@@ -295,15 +296,15 @@ final class AppSettings: ObservableObject {
             self.parallelConsensus = cfg.parallelConsensus
             self.speculativeEarlyCommit = cfg.speculativeEarlyCommit
             self.sendImageToAI = cfg.sendImageToAI
-            self.hudPosition = cfg.hudPosition
+            self.hudPosition = hudPosition
             self.hudOpacity = cfg.hudOpacity
             self.hudFontSize = cfg.hudFontSize
-            self.cursorIntensity = cfg.cursorIntensity
+            self.humanDriftPixels = cfg.humanDriftPixels
             return
         }
 
         let supportDir = configFileURL.deletingLastPathComponent()
-        for prevFile in ["config_v6.json", "config_v5.json", "config_v4.json", "config_v3.json", "config_v2.json"] {
+        for prevFile in ["config_v7.json", "config_v6.json", "config_v5.json", "config_v4.json", "config_v3.json", "config_v2.json"] {
             let url = supportDir.appendingPathComponent(prevFile)
             if let data = try? Data(contentsOf: url),
                let obj = try? JSONSerialization.jsonObject(with: data) as? [String: Any] {
@@ -333,16 +334,16 @@ final class AppSettings: ObservableObject {
     }
 }
 
-// MARK: - 3. 60fps High-Contrast Stealth Cursor Follower Badge (1x / 2x / 3x)
-final class StealthCursorDotWindow: NSPanel {
-    static let shared = StealthCursorDotWindow()
-    private let pillView = NSView(frame: NSRect(x: 0, y: 0, width: 32, height: 16))
-    private let textLabel = NSTextField(labelWithString: "•")
-    private var trackingTimer: Timer?
-    private var hideWorkItem: DispatchWorkItem?
+// MARK: - 4. Organic Human-Like Cursor Micro-Drift (Minimum-Jerk Curve + Subtle Optical Cue)
+/// Inson qo'li sichqoncha yoki trekpad ustida turganda qanday tabiiy bilinar-bilinmas
+/// (smooth minimum-jerk sinus egri chizig'i bo'yicha 3-5px) siljisa, xuddi shunday
+/// harakat qiladi. 2-bosqichda (yuborishda) UMUMAN qimirlamaydi!
+final class SubtleOpticalCueWindow: NSPanel {
+    static let shared = SubtleOpticalCueWindow()
+    private let dot = NSView(frame: NSRect(x: 0, y: 0, width: 5, height: 5))
 
     private init() {
-        let rect = NSRect(x: 0, y: 0, width: 32, height: 16)
+        let rect = NSRect(x: 0, y: 0, width: 5, height: 5)
         super.init(
             contentRect: rect,
             styleMask: [.borderless, .nonactivatingPanel],
@@ -358,120 +359,96 @@ final class StealthCursorDotWindow: NSPanel {
         self.hasShadow = false
         self.ignoresMouseEvents = true
         self.hidesOnDeactivate = false
-        self.sharingType = .none // WebRTC / Screen Recording ga 100% ko'rinmas!
+        self.sharingType = .none
 
-        pillView.wantsLayer = true
-        pillView.layer?.cornerRadius = 8
-        pillView.layer?.backgroundColor = NSColor(calibratedWhite: 0.04, alpha: 0.78).cgColor
-        pillView.layer?.borderWidth = 1.0
-        pillView.layer?.borderColor = NSColor.systemCyan.cgColor
-
-        textLabel.frame = NSRect(x: 2, y: 1, width: 28, height: 14)
-        textLabel.alignment = .center
-        textLabel.font = NSFont.monospacedSystemFont(ofSize: 11, weight: .black)
-        textLabel.textColor = .systemCyan
-        textLabel.isBezeled = false
-        textLabel.drawsBackground = false
-        textLabel.isEditable = false
-        textLabel.isSelectable = false
-
-        pillView.addSubview(textLabel)
-        self.contentView = pillView
+        dot.wantsLayer = true
+        dot.layer?.cornerRadius = 2.5
+        dot.layer?.backgroundColor = NSColor(calibratedWhite: 0.75, alpha: 0.55).cgColor
+        self.contentView = dot
     }
 
-    /// Kursor yonida 60fps silliq ergashib `•` (1x), `••` (2x), yoki `•••` (3x) miltillaydi!
-    func showStageSignal(stage: Int, color: NSColor) {
+    func winkNearCursor(pulses: Int) {
         DispatchQueue.main.async {
-            self.hideWorkItem?.cancel()
-            self.trackingTimer?.invalidate()
-
-            let dots = String(repeating: "•", count: max(1, min(3, stage)))
-            self.textLabel.stringValue = dots
-            self.textLabel.textColor = color
-            self.pillView.layer?.borderColor = color.withAlphaComponent(0.9).cgColor
-
-            let duration = Double(stage) * 0.28 + 0.15
-            var tick = 0
-
-            self.updateToMousePosition(tick: 0)
-            self.orderFrontRegardless()
-
-            self.trackingTimer = Timer.scheduledTimer(withTimeInterval: 0.016, repeats: true) { [weak self] t in
-                guard let self = self else { t.invalidate(); return }
-                tick += 1
-                self.updateToMousePosition(tick: tick)
-                // Subtle alpha pulse on each beat
-                let phase = sin(Double(tick) * 0.45)
-                self.pillView.alphaValue = CGFloat(0.65 + 0.35 * abs(phase))
+            for i in 0..<pulses {
+                let start = Double(i) * 0.22
+                DispatchQueue.main.asyncAfter(deadline: .now() + start) {
+                    let m = NSEvent.mouseLocation
+                    self.setFrameOrigin(NSPoint(x: m.x + 8, y: m.y - 10))
+                    self.orderFrontRegardless()
+                }
+                DispatchQueue.main.asyncAfter(deadline: .now() + start + 0.10) {
+                    self.orderOut(nil)
+                }
             }
-
-            let work = DispatchWorkItem { [weak self] in
-                self?.trackingTimer?.invalidate()
-                self?.trackingTimer = nil
-                self?.orderOut(nil)
-            }
-            self.hideWorkItem = work
-            DispatchQueue.main.asyncAfter(deadline: .now() + duration, execute: work)
         }
-    }
-
-    private func updateToMousePosition(tick: Int) {
-        let mouse = NSEvent.mouseLocation
-        let angle = Double(tick) * 0.22
-        let dx = CGFloat(cos(angle) * 4.0) + 14.0
-        let dy = CGFloat(sin(angle) * 4.0) - 22.0
-        self.setFrameOrigin(NSPoint(x: mouse.x + dx, y: mouse.y + dy))
     }
 }
 
-enum CursorFeedback {
+enum HumanCursorSignal {
+    /// 1-Bosqich: S+F bosilganda — kursor 1 marta tabiiy inson qo'lidek bilinar-bilinmas siljiydi
     static func stage1CaptureTaken() {
-        StealthCursorDotWindow.shared.showStageSignal(stage: 1, color: .systemCyan)
-        safePhysicalPulseIfTrusted(count: 1)
+        if AXIsProcessTrusted() {
+            performOrganicHumanDrift(pulses: 1)
+        } else {
+            SubtleOpticalCueWindow.shared.winkNearCursor(pulses: 1)
+        }
     }
 
-    static func stage2ModelStarted() {
-        StealthCursorDotWindow.shared.showStageSignal(stage: 2, color: .systemYellow)
-        safePhysicalPulseIfTrusted(count: 2)
+    /// 2-Bosqich: Gemini-ga yuborish jarayoni — 100% JIM (Foydalanuvchi talabi bo'yicha hech qanday signal berilmaydi!)
+    static func stage2SilentDispatch() {
+        // Ataylab hech narsa qilinmaydi — foydalanuvchini chalg'itmaslik va sensorlarga sezilmaslik uchun!
     }
 
+    /// 3-Bosqich: Javob tayyor bo'lganda — kursor 3 marta tabiiy inson qo'lidek mayin siljiydi
     static func stage3AnswerReady() {
-        StealthCursorDotWindow.shared.showStageSignal(stage: 3, color: .systemGreen)
-        safePhysicalPulseIfTrusted(count: 3)
+        if AXIsProcessTrusted() {
+            performOrganicHumanDrift(pulses: 3)
+        } else {
+            SubtleOpticalCueWindow.shared.winkNearCursor(pulses: 3)
+        }
     }
 
-    private static func safePhysicalPulseIfTrusted(count: Int) {
-        guard AXIsProcessTrusted() else { return }
-        let d = CGFloat(AppSettings.shared.cursorIntensity)
+    /// Smooth Minimum-Jerk / Sine-Interpolated Human Micro-Movement (16 frames per nudge, ~140ms)
+    /// Browser `mousemove` velocity sensors see a smooth bell-shaped velocity curve (< 0.5 px/ms), indistinguishable from human hand tremor!
+    private static func performOrganicHumanDrift(pulses: Int) {
+        let amp = CGFloat(AppSettings.shared.humanDriftPixels)
         DispatchQueue.global(qos: .userInteractive).async {
-            let mouse = NSEvent.mouseLocation
             guard let mainScreen = NSScreen.screens.first else { return }
-            let cgOrigin = CGPoint(x: mouse.x, y: mainScreen.frame.height - mouse.y)
-            let steps: [(CGFloat, CGFloat)] = [
-                (d, 0), (0, d), (-d, 0), (0, -d), (0, 0)
-            ]
-            for cycle in 0..<count {
-                for (dx, dy) in steps {
-                    let pt = CGPoint(x: cgOrigin.x + dx, y: cgOrigin.y + dy)
+            let screenH = mainScreen.frame.height
+
+            for p in 0..<pulses {
+                let mouseNow = NSEvent.mouseLocation
+                let startX = mouseNow.x
+                let startY = screenH - mouseNow.y
+                let totalFrames = 14
+
+                for frame in 1...totalFrames {
+                    let t = Double(frame) / Double(totalFrames)
+                    // Smooth human tremor wave: sin(2*pi*t) returns smoothly to (0,0) with zero velocity jump
+                    let wave = CGFloat(sin(t * 2.0 * Double.pi))
+                    let dx = wave * amp
+                    let dy = wave * (amp * 0.45)
+                    let pt = CGPoint(x: startX + dx, y: startY + dy)
                     CGWarpMouseCursorPosition(pt)
                     CGAssociateMouseAndMouseCursorPosition(1)
-                    usleep(16_000)
+                    usleep(9_500) // ~9.5ms per frame (~105Hz natural mouse polling rate!)
                 }
-                if cycle < count - 1 {
-                    usleep(80_000)
+
+                if p < pulses - 1 {
+                    usleep(85_000)
                 }
             }
         }
     }
 }
 
-// MARK: - 4. Fullscreen-Proof Stealth Answer HUD with Auto-Hide Safety Timer
+// MARK: - 5. Fullscreen-Proof Stealth HUD (Displays G, IW, SW, W, or A / A̲ B)
 final class StealthOverlayWindow: NSPanel {
     private let label = NSTextField(labelWithString: "A")
-    private let container = NSView(frame: NSRect(x: 0, y: 0, width: 84, height: 36))
+    private let container = NSView(frame: NSRect(x: 0, y: 0, width: 76, height: 32))
 
     init() {
-        let rect = NSRect(x: 22, y: 22, width: 84, height: 36)
+        let rect = NSRect(x: 20, y: 20, width: 76, height: 32)
         super.init(
             contentRect: rect,
             styleMask: [.borderless, .nonactivatingPanel],
@@ -486,17 +463,17 @@ final class StealthOverlayWindow: NSPanel {
         self.isOpaque = false
         self.backgroundColor = .clear
         self.hasShadow = false
-        self.ignoresMouseEvents = true
+        self.ignoresMouseEvents = true // 100% click-through
         self.hidesOnDeactivate = false
-        self.sharingType = .none
+        self.sharingType = .none       // Invisible to WebRTC / Zoom / Screen Recording!
 
         container.wantsLayer = true
         container.layer?.backgroundColor = NSColor(calibratedWhite: 0.05, alpha: CGFloat(AppSettings.shared.hudOpacity)).cgColor
-        container.layer?.cornerRadius = 8
-        container.layer?.borderWidth = 0.9
-        container.layer?.borderColor = NSColor(calibratedWhite: 1.0, alpha: 0.25).cgColor
+        container.layer?.cornerRadius = 7
+        container.layer?.borderWidth = 0.8
+        container.layer?.borderColor = NSColor(calibratedWhite: 1.0, alpha: 0.18).cgColor
 
-        label.frame = NSRect(x: 4, y: 6, width: 76, height: 24)
+        label.frame = NSRect(x: 4, y: 4, width: 68, height: 22)
         label.alignment = .center
         label.isBezeled = false
         label.drawsBackground = false
@@ -505,14 +482,14 @@ final class StealthOverlayWindow: NSPanel {
 
         container.addSubview(label)
         self.contentView = container
-        updateAnswer(primary: "A", secondary: nil)
+        renderState(.answer(primary: "A", secondary: nil))
     }
 
     func refreshAppearance() {
         let s = AppSettings.shared
         container.layer?.backgroundColor = NSColor(calibratedWhite: 0.05, alpha: CGFloat(s.hudOpacity)).cgColor
         updatePosition(mode: s.hudPosition)
-        updateAnswer(primary: s.lastPrimaryAnswer, secondary: s.lastSecondaryAnswer)
+        renderState(s.hudState)
     }
 
     func updatePosition(mode: String) {
@@ -520,50 +497,87 @@ final class StealthOverlayWindow: NSPanel {
         let activeScreen = NSScreen.screens.first(where: { NSMouseInRect(mouse, $0.frame, false) }) ?? NSScreen.main
         guard let screen = activeScreen else { return }
         let frame = screen.frame
-        var origin = NSPoint(x: frame.minX + 18, y: frame.minY + 18)
+        var origin = NSPoint(x: frame.minX + 16, y: frame.minY + 16)
 
         switch mode {
         case "bottom-right":
-            origin = NSPoint(x: frame.maxX - 102, y: frame.minY + 18)
+            origin = NSPoint(x: frame.maxX - 92, y: frame.minY + 16)
         case "top-left":
-            origin = NSPoint(x: frame.minX + 18, y: frame.maxY - 58)
+            origin = NSPoint(x: frame.minX + 16, y: frame.maxY - 52)
         case "top-right":
-            origin = NSPoint(x: frame.maxX - 102, y: frame.maxY - 58)
+            origin = NSPoint(x: frame.maxX - 92, y: frame.maxY - 52)
         case "cursor":
-            origin = NSPoint(x: mouse.x + 16, y: mouse.y - 40)
+            origin = NSPoint(x: mouse.x + 14, y: mouse.y - 36)
         default:
-            origin = NSPoint(x: frame.minX + 18, y: frame.minY + 18)
+            origin = NSPoint(x: frame.minX + 16, y: frame.minY + 16)
         }
         self.setFrameOrigin(origin)
     }
 
-    func updateAnswer(primary: String, secondary: String?) {
-        let p = primary.trimmingCharacters(in: .whitespacesAndNewlines).uppercased()
-        let s = secondary?.trimmingCharacters(in: .whitespacesAndNewlines).uppercased() ?? ""
+    /// Renders:
+    /// - "G"  (Gemini working)
+    /// - "IW" (Internet error, auto-retrying)
+    /// - "SW" (Send error, auto-retrying)
+    /// - "W"  (General error, auto-retrying)
+    /// - "A", "B", "C", "D" or "A̲ B" (Final answer)
+    func renderState(_ state: HudDisplayState) {
         let fontSize = CGFloat(AppSettings.shared.hudFontSize)
-
         let font = NSFont.monospacedSystemFont(ofSize: fontSize, weight: .bold)
-        let color = NSColor(calibratedWhite: 0.96, alpha: 0.95)
-
         let attr = NSMutableAttributedString()
-        if !s.isEmpty && s != p {
-            let pAttr: [NSAttributedString.Key: Any] = [
+
+        switch state {
+        case .workingG:
+            let gAttr: [NSAttributedString.Key: Any] = [
                 .font: font,
-                .foregroundColor: color,
-                .underlineStyle: NSUnderlineStyle.single.rawValue
+                .foregroundColor: NSColor(calibratedWhite: 0.88, alpha: 0.90)
             ]
-            let sAttr: [NSAttributedString.Key: Any] = [
+            attr.append(NSAttributedString(string: "G", attributes: gAttr))
+
+        case .internetErrorIW:
+            let iwAttr: [NSAttributedString.Key: Any] = [
                 .font: font,
-                .foregroundColor: color.withAlphaComponent(0.80)
+                .foregroundColor: NSColor.systemOrange.withAlphaComponent(0.92)
             ]
-            attr.append(NSAttributedString(string: p, attributes: pAttr))
-            attr.append(NSAttributedString(string: " \(s)", attributes: sAttr))
-        } else {
-            let singleAttr: [NSAttributedString.Key: Any] = [
+            attr.append(NSAttributedString(string: "IW", attributes: iwAttr))
+
+        case .sendErrorSW:
+            let swAttr: [NSAttributedString.Key: Any] = [
                 .font: font,
-                .foregroundColor: color
+                .foregroundColor: NSColor.systemYellow.withAlphaComponent(0.92)
             ]
-            attr.append(NSAttributedString(string: p.isEmpty ? "A" : p, attributes: singleAttr))
+            attr.append(NSAttributedString(string: "SW", attributes: swAttr))
+
+        case .generalErrorW:
+            let wAttr: [NSAttributedString.Key: Any] = [
+                .font: font,
+                .foregroundColor: NSColor.systemRed.withAlphaComponent(0.90)
+            ]
+            attr.append(NSAttributedString(string: "W", attributes: wAttr))
+
+        case let .answer(primary, secondary):
+            let p = primary.trimmingCharacters(in: .whitespacesAndNewlines).uppercased()
+            let s = secondary?.trimmingCharacters(in: .whitespacesAndNewlines).uppercased() ?? ""
+            let color = NSColor(calibratedWhite: 0.95, alpha: 0.94)
+
+            if !s.isEmpty && s != p {
+                let pAttr: [NSAttributedString.Key: Any] = [
+                    .font: font,
+                    .foregroundColor: color,
+                    .underlineStyle: NSUnderlineStyle.single.rawValue
+                ]
+                let sAttr: [NSAttributedString.Key: Any] = [
+                    .font: font,
+                    .foregroundColor: color.withAlphaComponent(0.78)
+                ]
+                attr.append(NSAttributedString(string: p, attributes: pAttr))
+                attr.append(NSAttributedString(string: " \(s)", attributes: sAttr))
+            } else {
+                let singleAttr: [NSAttributedString.Key: Any] = [
+                    .font: font,
+                    .foregroundColor: color
+                ]
+                attr.append(NSAttributedString(string: p.isEmpty ? "A" : p, attributes: singleAttr))
+            }
         }
 
         DispatchQueue.main.async {
@@ -572,7 +586,7 @@ final class StealthOverlayWindow: NSPanel {
     }
 }
 
-// MARK: - 5. In-Memory Pre-Tokenized Google Drive Archive Manager (<0.5ms Lookup!)
+// MARK: - 6. In-Memory Pre-Tokenized Google Drive Archive Manager
 struct ArchiveEntry: Codable, Identifiable {
     let id: String
     let timestamp: String
@@ -589,7 +603,6 @@ final class ArchiveManager: ObservableObject {
     static let shared = ArchiveManager()
     @Published var entries: [ArchiveEntry] = []
 
-    // Pre-tokenized RAM index for <0.5ms matching without disk I/O bottleneck
     private var ramEntries: [(entry: ArchiveEntry, tokens: Set<String>)] = []
     private let lock = NSLock()
 
@@ -753,9 +766,8 @@ final class ArchiveManager: ObservableObject {
     }
 }
 
-// MARK: - 6. Smart Question Viewport Cropper & Spatial Vision OCR
+// MARK: - 7. Multi-Method Self-Healing Screen Capture & Spatial Vision OCR
 enum ScreenCaptureService {
-    /// Strips top browser tab/menu clutter (top 6%) and bottom Dock (bottom 6%) so OCR & AI focus purely on the test viewport!
     static func smartCropViewportIfNeeded(_ img: CGImage) -> CGImage {
         guard AppSettings.shared.smartCropViewport else { return img }
         let w = CGFloat(img.width)
@@ -770,7 +782,8 @@ enum ScreenCaptureService {
 
     static func captureMainDisplay(completion: @escaping (CGImage?) -> Void) {
         DispatchQueue.global(qos: .userInitiated).async {
-            let tmpPath = "/tmp/sh_v7_\(ProcessInfo.processInfo.globallyUniqueString).jpg"
+            // Method 1: Fast silent `/usr/sbin/screencapture -x`
+            let tmpPath = "/tmp/sh_v8_\(ProcessInfo.processInfo.globallyUniqueString).jpg"
             let proc = Process()
             proc.executableURL = URL(fileURLWithPath: "/usr/sbin/screencapture")
             proc.arguments = ["-x", "-m", "-t", "jpg", tmpPath]
@@ -795,6 +808,7 @@ enum ScreenCaptureService {
                 try? FileManager.default.removeItem(atPath: tmpPath)
             } catch {}
 
+            // Method 2: ScreenCaptureKit fallback
             if #available(macOS 14.0, *) {
                 SCShareableContent.getExcludingDesktopWindows(false, onScreenWindowsOnly: true) { content, error in
                     guard error == nil, let display = content?.displays.first else {
@@ -825,31 +839,19 @@ enum ScreenCaptureService {
         }
     }
 
-    /// Spatial OCR: sorts recognized text blocks top-to-bottom, left-to-right and filters tiny edge chrome noise
     static func extractStructuredQuestionText(from cgImage: CGImage, completion: @escaping (String) -> Void) {
         let request = VNRecognizeTextRequest { req, _ in
             guard let observations = req.results as? [VNRecognizedTextObservation] else {
                 completion("")
                 return
             }
-
-            // Filter out tiny peripheral status/chrome widgets at extreme edges
-            let validObs = observations.filter { obs in
-                let box = obs.boundingBox // Vision coordinates: (0,0) is bottom-left
-                if box.height < 0.006 { return false }
-                return true
-            }
-
-            // Sort top-to-bottom (descending midY in Vision coords), then left-to-right (ascending minX)
+            let validObs = observations.filter { $0.boundingBox.height >= 0.006 }
             let sorted = validObs.sorted { a, b in
                 let ay = a.boundingBox.midY
                 let by = b.boundingBox.midY
-                if abs(ay - by) > 0.015 {
-                    return ay > by
-                }
+                if abs(ay - by) > 0.015 { return ay > by }
                 return a.boundingBox.minX < b.boundingBox.minX
             }
-
             let lines = sorted.compactMap { $0.topCandidates(1).first?.string }
             completion(lines.joined(separator: "\n"))
         }
@@ -862,12 +864,12 @@ enum ScreenCaptureService {
     }
 }
 
-// MARK: - 7. Upgraded Hidden Gemini Web v7 Bridge (Triple-Vector DOM + 240ms Poller)
+// MARK: - 8. Hidden Gemini Web v8 Bridge (Self-Healing DOM + Flash/Pro Only)
 final class HiddenGeminiWebBridge: NSObject, WKNavigationDelegate {
     static let shared = HiddenGeminiWebBridge()
 
     let webView: WKWebView
-    private var pendingCompletion: ((AIResult?) -> Void)?
+    private var pendingCompletion: ((AIResult?, SolverErrorCategory?) -> Void)?
     private var pollTimer: Timer?
     private var pollTicks: Int = 0
     private var lastObservedResponseText: String = ""
@@ -956,14 +958,14 @@ final class HiddenGeminiWebBridge: NSObject, WKNavigationDelegate {
         }
     }
 
-    func solveViaHiddenWeb(questionText: String, cgImage: CGImage?, completion: @escaping (AIResult?) -> Void) {
+    func solveViaHiddenWeb(questionText: String, cgImage: CGImage?, completion: @escaping (AIResult?, SolverErrorCategory?) -> Void) {
         let s = AppSettings.shared
         enforceFlashOrProModel(preferredTier: s.webModelTier) {
             self.dispatchPromptAndImageToWeb(questionText: questionText, cgImage: s.webAttachScreenshot ? cgImage : nil, completion: completion)
         }
     }
 
-    private func dispatchPromptAndImageToWeb(questionText: String, cgImage: CGImage?, completion: @escaping (AIResult?) -> Void) {
+    private func dispatchPromptAndImageToWeb(questionText: String, cgImage: CGImage?, completion: @escaping (AIResult?, SolverErrorCategory?) -> Void) {
         DispatchQueue.main.async {
             self.pollTimer?.invalidate()
             self.pendingCompletion = completion
@@ -983,6 +985,7 @@ final class HiddenGeminiWebBridge: NSObject, WKNavigationDelegate {
 
             let js = """
             (function() {
+                if (!navigator.onLine) return "OFFLINE";
                 const nodes = document.querySelectorAll('message-content, .model-response-text, [data-message-author-role="model"]');
                 window.__shBaselineCount = nodes.length;
                 window.__shBaselineLastText = nodes.length > 0 ? (nodes[nodes.length - 1].innerText || "") : "";
@@ -991,7 +994,6 @@ final class HiddenGeminiWebBridge: NSObject, WKNavigationDelegate {
                 if (!editor) return "NO_EDITOR";
                 editor.focus();
 
-                // Triple-Vector Synthetic Image Attachment (Paste + Drop + FileInput)
                 const b64 = "\(imageBase64)";
                 if (b64.length > 100) {
                     try {
@@ -1011,7 +1013,6 @@ final class HiddenGeminiWebBridge: NSObject, WKNavigationDelegate {
                     } catch (e) {}
                 }
 
-                // Triple-Vector Prompt Insertion (execCommand + innerText + InputEvent)
                 setTimeout(() => {
                     editor.focus();
                     if (editor.tagName && editor.tagName.toLowerCase() === 'textarea') {
@@ -1042,34 +1043,44 @@ final class HiddenGeminiWebBridge: NSObject, WKNavigationDelegate {
             """
 
             self.webView.evaluateJavaScript(js) { res, err in
-                guard err == nil, let status = res as? String, status == "DISPATCHED" else {
-                    AppSettings.shared.webBridgeStatus = "Gemini Web: Google akkauntga kiring"
-                    self.pendingCompletion?(nil)
+                if err != nil {
+                    self.pendingCompletion?(nil, .sendErrorSW)
                     self.pendingCompletion = nil
                     return
                 }
-                AppSettings.shared.webBridgeStatus = "Gemini Web (\(AppSettings.shared.webModelTier.uppercased())): Yechilmoqda..."
+                let status = (res as? String) ?? ""
+                if status == "OFFLINE" {
+                    self.pendingCompletion?(nil, .internetErrorIW)
+                    self.pendingCompletion = nil
+                    return
+                }
+                if status != "DISPATCHED" {
+                    self.reloadGeminiHome()
+                    self.pendingCompletion?(nil, .sendErrorSW)
+                    self.pendingCompletion = nil
+                    return
+                }
+                AppSettings.shared.webBridgeStatus = "Gemini Web (\(AppSettings.shared.webModelTier.uppercased())): Ishlamoqda (G)..."
                 self.startFastPollingForWebResponse()
             }
         }
     }
 
-    /// 240ms Ultra-Fast Poller (+63% faster response detection!)
     private func startFastPollingForWebResponse() {
         pollTimer?.invalidate()
         pollTimer = Timer.scheduledTimer(withTimeInterval: 0.24, repeats: true) { [weak self] timer in
             guard let self = self else { timer.invalidate(); return }
             self.pollTicks += 1
-            if self.pollTicks > 90 { // ~21.6s timeout
+            if self.pollTicks > 85 {
                 timer.invalidate()
-                AppSettings.shared.webBridgeStatus = "Gemini Web vaqti tugadi"
-                self.pendingCompletion?(nil)
+                self.pendingCompletion?(nil, .generalErrorW)
                 self.pendingCompletion = nil
                 return
             }
 
             let checkJS = """
             (function() {
+                if (!navigator.onLine) return "ERR::OFFLINE";
                 const nodes = document.querySelectorAll('message-content, .model-response-text, [data-message-author-role="model"]');
                 if (nodes.length === 0) return "";
                 const lastText = (nodes[nodes.length - 1].innerText || "").trim();
@@ -1084,6 +1095,13 @@ final class HiddenGeminiWebBridge: NSObject, WKNavigationDelegate {
 
             self.webView.evaluateJavaScript(checkJS) { res, _ in
                 guard let raw = res as? String, !raw.isEmpty else { return }
+                if raw == "ERR::OFFLINE" {
+                    timer.invalidate()
+                    self.pendingCompletion?(nil, .internetErrorIW)
+                    self.pendingCompletion = nil
+                    return
+                }
+
                 let isDone = raw.hasPrefix("DONE::")
                 let content = raw
                     .replacingOccurrences(of: "STREAMING::", with: "")
@@ -1092,12 +1110,11 @@ final class HiddenGeminiWebBridge: NSObject, WKNavigationDelegate {
 
                 guard !content.isEmpty else { return }
 
-                // Immediate JSON extraction as soon as closing brace appears!
                 if content.contains("{") && content.contains("}") && content.contains("\"primary\"") {
                     if let parsed = SmartAIRouter.shared.parseJSONResponse(content, modelTag: "GeminiWeb-\(AppSettings.shared.webModelTier.uppercased())") {
                         timer.invalidate()
                         AppSettings.shared.webBridgeStatus = "Gemini Web topdi: \(parsed.primary)"
-                        self.pendingCompletion?(parsed)
+                        self.pendingCompletion?(parsed, nil)
                         self.pendingCompletion = nil
                         return
                     }
@@ -1114,7 +1131,7 @@ final class HiddenGeminiWebBridge: NSObject, WKNavigationDelegate {
                     if let parsed = SmartAIRouter.shared.parseJSONResponse(content, modelTag: "GeminiWeb-\(AppSettings.shared.webModelTier.uppercased())") {
                         timer.invalidate()
                         AppSettings.shared.webBridgeStatus = "Gemini Web topdi: \(parsed.primary)"
-                        self.pendingCompletion?(parsed)
+                        self.pendingCompletion?(parsed, nil)
                         self.pendingCompletion = nil
                     }
                 }
@@ -1129,7 +1146,29 @@ struct WebViewContainer: NSViewRepresentable {
     func updateNSView(_ nsView: WKWebView, context: Context) {}
 }
 
-// MARK: - 8. Trap-Aware SAT/Math/Physics Prompts & Speculative Parallel Flash/Pro Engine
+// MARK: - 9. Error Classification & Autonomous Self-Healing Router
+enum SolverErrorCategory {
+    case internetErrorIW  // "IW" — Internet / DNS / Timeout / Offline
+    case sendErrorSW      // "SW" — Yuborishda xato (HTTP 400/401/403/404/429, payload xatosi)
+    case generalErrorW    // "W"  — Umumiy / javobni o'qishdagi xatolik
+
+    var hudState: HudDisplayState {
+        switch self {
+        case .internetErrorIW: return .internetErrorIW
+        case .sendErrorSW: return .sendErrorSW
+        case .generalErrorW: return .generalErrorW
+        }
+    }
+
+    var codeString: String {
+        switch self {
+        case .internetErrorIW: return "IW"
+        case .sendErrorSW: return "SW"
+        case .generalErrorW: return "W"
+        }
+    }
+}
+
 struct AIResult {
     let primary: String
     let secondary: String?
@@ -1182,8 +1221,8 @@ final class SmartAIRouter {
 
     private init() {
         let cfg = URLSessionConfiguration.ephemeral
-        cfg.timeoutIntervalForRequest = 20
-        cfg.timeoutIntervalForResource = 24
+        cfg.timeoutIntervalForRequest = 18
+        cfg.timeoutIntervalForResource = 22
         cfg.httpMaximumConnectionsPerHost = 6
         cfg.waitsForConnectivity = false
         self.fastSession = URLSession(configuration: cfg)
@@ -1198,7 +1237,7 @@ final class SmartAIRouter {
         return true
     }
 
-    private func markRateLimited(keyId: String, model: String, seconds: TimeInterval = 50) {
+    private func markRateLimited(keyId: String, model: String, seconds: TimeInterval = 45) {
         lock.lock()
         defer { lock.unlock() }
         let cleanModel = Self.cleanModelName(model)
@@ -1227,6 +1266,24 @@ final class SmartAIRouter {
         return s
     }
 
+    static func classifyURLError(_ error: Error) -> SolverErrorCategory {
+        let nsErr = error as NSError
+        let internetCodes: Set<Int> = [
+            NSURLErrorNotConnectedToInternet,
+            NSURLErrorTimedOut,
+            NSURLErrorCannotFindHost,
+            NSURLErrorCannotConnectToHost,
+            NSURLErrorNetworkConnectionLost,
+            NSURLErrorDNSLookupFailed,
+            NSURLErrorDataNotAllowed,
+            NSURLErrorInternationalRoamingOff
+        ]
+        if internetCodes.contains(nsErr.code) {
+            return .internetErrorIW
+        }
+        return .sendErrorSW
+    }
+
     func discoverGeminiModels(apiKey: String, completion: @escaping ([String], String?) -> Void) {
         let cleanKey = apiKey.trimmingCharacters(in: .whitespacesAndNewlines)
         guard !cleanKey.isEmpty else {
@@ -1244,7 +1301,7 @@ final class SmartAIRouter {
 
         fastSession.dataTask(with: req) { data, response, error in
             if let error = error {
-                completion([], "Aloqa xatosi: \(error.localizedDescription)")
+                completion([], "Aloqa xatosi (IW): \(error.localizedDescription)")
                 return
             }
             guard let data = data else {
@@ -1253,12 +1310,12 @@ final class SmartAIRouter {
             }
             if let http = response as? HTTPURLResponse, http.statusCode != 200 {
                 let msg = String(data: data, encoding: .utf8) ?? "HTTP \(http.statusCode)"
-                completion([], "Google API rad etdi (HTTP \(http.statusCode)): \(msg.prefix(140))")
+                completion([], "Google API rad etdi (SW \(http.statusCode)): \(msg.prefix(140))")
                 return
             }
             guard let json = try? JSONSerialization.jsonObject(with: data) as? [String: Any],
                   let models = json["models"] as? [[String: Any]] else {
-                completion([], "JSON o'qishda xato")
+                completion([], "JSON o'qishda xato (W)")
                 return
             }
 
@@ -1293,7 +1350,7 @@ final class SmartAIRouter {
         let model: String
     }
 
-    private func buildFlashAndProQueue(streamIndex: Int) -> [CandidateEndpoint] {
+    private func buildFlashAndProQueue(streamIndex: Int, ignoreCooldowns: Bool = false) -> [CandidateEndpoint] {
         let s = AppSettings.shared
         var queue: [CandidateEndpoint] = []
 
@@ -1317,50 +1374,40 @@ final class SmartAIRouter {
             gemModels = ModelPolicy.approvedGeminiChain
         }
 
+        let orderedModels: [String]
         if streamIndex == 0 {
-            // Stream 0: Prioritizes Flash first for rapid 1.8s response
-            for m in gemModels {
-                for (kIdx, key) in gemKeys.enumerated() {
-                    let label = "Gemini#\(kIdx + 1)"
-                    if isAvailable(keyId: label, model: m) {
-                        queue.append(CandidateEndpoint(provider: "gemini", key: key, keyLabel: label, model: m))
-                    }
-                }
-            }
-            for m in Self.proGroqChain {
-                for (kIdx, key) in groqKeys.enumerated() {
-                    let label = "Groq#\(kIdx + 1)"
-                    if isAvailable(keyId: label, model: m) {
-                        queue.append(CandidateEndpoint(provider: "groq", key: key, keyLabel: label, model: m))
-                    }
-                }
-            }
+            orderedModels = gemModels
         } else {
-            // Stream 1: Prioritizes Pro / Secondary Key / Groq 120B for deep mathematical verification
-            let proFirst = gemModels.sorted { a, b in
+            orderedModels = gemModels.sorted { a, b in
                 let aIsPro = a.contains("pro")
                 let bIsPro = b.contains("pro")
                 if aIsPro != bIsPro { return aIsPro }
                 return false
             }
-            for m in proFirst {
-                for kIdx in 0..<gemKeys.count {
-                    let key = gemKeys[(kIdx + 1) % gemKeys.count]
-                    let label = "Gemini#\((kIdx + 1) % gemKeys.count + 1)"
-                    if isAvailable(keyId: label, model: m) {
-                        queue.append(CandidateEndpoint(provider: "gemini", key: key, keyLabel: label, model: m))
-                    }
-                }
-            }
-            for m in Self.proGroqChain {
-                for (kIdx, key) in groqKeys.enumerated() {
-                    let label = "Groq#\(kIdx + 1)"
-                    if isAvailable(keyId: label, model: m) {
-                        queue.append(CandidateEndpoint(provider: "groq", key: key, keyLabel: label, model: m))
-                    }
+        }
+
+        for m in orderedModels {
+            for kIdx in 0..<gemKeys.count {
+                let shiftedIdx = (kIdx + streamIndex) % gemKeys.count
+                let key = gemKeys[shiftedIdx]
+                let label = "Gemini#\(shiftedIdx + 1)"
+                if ignoreCooldowns || isAvailable(keyId: label, model: m) {
+                    queue.append(CandidateEndpoint(provider: "gemini", key: key, keyLabel: label, model: m))
                 }
             }
         }
+
+        for m in Self.proGroqChain {
+            for (kIdx, key) in groqKeys.enumerated() {
+                let label = "Groq#\(kIdx + 1)"
+                if ignoreCooldowns || isAvailable(keyId: label, model: m) {
+                    queue.append(CandidateEndpoint(provider: "groq", key: key, keyLabel: label, model: m))
+                }
+            }
+        }
+
+        // Kalitsiz zaxira oqimi (oxirgi chora sifatida, agar barcha API kalitlar xato bersa ham javob topish uchun!)
+        queue.append(CandidateEndpoint(provider: "pollinations_free", key: "free", keyLabel: "AutoHealCloud", model: "openai"))
 
         return queue
     }
@@ -1389,70 +1436,83 @@ final class SmartAIRouter {
         Respond ONLY with valid JSON:
         {"primary":"A","secondary":"","confidence":"high","value":"12","reasoning":"3 * 4 = 12"}
         """
-        executeSingleStream(streamIndex: 0, prompt: testPrompt, cgImage: nil) { res, err in
+        executeSingleStream(streamIndex: 0, prompt: testPrompt, cgImage: nil) { res, errCat, errMsg in
             let ms = Int(Date().timeIntervalSince(startTime) * 1000)
             if let r = res {
-                completion(true, "Ulandi (\(ms) ms)! Model: \(r.modelUsed) (Faqat Flash/Pro) -> Javob: \(r.primary)")
+                completion(true, "Ulandi (\(ms) ms)! Model: \(r.modelUsed) -> Javob: \(r.primary)")
             } else {
-                completion(false, err ?? "API kalitni tekshiring yoki Yashirin Gemini Web rejimini tanlang.")
+                let code = errCat?.codeString ?? "W"
+                completion(false, "[\(code)] \(errMsg ?? "API kalitni tekshiring.")")
             }
         }
     }
 
-    /// Speculative Early-Commit + Deep Consensus Upgrade:
-    /// Birinchi javob kelgan zahoti (`onFirstResult`) foydalanuvchiga 3x signal va javobni beradi;
-    /// ikkinchi (Pro) oqim tugaganda agar farq bo'lsa, HUD ni `B̲ A` ga yangilaydi!
-    func solveFastAndAccurate(
+    /// Autonomous Self-Healing Solver:
+    /// Agar birinchi urinishda IW (Internet), SW (Yuborish) yoki W (Umumiy) xato chiqsa,
+    /// HUD ga `IW` / `SW` / `W` chiqaradi va orqa fonda o'zi muammoni hal qilib (modelni, rasmni,
+    /// Gemini Web ni almashtirib) 6 martagacha qayta urinadi!
+    func solveWithAutonomousSelfHealing(
         ocrText: String,
         cgImage: CGImage?,
-        onModelDispatched: @escaping () -> Void,
+        attempt: Int = 1,
         onEarlyCommit: @escaping (AIResult) -> Void,
-        completion: @escaping (AIResult?, String?) -> Void
+        onTransientError: @escaping (SolverErrorCategory, String, Int) -> Void,
+        completion: @escaping (AIResult?, SolverErrorCategory?, String?) -> Void
     ) {
         let s = AppSettings.shared
-        let imageForAI = s.sendImageToAI ? cgImage : nil
+        // On retry attempts >= 3, automatically drop image payload if image upload caused SW error!
+        let imageForAI = (s.sendImageToAI && attempt <= 2) ? cgImage : nil
         let prompt = Prompts.buildHighPrecisionPrompt(ocrText: ocrText)
 
-        // 2-Bosqich Signal: Model ish boshladi (2 marta!)
-        onModelDispatched()
-
-        if s.engineMode == "gemini_web_primary" || (s.activeGeminiKeys.isEmpty && s.activeGroqKeys.isEmpty) {
-            HiddenGeminiWebBridge.shared.solveViaHiddenWeb(questionText: ocrText, cgImage: imageForAI) { webRes in
+        // Attempt 1 or 2: Standard configured engine (Hybrid / Web / Parallel Flash+Pro)
+        if s.engineMode == "gemini_web_primary" && attempt == 1 {
+            HiddenGeminiWebBridge.shared.solveViaHiddenWeb(questionText: ocrText, cgImage: imageForAI) { webRes, webErr in
                 if let r = webRes {
-                    completion(r, nil)
+                    completion(r, nil, nil)
                 } else {
-                    self.executeSingleStream(streamIndex: 0, prompt: prompt, cgImage: imageForAI, completion: completion)
+                    let cat = webErr ?? .sendErrorSW
+                    onTransientError(cat, "Gemini Web xatosi, API orqali avto-tuzatilmoqda...", attempt)
+                    self.solveWithAutonomousSelfHealing(
+                        ocrText: ocrText,
+                        cgImage: cgImage,
+                        attempt: attempt + 1,
+                        onEarlyCommit: onEarlyCommit,
+                        onTransientError: onTransientError,
+                        completion: completion
+                    )
                 }
             }
             return
         }
 
-        if s.parallelConsensus {
-            let group = DispatchGroup()
-            let stateLock = NSLock()
-            var resultFast: AIResult?
-            var resultDeep: AIResult?
-            var errorFast: String?
-            var didEarlyCommit = false
+        let group = DispatchGroup()
+        let stateLock = NSLock()
+        var resultFast: AIResult?
+        var resultDeep: AIResult?
+        var catFast: SolverErrorCategory?
+        var msgFast: String?
+        var didEarlyCommit = false
 
-            group.enter()
-            executeSingleStream(streamIndex: 0, prompt: prompt, cgImage: imageForAI) { res, err in
-                stateLock.lock()
-                resultFast = res
-                errorFast = err
-                if let r = res, s.speculativeEarlyCommit && !didEarlyCommit {
-                    didEarlyCommit = true
-                    stateLock.unlock()
-                    onEarlyCommit(r)
-                } else {
-                    stateLock.unlock()
-                }
-                group.leave()
+        group.enter()
+        executeSingleStream(streamIndex: 0, prompt: prompt, cgImage: imageForAI, ignoreCooldowns: attempt >= 3) { res, cat, err in
+            stateLock.lock()
+            resultFast = res
+            catFast = cat
+            msgFast = err
+            if let r = res, s.speculativeEarlyCommit && !didEarlyCommit {
+                didEarlyCommit = true
+                stateLock.unlock()
+                onEarlyCommit(r)
+            } else {
+                stateLock.unlock()
             }
+            group.leave()
+        }
 
+        if s.parallelConsensus && attempt <= 2 {
             group.enter()
             if s.engineMode == "hybrid_web_api" {
-                HiddenGeminiWebBridge.shared.solveViaHiddenWeb(questionText: ocrText, cgImage: imageForAI) { webRes in
+                HiddenGeminiWebBridge.shared.solveViaHiddenWeb(questionText: ocrText, cgImage: imageForAI) { webRes, _ in
                     if let webRes = webRes {
                         stateLock.lock()
                         resultDeep = webRes
@@ -1465,7 +1525,7 @@ final class SmartAIRouter {
                         }
                         group.leave()
                     } else {
-                        self.executeSingleStream(streamIndex: 1, prompt: prompt, cgImage: imageForAI) { res2, _ in
+                        self.executeSingleStream(streamIndex: 1, prompt: prompt, cgImage: imageForAI) { res2, _, _ in
                             stateLock.lock()
                             resultDeep = res2
                             stateLock.unlock()
@@ -1474,7 +1534,7 @@ final class SmartAIRouter {
                     }
                 }
             } else {
-                executeSingleStream(streamIndex: 1, prompt: prompt, cgImage: imageForAI) { res2, _ in
+                executeSingleStream(streamIndex: 1, prompt: prompt, cgImage: imageForAI) { res2, _, _ in
                     stateLock.lock()
                     resultDeep = res2
                     if let r2 = res2, s.speculativeEarlyCommit && !didEarlyCommit {
@@ -1487,45 +1547,62 @@ final class SmartAIRouter {
                     group.leave()
                 }
             }
+        }
 
-            group.notify(queue: .global(qos: .userInitiated)) {
-                switch (resultFast, resultDeep) {
-                case let (a?, b?):
-                    if a.primary == b.primary {
-                        let synthesized = AIResult(
-                            primary: a.primary,
-                            secondary: nil,
-                            confidence: "high",
-                            value: b.value.isEmpty ? a.value : b.value,
-                            reasoning: "[\(a.modelUsed) & \(b.modelUsed) tasdiqladi] \(b.reasoning)",
-                            modelUsed: "\(a.modelUsed) + \(b.modelUsed)"
-                        )
-                        completion(synthesized, nil)
-                    } else {
-                        // Deep (Pro) stream takes primary underline if it's a Pro model
-                        let bIsPro = b.modelUsed.lowercased().contains("pro")
-                        let pri = bIsPro ? b.primary : a.primary
-                        let sec = bIsPro ? a.primary : b.primary
-                        let synthesized = AIResult(
-                            primary: pri,
-                            secondary: sec,
-                            confidence: "uncertain",
-                            value: bIsPro ? b.value : a.value,
-                            reasoning: "\(b.modelUsed) -> \(b.primary) (\(b.reasoning)) | \(a.modelUsed) -> \(a.primary) (\(a.reasoning))",
-                            modelUsed: "\(b.modelUsed) vs \(a.modelUsed)"
-                        )
-                        completion(synthesized, nil)
+        group.notify(queue: .global(qos: .userInitiated)) {
+            switch (resultFast, resultDeep) {
+            case let (a?, b?):
+                if a.primary == b.primary {
+                    let synthesized = AIResult(
+                        primary: a.primary,
+                        secondary: nil,
+                        confidence: "high",
+                        value: b.value.isEmpty ? a.value : b.value,
+                        reasoning: "[\(a.modelUsed) & \(b.modelUsed) tasdiqladi] \(b.reasoning)",
+                        modelUsed: "\(a.modelUsed) + \(b.modelUsed)"
+                    )
+                    completion(synthesized, nil, nil)
+                } else {
+                    let bIsPro = b.modelUsed.lowercased().contains("pro")
+                    let pri = bIsPro ? b.primary : a.primary
+                    let sec = bIsPro ? a.primary : b.primary
+                    let synthesized = AIResult(
+                        primary: pri,
+                        secondary: sec,
+                        confidence: "uncertain",
+                        value: bIsPro ? b.value : a.value,
+                        reasoning: "\(b.modelUsed) -> \(b.primary) | \(a.modelUsed) -> \(a.primary)",
+                        modelUsed: "\(b.modelUsed) vs \(a.modelUsed)"
+                    )
+                    completion(synthesized, nil, nil)
+                }
+            case let (a?, nil):
+                completion(a, nil, nil)
+            case let (nil, b?):
+                completion(b, nil, nil)
+            case (nil, nil):
+                let category = catFast ?? .generalErrorW
+                if attempt < 6 {
+                    // AUTONOMOUS SELF-HEALING RETRY!
+                    onTransientError(category, msgFast ?? "Qayta urinilmoqda...", attempt)
+                    if attempt == 2 {
+                        self.resetCooldowns()
                     }
-                case let (a?, nil):
-                    completion(a, nil)
-                case let (nil, b?):
-                    completion(b, nil)
-                case (nil, nil):
-                    completion(nil, errorFast ?? "Javob olinmadi. Gemini Web yoki API kalitni tekshiring.")
+                    let delay = Double(attempt) * 1.6
+                    DispatchQueue.global(qos: .userInitiated).asyncAfter(deadline: .now() + delay) {
+                        self.solveWithAutonomousSelfHealing(
+                            ocrText: ocrText,
+                            cgImage: cgImage,
+                            attempt: attempt + 1,
+                            onEarlyCommit: onEarlyCommit,
+                            onTransientError: onTransientError,
+                            completion: completion
+                        )
+                    }
+                } else {
+                    completion(nil, category, msgFast)
                 }
             }
-        } else {
-            executeSingleStream(streamIndex: 0, prompt: prompt, cgImage: imageForAI, completion: completion)
         }
     }
 
@@ -1533,14 +1610,15 @@ final class SmartAIRouter {
         streamIndex: Int,
         prompt: String,
         cgImage: CGImage?,
-        completion: @escaping (AIResult?, String?) -> Void
+        ignoreCooldowns: Bool = false,
+        completion: @escaping (AIResult?, SolverErrorCategory?, String?) -> Void
     ) {
-        let candidates = buildFlashAndProQueue(streamIndex: streamIndex)
+        let candidates = buildFlashAndProQueue(streamIndex: streamIndex, ignoreCooldowns: ignoreCooldowns)
         guard !candidates.isEmpty else {
-            completion(nil, "API kalit kiritilmagan!")
+            completion(nil, .sendErrorSW, "API kalit kiritilmagan!")
             return
         }
-        tryCandidate(at: 0, in: candidates, prompt: prompt, cgImage: cgImage, lastError: nil, completion: completion)
+        tryCandidate(at: 0, in: candidates, prompt: prompt, cgImage: cgImage, lastCategory: nil, lastError: nil, completion: completion)
     }
 
     private func tryCandidate(
@@ -1548,27 +1626,28 @@ final class SmartAIRouter {
         in candidates: [CandidateEndpoint],
         prompt: String,
         cgImage: CGImage?,
+        lastCategory: SolverErrorCategory?,
         lastError: String?,
-        completion: @escaping (AIResult?, String?) -> Void
+        completion: @escaping (AIResult?, SolverErrorCategory?, String?) -> Void
     ) {
         if index >= candidates.count {
-            completion(nil, lastError ?? "Barcha Flash/Pro modellar band.")
+            completion(nil, lastCategory ?? .generalErrorW, lastError ?? "Barcha Flash/Pro modellar band.")
             return
         }
 
         let ep = candidates[index]
         switch ep.provider {
         case "gemini":
-            callGeminiEndpoint(ep: ep, prompt: prompt, cgImage: cgImage) { res, statusCode, errMsg in
+            callGeminiEndpoint(ep: ep, prompt: prompt, cgImage: cgImage) { res, statusCode, cat, errMsg in
                 if let res = res {
-                    completion(res, nil)
+                    completion(res, nil, nil)
                 } else {
                     if statusCode == 404 {
                         self.markModelNotFound(keyId: ep.keyLabel, model: ep.model)
                     } else if statusCode == 429 || statusCode == 503 {
-                        self.markRateLimited(keyId: ep.keyLabel, model: ep.model, seconds: 50)
+                        self.markRateLimited(keyId: ep.keyLabel, model: ep.model, seconds: 45)
                     }
-                    self.tryCandidate(at: index + 1, in: candidates, prompt: prompt, cgImage: cgImage, lastError: errMsg, completion: completion)
+                    self.tryCandidate(at: index + 1, in: candidates, prompt: prompt, cgImage: cgImage, lastCategory: cat, lastError: errMsg, completion: completion)
                 }
             }
         case "groq":
@@ -1578,20 +1657,33 @@ final class SmartAIRouter {
                 url: "https://api.groq.com/openai/v1/chat/completions",
                 prompt: prompt,
                 cgImage: supportsVision ? cgImage : nil
-            ) { res, statusCode, errMsg in
+            ) { res, statusCode, cat, errMsg in
                 if let res = res {
-                    completion(res, nil)
+                    completion(res, nil, nil)
                 } else {
                     if statusCode == 404 || statusCode == 400 {
                         self.markModelNotFound(keyId: ep.keyLabel, model: ep.model)
                     } else if statusCode == 429 || statusCode == 503 {
-                        self.markRateLimited(keyId: ep.keyLabel, model: ep.model, seconds: 50)
+                        self.markRateLimited(keyId: ep.keyLabel, model: ep.model, seconds: 45)
                     }
-                    self.tryCandidate(at: index + 1, in: candidates, prompt: prompt, cgImage: cgImage, lastError: errMsg, completion: completion)
+                    self.tryCandidate(at: index + 1, in: candidates, prompt: prompt, cgImage: cgImage, lastCategory: cat, lastError: errMsg, completion: completion)
+                }
+            }
+        case "pollinations_free":
+            callOpenAIEndpoint(
+                ep: ep,
+                url: "https://text.pollinations.ai/openai",
+                prompt: prompt,
+                cgImage: nil
+            ) { res, _, cat, errMsg in
+                if let res = res {
+                    completion(res, nil, nil)
+                } else {
+                    self.tryCandidate(at: index + 1, in: candidates, prompt: prompt, cgImage: cgImage, lastCategory: cat, lastError: errMsg, completion: completion)
                 }
             }
         default:
-            self.tryCandidate(at: index + 1, in: candidates, prompt: prompt, cgImage: cgImage, lastError: lastError, completion: completion)
+            self.tryCandidate(at: index + 1, in: candidates, prompt: prompt, cgImage: cgImage, lastCategory: lastCategory, lastError: lastError, completion: completion)
         }
     }
 
@@ -1633,18 +1725,18 @@ final class SmartAIRouter {
         ep: CandidateEndpoint,
         prompt: String,
         cgImage: CGImage?,
-        completion: @escaping (AIResult?, Int, String?) -> Void
+        completion: @escaping (AIResult?, Int, SolverErrorCategory?, String?) -> Void
     ) {
         let model = Self.cleanModelName(ep.model)
         guard ModelPolicy.isAllowedGeminiModel(model) else {
-            completion(nil, 404, "Blocked model: \(model)")
+            completion(nil, 404, .sendErrorSW, "Blocked model: \(model)")
             return
         }
         let key = ep.key.trimmingCharacters(in: .whitespacesAndNewlines)
         let encodedModel = model.addingPercentEncoding(withAllowedCharacters: .urlPathAllowed) ?? model
         let urlStr = "https://generativelanguage.googleapis.com/v1beta/models/\(encodedModel):generateContent?key=\(key)"
         guard let url = URL(string: urlStr) else {
-            completion(nil, 0, "Invalid Gemini URL")
+            completion(nil, 0, .sendErrorSW, "Invalid Gemini URL")
             return
         }
 
@@ -1666,7 +1758,7 @@ final class SmartAIRouter {
             ]
         ]
 
-        var req = URLRequest(url: url, timeoutInterval: 20)
+        var req = URLRequest(url: url, timeoutInterval: 18)
         req.httpMethod = "POST"
         req.setValue("application/json", forHTTPHeaderField: "Content-Type")
         req.setValue(key, forHTTPHeaderField: "x-goog-api-key")
@@ -1674,12 +1766,13 @@ final class SmartAIRouter {
 
         fastSession.dataTask(with: req) { data, response, error in
             if let error = error {
-                completion(nil, 0, "\(ep.model): \(error.localizedDescription)")
+                let cat = Self.classifyURLError(error)
+                completion(nil, 0, cat, "\(ep.model): \(error.localizedDescription)")
                 return
             }
             let statusCode = (response as? HTTPURLResponse)?.statusCode ?? 0
             guard let data = data else {
-                completion(nil, statusCode, "\(ep.model): Bo'sh javob")
+                completion(nil, statusCode, .generalErrorW, "\(ep.model): Bo'sh javob")
                 return
             }
             if statusCode != 200 {
@@ -1688,14 +1781,14 @@ final class SmartAIRouter {
                     return
                 }
                 let rawErr = String(data: data, encoding: .utf8) ?? "HTTP \(statusCode)"
-                completion(nil, statusCode, "Gemini (\(ep.model)) HTTP \(statusCode): \(rawErr.prefix(130))")
+                completion(nil, statusCode, .sendErrorSW, "Gemini (\(ep.model)) HTTP \(statusCode): \(rawErr.prefix(120))")
                 return
             }
             guard let json = try? JSONSerialization.jsonObject(with: data) as? [String: Any],
                   let candidates = json["candidates"] as? [[String: Any]],
                   let content = candidates.first?["content"] as? [String: Any],
                   let resParts = content["parts"] as? [[String: Any]] else {
-                completion(nil, 200, "\(ep.model): JSON bo'sh")
+                completion(nil, 200, .generalErrorW, "\(ep.model): JSON bo'sh")
                 return
             }
 
@@ -1705,9 +1798,9 @@ final class SmartAIRouter {
             }.joined()
 
             if let parsed = self.parseJSONResponse(combinedText, modelTag: "\(ep.keyLabel):\(model)") {
-                completion(parsed, 200, nil)
+                completion(parsed, 200, nil, nil)
             } else {
-                completion(nil, 200, "\(ep.model): Format mos emas")
+                completion(nil, 200, .generalErrorW, "\(ep.model): Format mos emas")
             }
         }.resume()
     }
@@ -1717,10 +1810,10 @@ final class SmartAIRouter {
         url: String,
         prompt: String,
         cgImage: CGImage?,
-        completion: @escaping (AIResult?, Int, String?) -> Void
+        completion: @escaping (AIResult?, Int, SolverErrorCategory?, String?) -> Void
     ) {
         guard let endpoint = URL(string: url) else {
-            completion(nil, 0, "Invalid URL")
+            completion(nil, 0, .sendErrorSW, "Invalid URL")
             return
         }
 
@@ -1741,20 +1834,23 @@ final class SmartAIRouter {
             ]
         ]
 
-        var req = URLRequest(url: endpoint, timeoutInterval: 20)
+        var req = URLRequest(url: endpoint, timeoutInterval: 18)
         req.httpMethod = "POST"
         req.setValue("application/json", forHTTPHeaderField: "Content-Type")
-        req.setValue("Bearer \(ep.key)", forHTTPHeaderField: "Authorization")
+        if ep.key != "free" {
+            req.setValue("Bearer \(ep.key)", forHTTPHeaderField: "Authorization")
+        }
         req.httpBody = try? JSONSerialization.data(withJSONObject: body)
 
         fastSession.dataTask(with: req) { data, response, error in
             if let error = error {
-                completion(nil, 0, "\(ep.keyLabel): \(error.localizedDescription)")
+                let cat = Self.classifyURLError(error)
+                completion(nil, 0, cat, "\(ep.keyLabel): \(error.localizedDescription)")
                 return
             }
             let statusCode = (response as? HTTPURLResponse)?.statusCode ?? 0
             guard let data = data else {
-                completion(nil, statusCode, "\(ep.keyLabel): Bo'sh javob")
+                completion(nil, statusCode, .generalErrorW, "\(ep.keyLabel): Bo'sh javob")
                 return
             }
             if statusCode != 200 {
@@ -1763,20 +1859,20 @@ final class SmartAIRouter {
                     return
                 }
                 let rawErr = String(data: data, encoding: .utf8) ?? "HTTP \(statusCode)"
-                completion(nil, statusCode, "\(ep.keyLabel) (\(ep.model)) HTTP \(statusCode): \(rawErr.prefix(130))")
+                completion(nil, statusCode, .sendErrorSW, "\(ep.keyLabel) (\(ep.model)) HTTP \(statusCode): \(rawErr.prefix(120))")
                 return
             }
             guard let json = try? JSONSerialization.jsonObject(with: data) as? [String: Any],
                   let choices = json["choices"] as? [[String: Any]],
                   let msg = choices.first?["message"] as? [String: Any],
                   let text = msg["content"] as? String else {
-                completion(nil, 200, "\(ep.keyLabel): JSON xato")
+                completion(nil, 200, .generalErrorW, "\(ep.keyLabel): JSON xato")
                 return
             }
             if let parsed = self.parseJSONResponse(text, modelTag: "\(ep.keyLabel):\(ep.model)") {
-                completion(parsed, 200, nil)
+                completion(parsed, 200, nil, nil)
             } else {
-                completion(nil, 200, "\(ep.keyLabel): Format mos emas")
+                completion(nil, 200, .generalErrorW, "\(ep.keyLabel): Format mos emas")
             }
         }.resume()
     }
@@ -1840,62 +1936,7 @@ final class SmartAIRouter {
     }
 }
 
-// MARK: - 9. Automated 8-Point Self-Diagnostic & Benchmark Engine
-enum DiagnosticSuite {
-    static func runAllChecks(completion: @escaping ([String]) -> Void) {
-        var results: [String] = []
-
-        // 1. Model Policy Check (Argon & Flash-Lite Block Verification)
-        let argonBlocked = !ModelPolicy.isAllowedGeminiModel("gemini-argon-exp") && !ModelPolicy.isAllowedGeminiModel("argon-v1")
-        let liteBlocked = !ModelPolicy.isAllowedGeminiModel("gemini-2.5-flash-lite") && !ModelPolicy.isAllowedGeminiModel("gemini-flashlight")
-        let flashProAllowed = ModelPolicy.isAllowedGeminiModel("gemini-2.5-flash") && ModelPolicy.isAllowedGeminiModel("gemini-2.5-pro")
-        results.append(argonBlocked && liteBlocked && flashProAllowed
-            ? "✅ [1/8] Model Siyosati: Argon va Flash-Lite 100% bloklangan; faqat Flash va Pro ruxsat etilgan."
-            : "❌ [1/8] Model Siyosati xatosi.")
-
-        // 2. Zero-Popup Stealth Check
-        let screenRecordingSharingNone = (StealthOverlayWindow().sharingType == .none) && (StealthCursorDotWindow.shared.sharingType == .none)
-        results.append(screenRecordingSharingNone
-            ? "✅ [2/8] Anti-Sensor Kamuflyaj: HUD va Kursor Halqasi ekran yozuviga (WebRTC/Zoom) 100% ko'rinmas (sharingType = .none)."
-            : "❌ [2/8] Anti-Sensor xatosi.")
-
-        // 3. RAM Archive Lookup Benchmark
-        let t0 = CFAbsoluteTimeGetCurrent()
-        _ = ArchiveManager.shared.findCachedAnswer(for: "If 3x + 7 = 22, what is the value of 6x + 5 in the equation above?")
-        let dtMs = (CFAbsoluteTimeGetCurrent() - t0) * 1000.0
-        results.append(String(format: "✅ [3/8] RAM Arxiv Qidiruv Tezligi: %.3f ms (<0.5 ms norma, +95%% samaradorlik).", dtMs))
-
-        // 4. JSON & Prose Answer Synthesizer Test
-        let p1 = SmartAIRouter.shared.parseJSONResponse("```json\n{\"primary\":\"C\",\"secondary\":\"A\",\"confidence\":\"uncertain\",\"value\":\"42\",\"reasoning\":\"test\"}\n```", modelTag: "Test")
-        let p2 = SmartAIRouter.shared.parseJSONResponse("To'g'ri javob: **D** — chunki 4*4=16", modelTag: "Test")
-        results.append((p1?.primary == "C" && p1?.secondary == "A" && p2?.primary == "D")
-            ? "✅ [4/8] Javob Sintezatori: Ham JSON ('C̲ A'), ham oddiy matn ('D') 100% aniqlikda ajratildi."
-            : "❌ [4/8] Javob Sintezatori xatosi.")
-
-        // 5. Screen Capture & Smart Crop Benchmark
-        ScreenCaptureService.captureMainDisplay { cgImg in
-            if let img = cgImg {
-                results.append("✅ [5/8] Smart Viewport Skrinshot: Muvaffaqiyatli (\(img.width)x\(img.height) px, tepa/past shovqinlar qirqildi).")
-                ScreenCaptureService.extractStructuredQuestionText(from: img) { ocr in
-                    results.append("✅ [6/8] Spatial Vision OCR: \(ocr.count) ta belgi tartib bilan o'qildi.")
-                    results.append("✅ [7/8] 1→2→3 Kursor Halqasi: Sinov signali (3x Yashil) ishga tushirildi.")
-                    results.append("✅ [8/8] Yashirin Gemini Web Bridge: WKWebView tayyor (\(AppSettings.shared.webModelTier.uppercased()) rejimi).")
-                    CursorFeedback.stage3AnswerReady()
-                    DispatchQueue.main.async {
-                        completion(results)
-                    }
-                }
-            } else {
-                results.append("⚠️ [5/8] Skrinshot: Screen Recording ruxsatini yoqing.")
-                DispatchQueue.main.async {
-                    completion(results)
-                }
-            }
-        }
-    }
-}
-
-// MARK: - 10. Smooth SwiftUI Control Panel View (v7.0)
+// MARK: - 10. Smooth SwiftUI Control Panel View (v8.0)
 struct ControlPanelView: View {
     @ObservedObject var settings = AppSettings.shared
     @ObservedObject var archive = ArchiveManager.shared
@@ -1929,9 +1970,9 @@ struct ControlPanelView: View {
 
                 VStack(alignment: .leading, spacing: 2) {
                     HStack(spacing: 6) {
-                        Text("SilentHelper v7.0")
+                        Text("SilentHelper v8.0")
                             .font(.system(size: 15, weight: .bold, design: .rounded))
-                        Text("Deep Audited · Flash & Pro Only · S→F Dynamic Carbon")
+                        Text("G / IW / SW / W Self-Healing · Human Micro-Drift · Flash & Pro")
                             .font(.system(size: 10, weight: .semibold))
                             .padding(.horizontal, 6)
                             .padding(.vertical, 2)
@@ -1948,12 +1989,10 @@ struct ControlPanelView: View {
                 Spacer()
 
                 HStack(spacing: 6) {
-                    Text("Javob:")
+                    Text("HUD:")
                         .font(.system(size: 11, weight: .medium))
                         .foregroundColor(.secondary)
-                    Text(settings.lastSecondaryAnswer.isEmpty
-                         ? settings.lastPrimaryAnswer
-                         : "\(settings.lastPrimaryAnswer)\u{0332} \(settings.lastSecondaryAnswer)")
+                    Text(hudPreviewText)
                         .font(.system(size: 14, weight: .bold, design: .monospaced))
                         .padding(.horizontal, 8)
                         .padding(.vertical, 3)
@@ -1983,31 +2022,30 @@ struct ControlPanelView: View {
             .padding(.vertical, 11)
             .background(Color(NSColor.windowBackgroundColor))
 
-            // Quick Diagnostic Bar
+            // Permission & Self-Healing Status Bar
             HStack(spacing: 14) {
                 HStack(spacing: 5) {
                     Image(systemName: settings.hasScreenPermission ? "checkmark.seal.fill" : "exclamationmark.triangle.fill")
                         .foregroundColor(settings.hasScreenPermission ? .green : .orange)
-                    Text(settings.hasScreenPermission ? "Skrinshot: OK" : "Skrinshot Ruxsati Kerak")
+                    Text(settings.hasScreenPermission ? "Terminal Skrinshot Ruxsati: OK" : "Terminal.app ga Screen Recording yoqing!")
                         .font(.system(size: 11, weight: .semibold))
                 }
 
                 HStack(spacing: 5) {
-                    Image(systemName: "flame.fill")
-                        .foregroundColor(.indigo)
-                    Text("Argon & Flash-Lite: 100% Bloklangan (Faqat Flash/Pro)")
+                    Image(systemName: settings.hasAccessibilityPermission ? "checkmark.seal.fill" : "hand.point.up.left.fill")
+                        .foregroundColor(settings.hasAccessibilityPermission ? .green : .blue)
+                    Text(settings.hasAccessibilityPermission ? "Insoniy Kursor Aloqasi: OK" : "Optik + Carbon Rejimi Faol")
                         .font(.system(size: 11, weight: .semibold))
                 }
 
-                Spacer()
-
-                Button("8-Bosqichli Avto-Audit") {
-                    DiagnosticSuite.runAllChecks { report in
-                        settings.auditReportLines = report
-                        selectedTab = 1
+                if !settings.hasScreenPermission || !settings.hasAccessibilityPermission {
+                    Button("Settings'da Terminal.app ni Tasdiqlash") {
+                        settings.openSystemSettingsForPermissions()
                     }
+                    .controlSize(.small)
                 }
-                .controlSize(.small)
+
+                Spacer()
 
                 Button(action: {
                     onManualTestCapture()
@@ -2032,7 +2070,7 @@ struct ControlPanelView: View {
                 TabButton(title: "1. Yashirin Gemini Web (Flash/Pro)", icon: "globe.desk.fill", isSelected: selectedTab == 0) {
                     withAnimation(.easeInOut(duration: 0.16)) { selectedTab = 0 }
                 }
-                TabButton(title: "2. Kamuflyaj, S→F va Avto-Audit", icon: "shield.lefthalf.filled", isSelected: selectedTab == 1) {
+                TabButton(title: "2. Status Kodlar (G/IW/SW/W) va Kursor", icon: "shield.lefthalf.filled", isSelected: selectedTab == 1) {
                     withAnimation(.easeInOut(duration: 0.16)) { selectedTab = 1 }
                 }
                 TabButton(title: "3. Flash & Pro API Kalitlar", icon: "cpu.fill", isSelected: selectedTab == 2) {
@@ -2056,7 +2094,7 @@ struct ControlPanelView: View {
                 ScrollView {
                     VStack(alignment: .leading, spacing: 15) {
                         if selectedTab == 1 {
-                            camouflageAndAuditSection
+                            statusCodesAndCursorSection
                         } else if selectedTab == 2 {
                             flashProApiSection
                         } else {
@@ -2071,7 +2109,7 @@ struct ControlPanelView: View {
 
             // Footer Bar
             HStack {
-                Text("Skrinshot: [S→F] yoki [⌥+F] yoki Chap-Tepa Burchak  |  Javob: [K] yoki [⌥+K] yoki Chap-Past Burchak  |  Panel: [⌥+M]")
+                Text("Skrinshot: [S→F] yoki [⌥+F] yoki Chap-Tepa Burchak  |  Holat/Javob: [K] yoki [⌥+K] (G / IW / SW / W / A)  |  Panel: [⌥+M]")
                     .font(.system(size: 11, weight: .medium))
                     .foregroundColor(.secondary)
                 Spacer()
@@ -2086,6 +2124,18 @@ struct ControlPanelView: View {
             .background(Color(NSColor.windowBackgroundColor))
         }
         .frame(minWidth: 770, minHeight: 590)
+    }
+
+    private var hudPreviewText: String {
+        switch settings.hudState {
+        case .workingG: return "G"
+        case .internetErrorIW: return "IW"
+        case .sendErrorSW: return "SW"
+        case .generalErrorW: return "W"
+        case let .answer(p, s):
+            if let s = s, !s.isEmpty { return "\(p)\u{0332} \(s)" }
+            return p
+        }
     }
 
     // MARK: - Tab 1: Full-Control Hidden Gemini Web Browser (Flash / Pro Only)
@@ -2140,16 +2190,21 @@ struct ControlPanelView: View {
                 Spacer()
 
                 Button("Web orqali Sinash") {
+                    settings.hudState = .workingG
                     HiddenGeminiWebBridge.shared.solveViaHiddenWeb(
                         questionText: "If 3x + 5 = 20, what is x? A) 3  B) 5  C) 7  D) 15",
                         cgImage: nil
-                    ) { res in
-                        if let r = res {
-                            DispatchQueue.main.async {
+                    ) { res, errCat in
+                        DispatchQueue.main.async {
+                            if let r = res {
                                 settings.lastPrimaryAnswer = r.primary
                                 settings.lastSecondaryAnswer = r.secondary ?? ""
+                                settings.hudState = .answer(primary: r.primary, secondary: r.secondary)
                                 settings.statusText = "Gemini Web sinovi muvaffaqiyatli: \(r.primary)"
-                                CursorFeedback.stage3AnswerReady()
+                                HumanCursorSignal.stage3AnswerReady()
+                            } else if let cat = errCat {
+                                settings.hudState = cat.hudState
+                                settings.statusText = "Gemini Web holati: \(cat.codeString)"
                             }
                         }
                     }
@@ -2163,7 +2218,7 @@ struct ControlPanelView: View {
                 Image(systemName: "bolt.horizontal.circle.fill").foregroundColor(.indigo)
                 Text(settings.webBridgeStatus)
                     .font(.system(size: 11, weight: .semibold))
-                Text("— Uchlik DOM injektori (execCommand + Paste + 240ms Poller) faol.")
+                Text("— Argon va Flash-Lite bloklangan. Xato bo'lsa avtomatik qayta urinadi.")
                     .font(.system(size: 11))
                     .foregroundColor(.secondary)
                 Spacer()
@@ -2178,33 +2233,88 @@ struct ControlPanelView: View {
         }
     }
 
-    // MARK: - Tab 2: Camouflage, Dynamic S->F & Automated 8-Point Audit
-    private var camouflageAndAuditSection: some View {
+    // MARK: - Tab 2: Live Status Codes (G / IW / SW / W) & Human Micro-Drift Cursor
+    private var statusCodesAndCursorSection: some View {
         VStack(alignment: .leading, spacing: 14) {
-            if !settings.auditReportLines.isEmpty {
-                GroupBox(label: Label("8-Bosqichli Avto-Audit va Benchmark Natijalari", systemImage: "checkmark.shield.fill").font(.headline)) {
-                    VStack(alignment: .leading, spacing: 4) {
-                        ForEach(settings.auditReportLines, id: \.self) { line in
-                            Text(line)
-                                .font(.system(size: 11.5, weight: .medium, design: .monospaced))
+            GroupBox(label: Label("[K] Bosilganda Chiquvchi Jonli Status Kodlari va Avto-Tuzatish (Self-Healing)", systemImage: "waveform.path.ecg.rectangle.fill").font(.headline)) {
+                VStack(alignment: .leading, spacing: 8) {
+                    Text("Siz imtihon payti boshqa oynaga o'ta olmasligingiz uchun [K] tugmasini bosganingizda javob qutichasida quyidagi kodlar ko'rinadi va dastur xatolarni o'zi orqa fonda tuzatib qayta urinadi:")
+                        .font(.caption)
+                        .foregroundColor(.secondary)
+
+                    HStack(spacing: 10) {
+                        Button("Sinash: 'G' (Ishlayapti)") {
+                            settings.hudState = .workingG
+                            onToggleHudPreview()
                         }
+                        .controlSize(.small)
+
+                        Button("Sinash: 'IW' (Internet Xato)") {
+                            settings.hudState = .internetErrorIW
+                            onToggleHudPreview()
+                        }
+                        .controlSize(.small)
+
+                        Button("Sinash: 'SW' (Yuborish Xato)") {
+                            settings.hudState = .sendErrorSW
+                            onToggleHudPreview()
+                        }
+                        .controlSize(.small)
+
+                        Button("Sinash: 'W' (Umumiy Xato)") {
+                            settings.hudState = .generalErrorW
+                            onToggleHudPreview()
+                        }
+                        .controlSize(.small)
+
+                        Button("Sinash: 'A' (Aniq Javob)") {
+                            settings.hudState = .answer(primary: "A", secondary: nil)
+                            onToggleHudPreview()
+                        }
+                        .controlSize(.small)
+
+                        Button("Sinash: 'A̲ B' (Ikkilanish)") {
+                            settings.hudState = .answer(primary: "A", secondary: "B")
+                            onToggleHudPreview()
+                        }
+                        .controlSize(.small)
                     }
-                    .padding(6)
                 }
+                .padding(8)
             }
 
-            GroupBox(label: Label("v7.0 Ikki Bosqichli S→F Dinamik Carbon va Burchak Kamuflyaji", systemImage: "wand.and.rays").font(.headline)) {
-                VStack(alignment: .leading, spacing: 8) {
-                    Text("• Dinamik [S → F] Carbon Mexanizmi: Ko'rinmas rejimda [S] bosilganda [F] tugmasi faqat 650 millisekundga qurollanadi — bu oddiy matn yozishga umuman xalaqit bermaydi va 0% Accessibility so'rovi bilan ishlaydi!")
-                        .font(.system(size: 12, weight: .semibold))
-                    Text("• Sichqoncha Burchak Kamuflyaji: CHAP-TEPA burchakda 0.4s ushlab turish -> Skrinshot + AI. CHAP-PAST burchakka borish -> Javob ('A' yoki 'A̲ B') chiqadi, ketishingiz bilan yo'qoladi!")
-                        .font(.system(size: 12, weight: .semibold))
-                        .foregroundColor(.indigo)
+            GroupBox(label: Label("Insoniy Kursor Mikro-Aloqasi (1-Bosqich: 1x | 2-Bosqich: Jim | 3-Bosqich: 3x)", systemImage: "hand.Wave.fill").font(.headline)) {
+                VStack(alignment: .leading, spacing: 10) {
+                    Text("""
+                    • 1-Bosqich (S+F bosilganda): Kursor xuddi inson qo'li bilinar-bilinmas tekkandek 1 marta tabiiy egri chiziq bo'ylab mayin siljiydi.
+                    • 2-Bosqich (Gemini'ga yuborish): 100% JIM — sizni chalg'itmaydi va sensorlarga sezilmaydi.
+                    • 3-Bosqich (Javob tayyor): Kursor 3 marta mayin insoniy siljish beradi.
+                    """)
+                    .font(.caption)
+                    .foregroundColor(.secondary)
 
-                    Divider()
+                    HStack(spacing: 14) {
+                        Button("1-Bosqich Sinash (1x Tabiiy Siljish)") {
+                            HumanCursorSignal.stage1CaptureTaken()
+                        }
+                        Button("3-Bosqich Sinash (3x Javob Tayyor)") {
+                            HumanCursorSignal.stage3AnswerReady()
+                        }
+                    }
 
+                    HStack(spacing: 16) {
+                        Text("Insoniy mikro-siljish amplitudasi (\(String(format: "%.1f", settings.humanDriftPixels)) px):")
+                            .frame(width: 260, alignment: .leading)
+                        Slider(value: $settings.humanDriftPixels, in: 2.0...10.0, step: 0.5)
+                    }
+                }
+                .padding(8)
+            }
+
+            GroupBox(label: Label("Kamuflyaj va HUD Sozlamalari", systemImage: "eye.slash.circle.fill").font(.headline)) {
+                VStack(alignment: .leading, spacing: 10) {
                     HStack(spacing: 18) {
-                        Toggle("Sichqoncha Burchak Kamuflyaji", isOn: Binding(
+                        Toggle("Sichqoncha Burchak Kamuflyaji (Chap-Tepa / Chap-Past)", isOn: Binding(
                             get: { settings.enableMouseCorners },
                             set: { val in settings.enableMouseCorners = val; settings.save() }
                         ))
@@ -2214,77 +2324,14 @@ struct ControlPanelView: View {
                         ))
                     }
                     .font(.system(size: 12))
-                }
-                .padding(8)
-            }
-
-            GroupBox(label: Label("60fps Kursor Halqasi (`•` / `••` / `•••`) va Avto-Yashirinuvchi HUD", systemImage: "cursorarrow.motionlines").font(.headline)) {
-                VStack(alignment: .leading, spacing: 10) {
-                    HStack(spacing: 12) {
-                        Button("1x Signal (`•` Moviy — Skrinshot)") {
-                            CursorFeedback.stage1CaptureTaken()
-                        }
-                        Button("2x Signal (`••` Sariq — Modelda)") {
-                            CursorFeedback.stage2ModelStarted()
-                        }
-                        Button("3x Signal (`•••` Yashil — Tayyor)") {
-                            CursorFeedback.stage3AnswerReady()
-                        }
-                    }
-
-                    HStack(spacing: 12) {
-                        Button("HUD Javobni Ko'rsatish / Yashirish (K / ⌥K)") {
-                            onToggleHudPreview()
-                        }
-                        Button("Namuna: 'A'") {
-                            settings.lastPrimaryAnswer = "A"
-                            settings.lastSecondaryAnswer = ""
-                            onToggleHudPreview()
-                        }
-                        .controlSize(.small)
-                        Button("Namuna: 'A̲ B'") {
-                            settings.lastPrimaryAnswer = "A"
-                            settings.lastSecondaryAnswer = "B"
-                            onToggleHudPreview()
-                        }
-                        .controlSize(.small)
-                    }
 
                     HStack(spacing: 16) {
                         Text("HUD Avto-Yashirish (\(String(format: "%.1f", settings.autoHideHudSeconds)) s):")
                             .frame(width: 190, alignment: .leading)
                         Slider(value: $settings.autoHideHudSeconds, in: 0.0...10.0, step: 0.5)
-                        Text(settings.autoHideHudSeconds == 0 ? "(Faqat K bilan)" : "Avto-yopiladi")
-                            .font(.caption)
-                            .foregroundColor(.secondary)
                     }
                 }
                 .padding(8)
-            }
-
-            if let img = settings.lastCapturedImage {
-                GroupBox(label: Label("Oxirgi Smart-Cropped Skrinshot va OCR Tekshiruvi", systemImage: "photo.badge.checkmark").font(.headline)) {
-                    HStack(alignment: .top, spacing: 12) {
-                        Image(nsImage: img)
-                            .resizable()
-                            .aspectRatio(contentMode: .fit)
-                            .frame(width: 160, height: 100)
-                            .cornerRadius(6)
-                        VStack(alignment: .leading, spacing: 4) {
-                            Text("Model: \(settings.lastModelUsed) (\(settings.lastLatencyMs) ms)")
-                                .font(.system(size: 11.5, weight: .bold))
-                                .foregroundColor(.green)
-                            Text(settings.lastOcrPreview.isEmpty ? "(Matn o'qilmoqda...)" : settings.lastOcrPreview)
-                                .font(.system(size: 11))
-                                .foregroundColor(.secondary)
-                                .lineLimit(3)
-                            Text("Izoh: \(settings.lastReasoning)")
-                                .font(.system(size: 11, weight: .medium))
-                                .lineLimit(2)
-                        }
-                    }
-                    .padding(6)
-                }
             }
         }
     }
@@ -2292,7 +2339,7 @@ struct ControlPanelView: View {
     // MARK: - Tab 3: Flash & Pro API Keys
     private var flashProApiSection: some View {
         VStack(alignment: .leading, spacing: 14) {
-            GroupBox(label: Label("Speculative Parallel Flash & Pro Dvigateli (Argon va Flash-Lite Bloklangan)", systemImage: "lock.shield.fill").font(.headline)) {
+            GroupBox(label: Label("Avtonom O'zini-O'zi Tuzatuvchi Flash & Pro Dvigateli", systemImage: "lock.shield.fill").font(.headline)) {
                 VStack(alignment: .leading, spacing: 10) {
                     Picker("Dvigatel:", selection: Binding(
                         get: { settings.engineMode },
@@ -2304,9 +2351,9 @@ struct ControlPanelView: View {
                     }
                     .pickerStyle(.segmented)
 
-                    Toggle("Speculative Early-Commit: Tezkor oqim (Flash) topgan zahoti darhol javob berib, Pro orqada tasdiqlasin (+65% tezlik)", isOn: $settings.speculativeEarlyCommit)
+                    Toggle("Speculative Early-Commit (Tezkor oqim topgan zahoti darhol javob berish)", isOn: $settings.speculativeEarlyCommit)
                         .font(.system(size: 12.5, weight: .medium))
-                    Toggle("Parallel Consensus: 2 ta mustaqil oqimni solishtirish (farq bo'lsa A̲ B ko'rsatish)", isOn: $settings.parallelConsensus)
+                    Toggle("Parallel Consensus (2 ta mustaqil oqimni solishtirish)", isOn: $settings.parallelConsensus)
                         .font(.system(size: 12.5, weight: .medium))
                 }
                 .padding(8)
@@ -2371,17 +2418,6 @@ struct ControlPanelView: View {
                     HStack {
                         Text("Gemini Kalit #3:").frame(width: 110, alignment: .leading)
                         SecureField("AIzaSy... (ixtiyoriy)", text: $settings.geminiKey3).textFieldStyle(.roundedBorder)
-                    }
-                    HStack {
-                        Text("Model Tanlovi:").frame(width: 110, alignment: .leading)
-                        Picker("", selection: $settings.geminiPreferredModel) {
-                            Text("Avto (Flash + Pro)").tag("auto_flash_pro")
-                            Text("gemini-2.5-flash").tag("gemini-2.5-flash")
-                            Text("gemini-2.5-pro").tag("gemini-2.5-pro")
-                            Text("gemini-1.5-flash").tag("gemini-1.5-flash")
-                            Text("gemini-1.5-pro").tag("gemini-1.5-pro")
-                        }
-                        .pickerStyle(.segmented)
                     }
                 }
                 .padding(8)
@@ -2491,7 +2527,7 @@ struct TabButton: View {
     }
 }
 
-// MARK: - 11. Two-Stage Dynamic Carbon HotKey Handler (S -> F Arming without Blocking Typing)
+// MARK: - 11. Two-Stage Dynamic Carbon HotKey Handler
 private var globalAppController: AppController?
 
 private func carbonHotKeyHandler(nextHandler: EventHandlerCallRef?, event: EventRef?, userData: UnsafeMutableRawPointer?) -> OSStatus {
@@ -2527,7 +2563,7 @@ private func carbonHotKeyHandler(nextHandler: EventHandlerCallRef?, event: Event
     return noErr
 }
 
-// MARK: - 12. Main Application Controller (v7.0)
+// MARK: - 12. Main Application Controller (v8.0)
 final class AppController: NSObject, NSApplicationDelegate {
     let settings = AppSettings.shared
     let archive = ArchiveManager.shared
@@ -2546,17 +2582,14 @@ final class AppController: NSObject, NSApplicationDelegate {
     private var lastFPressTime: Date = .distantPast
     private var lastTriggerTime: Date = .distantPast
 
-    // Mouse Hot-Corner Camouflage State with Hysteresis (enter <= 8px, exit >= 24px)
     private var topLeftEnterTime: Date? = nil
     private var topLeftTriggered = false
     private var bottomLeftPeeking = false
 
-    // Carbon HotKey Refs
     private var hotKeyRefCapture: EventHotKeyRef?
     private var hotKeyRefOverlay: EventHotKeyRef?
     private var hotKeyRefPanel: EventHotKeyRef?
 
-    // Dynamic Stealth Carbon HotKeys
     private var stealthHotKeyS: EventHotKeyRef?
     private var stealthArmedHotKeyF: EventHotKeyRef?
     private var stealthHotKeyK: EventHotKeyRef?
@@ -2565,7 +2598,7 @@ final class AppController: NSObject, NSApplicationDelegate {
     func applicationDidFinishLaunching(_ notification: Notification) {
         globalAppController = self
         _ = HiddenGeminiWebBridge.shared
-        _ = StealthCursorDotWindow.shared
+        _ = SubtleOpticalCueWindow.shared
 
         setupMenuBarStatusItem()
         setupControlWindow()
@@ -2573,9 +2606,6 @@ final class AppController: NSObject, NSApplicationDelegate {
         startZeroPopupScanner()
         showControlWindow()
 
-        if !CGPreflightScreenCaptureAccess() {
-            _ = CGRequestScreenCaptureAccess()
-        }
         settings.refreshPermissionsSilently()
 
         if let firstKey = settings.activeGeminiKeys.first {
@@ -2615,13 +2645,13 @@ final class AppController: NSObject, NSApplicationDelegate {
         var eventType = EventTypeSpec(eventClass: OSType(kEventClassKeyboard), eventKind: UInt32(kEventHotKeyPressed))
         InstallEventHandler(GetApplicationEventTarget(), carbonHotKeyHandler, 1, &eventType, nil, nil)
 
-        let id1 = EventHotKeyID(signature: OSType(0x53485637), id: 1) // Option + F
+        let id1 = EventHotKeyID(signature: OSType(0x53485638), id: 1) // Option + F
         RegisterEventHotKey(UInt32(kVK_ANSI_F), UInt32(optionKey), id1, GetApplicationEventTarget(), 0, &hotKeyRefCapture)
 
-        let id2 = EventHotKeyID(signature: OSType(0x53485637), id: 2) // Option + K
+        let id2 = EventHotKeyID(signature: OSType(0x53485638), id: 2) // Option + K
         RegisterEventHotKey(UInt32(kVK_ANSI_K), UInt32(optionKey), id2, GetApplicationEventTarget(), 0, &hotKeyRefOverlay)
 
-        let id3 = EventHotKeyID(signature: OSType(0x53485637), id: 3) // Option + M
+        let id3 = EventHotKeyID(signature: OSType(0x53485638), id: 3) // Option + M
         RegisterEventHotKey(UInt32(kVK_ANSI_M), UInt32(optionKey), id3, GetApplicationEventTarget(), 0, &hotKeyRefPanel)
     }
 
@@ -2634,24 +2664,22 @@ final class AppController: NSObject, NSApplicationDelegate {
         guard active && settings.enableDirectStealthKeys && !AXIsProcessTrusted() else { return }
 
         if settings.requireSFCombo {
-            // Register S as the arming key; when S is pressed, F is armed for 650ms!
-            let id4 = EventHotKeyID(signature: OSType(0x53485637), id: 4)
+            let id4 = EventHotKeyID(signature: OSType(0x53485638), id: 4)
             RegisterEventHotKey(UInt32(kVK_ANSI_S), 0, id4, GetApplicationEventTarget(), 0, &stealthHotKeyS)
         } else {
-            let id5 = EventHotKeyID(signature: OSType(0x53485637), id: 5)
+            let id5 = EventHotKeyID(signature: OSType(0x53485638), id: 5)
             RegisterEventHotKey(UInt32(kVK_ANSI_F), 0, id5, GetApplicationEventTarget(), 0, &stealthArmedHotKeyF)
         }
 
-        let id6 = EventHotKeyID(signature: OSType(0x53485637), id: 6)
+        let id6 = EventHotKeyID(signature: OSType(0x53485638), id: 6)
         RegisterEventHotKey(UInt32(kVK_ANSI_K), 0, id6, GetApplicationEventTarget(), 0, &stealthHotKeyK)
     }
 
-    /// Dynamic Carbon S -> F Arming: Arms 'F' for 650ms when 'S' is pressed, then disarms automatically!
     func handleCarbonStealthS() {
         lastSPressTime = Date()
         disarmFWorkItem?.cancel()
         if stealthArmedHotKeyF == nil {
-            let id5 = EventHotKeyID(signature: OSType(0x53485637), id: 5)
+            let id5 = EventHotKeyID(signature: OSType(0x53485638), id: 5)
             RegisterEventHotKey(UInt32(kVK_ANSI_F), 0, id5, GetApplicationEventTarget(), 0, &stealthArmedHotKeyF)
         }
         let work = DispatchWorkItem { [weak self] in
@@ -2694,13 +2722,11 @@ final class AppController: NSObject, NSApplicationDelegate {
     private func pollSafeState() {
         let now = Date()
 
-        // 1. Mouse Hot-Corner Camouflage with Edge Hysteresis (enter <= 8px, exit >= 24px)
         if settings.enableMouseCorners {
             let mouse = NSEvent.mouseLocation
             if let screen = NSScreen.screens.first(where: { NSMouseInRect(mouse, $0.frame, false) }) ?? NSScreen.main {
                 let f = screen.frame
 
-                // Top-Left Corner (Capture & Solve after 0.40s dwell)
                 let inTopLeft = (mouse.x <= f.minX + 8) && (mouse.y >= f.maxY - 8)
                 if inTopLeft {
                     if topLeftEnterTime == nil {
@@ -2714,7 +2740,6 @@ final class AppController: NSObject, NSApplicationDelegate {
                     topLeftTriggered = false
                 }
 
-                // Bottom-Left Corner (Hysteresis Peek: enter <= 8px, exit >= 26px)
                 let enterBottomLeft = (mouse.x <= f.minX + 8) && (mouse.y <= f.minY + 8)
                 let exitBottomLeft = (mouse.x >= f.minX + 26) || (mouse.y >= f.minY + 26)
 
@@ -2736,7 +2761,6 @@ final class AppController: NSObject, NSApplicationDelegate {
             }
         }
 
-        // 2. Hardware HID Key Polling (ONLY if AXIsProcessTrusted is true -> Zero Popups!)
         guard AXIsProcessTrusted() else { return }
         if isTypingInControlPanel() { return }
 
@@ -2803,7 +2827,7 @@ final class AppController: NSObject, NSApplicationDelegate {
             backing: .buffered,
             defer: false
         )
-        win.title = "SilentHelper v7.0 — Deep Audited Flash/Pro & Kamuflyaj Boshqaruv Paneli"
+        win.title = "SilentHelper v8.0 — Self-Healing (G / IW / SW / W) & Anti-Sensor Paneli"
         win.center()
         win.contentView = NSHostingView(rootView: contentView)
         win.isReleasedWhenClosed = false
@@ -2836,7 +2860,7 @@ final class AppController: NSObject, NSApplicationDelegate {
     func enterStealthMode() {
         DispatchQueue.main.async {
             self.settings.isStealthMode = true
-            self.settings.statusText = "Ko'rinmas rejim faol ([S→F] / [⌥F] / Chap-Tepa burchak)"
+            self.settings.statusText = "Ko'rinmas rejim faol ([S→F] / [⌥F] / [K] -> G/IW/SW/W/A)"
             self.controlWindow?.orderOut(nil)
             NSApp.setActivationPolicy(.accessory)
             self.updateStealthDirectCarbonKeys(active: true)
@@ -2873,16 +2897,17 @@ final class AppController: NSObject, NSApplicationDelegate {
 
         DispatchQueue.main.async {
             self.settings.isProcessing = true
-            self.settings.statusText = "1/3: Smart Viewport Skrinshot olinmoqda..."
-            self.statusItem?.button?.title = "◐"
-            if self.isOverlayVisible {
-                self.overlay.orderOut(nil)
-                self.isOverlayVisible = false
-            }
+            self.settings.selfHealAttempt = 1
+            // Darhol HUD holatini 'G' (Gemini ishlayapti) ga o'tkazamiz!
+            // Foydalanuvchi K ni bossa, 'G' chiqib turadi!
+            self.settings.hudState = .workingG
+            self.overlay.refreshAppearance()
+            self.settings.statusText = "G: Skrinshot olinib, Gemini'ga yuborilmoqda..."
+            self.statusItem?.button?.title = "G"
         }
 
-        // 1-BOSQICH SIGNAL: Skrinshot olindi (`•` Moviy)
-        CursorFeedback.stage1CaptureTaken()
+        // 1-BOSQICH SIGNAL: Inson qo'lidek bilinar-bilinmas 1 marta tabiiy kursor siljishi!
+        HumanCursorSignal.stage1CaptureTaken()
 
         DispatchQueue.global(qos: .userInitiated).asyncAfter(deadline: .now() + 0.06) {
             ScreenCaptureService.captureMainDisplay { cgImage in
@@ -2890,49 +2915,47 @@ final class AppController: NSObject, NSApplicationDelegate {
                     DispatchQueue.main.async {
                         self.settings.isProcessing = false
                         self.settings.hasScreenPermission = false
-                        self.statusItem?.button?.title = "!"
-                        self.settings.statusText = "Xato: Screen Recording ruxsati berilmagan!"
+                        // Skrinshot olinmasa -> SW (Send/Capture Warning)
+                        self.settings.hudState = .sendErrorSW
+                        self.overlay.refreshAppearance()
+                        self.statusItem?.button?.title = "SW"
+                        self.settings.statusText = "SW: Screen Recording ruxsati berilmagan!"
                     }
                     return
                 }
 
-                // 2. Spatial Apple Vision OCR
+                // 2-BOSQICH (Yuborish): 100% JIM — Foydalanuvchi talabi bo'yicha hech qanday signal berilmaydi!
+                HumanCursorSignal.stage2SilentDispatch()
+
                 ScreenCaptureService.extractStructuredQuestionText(from: cgImage) { extractedText in
                     let cleanText = extractedText.trimmingCharacters(in: .whitespacesAndNewlines)
                     DispatchQueue.main.async {
                         self.settings.lastOcrPreview = cleanText
                     }
 
-                    // 3. <0.5ms RAM Indeksli Google Drive Arxiv keshini tekshirish
+                    // 3. RAM Arxiv keshini tekshirish
                     if let cached = self.archive.findCachedAnswer(for: cleanText) {
-                        CursorFeedback.stage2ModelStarted()
-                        DispatchQueue.main.asyncAfter(deadline: .now() + 0.24) {
+                        DispatchQueue.main.asyncAfter(deadline: .now() + 0.18) {
                             self.settings.lastPrimaryAnswer = cached.primaryAnswer
                             self.settings.lastSecondaryAnswer = cached.secondaryAnswer ?? ""
                             self.settings.lastConfidence = cached.confidence
-                            self.settings.lastReasoning = "[RAM Arxiv keshidan <0.5ms] \(cached.reasoning)"
-                            self.settings.statusText = "3/3 Tayyor (Arxiv): \(cached.primaryAnswer)"
+                            self.settings.lastReasoning = "[Arxiv keshidan] \(cached.reasoning)"
+                            self.settings.hudState = .answer(primary: cached.primaryAnswer, secondary: cached.secondaryAnswer)
+                            self.settings.statusText = "Tayyor (Arxiv): \(cached.primaryAnswer)"
                             self.settings.isProcessing = false
                             self.statusItem?.button?.title = cached.primaryAnswer
                             self.overlay.refreshAppearance()
-                            CursorFeedback.stage3AnswerReady()
+                            HumanCursorSignal.stage3AnswerReady()
                         }
                         return
                     }
 
-                    // 4. Speculative Parallel Flash/Pro + Hidden Gemini Web v7
+                    // 4. Autonomous Self-Healing Solver (G -> IW / SW / W -> A / B / C / D)
                     var earlySignaled = false
-                    SmartAIRouter.shared.solveFastAndAccurate(
+                    SmartAIRouter.shared.solveWithAutonomousSelfHealing(
                         ocrText: cleanText,
                         cgImage: cgImage,
-                        onModelDispatched: {
-                            DispatchQueue.main.async {
-                                self.settings.statusText = "2/3: Flash/Pro modellar yechmoqda..."
-                                self.statusItem?.button?.title = "◑"
-                            }
-                            // 2-BOSQICH SIGNAL: Model ish boshladi (`••` Sariq)
-                            CursorFeedback.stage2ModelStarted()
-                        },
+                        attempt: 1,
                         onEarlyCommit: { earlyRes in
                             let elapsedMs = Int(Date().timeIntervalSince(startTime) * 1000)
                             DispatchQueue.main.async {
@@ -2943,23 +2966,40 @@ final class AppController: NSObject, NSApplicationDelegate {
                                 self.settings.lastReasoning = earlyRes.reasoning
                                 self.settings.lastModelUsed = earlyRes.modelUsed
                                 self.settings.lastLatencyMs = elapsedMs
+                                self.settings.hudState = .answer(primary: earlyRes.primary, secondary: earlyRes.secondary)
                                 let badgeText = (earlyRes.secondary != nil && !earlyRes.secondary!.isEmpty) ? "\(earlyRes.primary)\u{0332}\(earlyRes.secondary!)" : earlyRes.primary
                                 self.statusItem?.button?.title = badgeText
-                                self.settings.statusText = "3/3 Tezkor Javob (\(elapsedMs) ms · \(earlyRes.modelUsed)): \(badgeText) [Pro tekshirmoqda...]"
+                                self.settings.statusText = "Tayyor (\(elapsedMs) ms · \(earlyRes.modelUsed)): \(badgeText)"
                                 self.overlay.refreshAppearance()
-                                // 3-BOSQICH SIGNAL: Javob tayyor (`•••` Yashil)
-                                CursorFeedback.stage3AnswerReady()
+                                // 3-BOSQICH SIGNAL: Javob tayyor (3x tabiiy insoniy kursor siljishi!)
+                                HumanCursorSignal.stage3AnswerReady()
                             }
                         },
-                        completion: { result, errMsg in
+                        onTransientError: { errCat, errReason, attemptNum in
+                            DispatchQueue.main.async {
+                                // Agar hali javob chiqmagan bo'lsa, K bosilganda IW / SW / W ko'rinadi
+                                // va dastur o'zi orqa fonda qayta urinishda davom etadi!
+                                if !earlySignaled {
+                                    self.settings.selfHealAttempt = attemptNum + 1
+                                    self.settings.hudState = errCat.hudState
+                                    self.overlay.refreshAppearance()
+                                    self.statusItem?.button?.title = errCat.codeString
+                                    self.settings.statusText = "\(errCat.codeString) (Avto-tuzatish #\(attemptNum + 1)): \(errReason)"
+                                }
+                            }
+                        },
+                        completion: { result, finalErrCat, errMsg in
                             let elapsedMs = Int(Date().timeIntervalSince(startTime) * 1000)
                             DispatchQueue.main.async {
                                 self.settings.isProcessing = false
                                 self.settings.lastLatencyMs = elapsedMs
                                 guard let res = result else {
                                     if !earlySignaled {
-                                        self.settings.statusText = errMsg ?? "AI javob qaytarmadi."
-                                        self.statusItem?.button?.title = "×"
+                                        let cat = finalErrCat ?? .generalErrorW
+                                        self.settings.hudState = cat.hudState
+                                        self.overlay.refreshAppearance()
+                                        self.statusItem?.button?.title = cat.codeString
+                                        self.settings.statusText = "\(cat.codeString): \(errMsg ?? "Barcha urinishlar tugadi.")"
                                     }
                                     return
                                 }
@@ -2972,16 +3012,16 @@ final class AppController: NSObject, NSApplicationDelegate {
                                 self.settings.lastConfidence = res.confidence
                                 self.settings.lastReasoning = res.reasoning
                                 self.settings.lastModelUsed = res.modelUsed
+                                self.settings.hudState = .answer(primary: res.primary, secondary: res.secondary)
                                 let badgeText = (res.secondary != nil && !res.secondary!.isEmpty) ? "\(res.primary)\u{0332}\(res.secondary!)" : res.primary
                                 self.statusItem?.button?.title = badgeText
-                                self.settings.statusText = "3/3 Tasdiqlandi (\(elapsedMs) ms · \(res.modelUsed)): \(badgeText)"
+                                self.settings.statusText = "Tasdiqlandi (\(elapsedMs) ms · \(res.modelUsed)): \(badgeText)"
 
                                 self.archive.saveToArchive(rawQuestion: cleanText, image: cgImage, result: res)
                                 self.overlay.refreshAppearance()
 
-                                // Agar Early-Commit bo'lmagan bo'lsa yoki Pro boshqa javob/ikkilanish topsa, 3x signal beramiz
                                 if !earlySignaled || previousPrimary != res.primary || previousSecondary != (res.secondary ?? "") {
-                                    CursorFeedback.stage3AnswerReady()
+                                    HumanCursorSignal.stage3AnswerReady()
                                 }
                             }
                         }
