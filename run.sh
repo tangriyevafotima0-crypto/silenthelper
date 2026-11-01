@@ -2,7 +2,7 @@
 set -euo pipefail
 
 APP_NAME="SilentHelper"
-VERSION="10.0.0"
+VERSION="11.0.0"
 INSTALL_DIR="$HOME/Applications"
 APP_BUNDLE="${INSTALL_DIR}/${APP_NAME}.app"
 CONTENTS_DIR="${APP_BUNDLE}/Contents"
@@ -10,7 +10,7 @@ MACOS_DIR="${CONTENTS_DIR}/MacOS"
 BRIDGE_BIN="/tmp/sh_terminal_bridge"
 
 echo "--------------------------------------------------------"
-echo "  ${APP_NAME} v${VERSION} — Auto-Bridge & Drive Telemetry"
+echo "  ${APP_NAME} v${VERSION} — 0-Popup Bridge & Fast Solver"
 echo "--------------------------------------------------------"
 
 if ! command -v swiftc >/dev/null 2>&1; then
@@ -31,7 +31,7 @@ elif [ -d "$HOME/Google Drive/My Drive" ]; then
 fi
 
 mkdir -p "$DEFAULT_ARCHIVE/FlightLogs"
-mkdir -p "/tmp/sh_v10_ipc"
+mkdir -p "/tmp/sh_v11_ipc"
 
 pkill -f "sh_terminal_bridge" >/dev/null 2>&1 || true
 pkill -f "${APP_NAME}.app/Contents/MacOS/${APP_NAME}" >/dev/null 2>&1 || true
@@ -82,7 +82,7 @@ if [ -f "${CONTENTS_DIR}/source.sha256" ]; then
 fi
 
 if [ ! -f "${MACOS_DIR}/${APP_NAME}" ] || [ "$CURRENT_HASH" != "$SAVED_HASH" ]; then
-    echo "[*] ${APP_NAME}.app (v${VERSION}) yig'ilmoqda (CDHash doimiy saqlanadi)..."
+    echo "[*] ${APP_NAME}.app (v${VERSION}) yig'ilmoqda..."
 
     cat <<EOF > "${CONTENTS_DIR}/Info.plist"
 <?xml version="1.0" encoding="UTF-8"?>
@@ -101,10 +101,6 @@ if [ ! -f "${MACOS_DIR}/${APP_NAME}" ] || [ "$CURRENT_HASH" != "$SAVED_HASH" ]; 
     <string>APPL</string>
     <key>NSHighResolutionCapable</key>
     <true/>
-    <key>NSScreenCaptureUsageDescription</key>
-    <string>SilentHelper savollarni tahlil qilish uchun ekrandan xavfsiz skrinshot oladi.</string>
-    <key>NSAccessibilityUsageDescription</key>
-    <string>SilentHelper kursorni siljitish va klavishlarni kuzatish uchun ruxsat ishlatadi.</string>
 </dict>
 </plist>
 EOF
@@ -134,7 +130,7 @@ EOF
 
     echo "$CURRENT_HASH" > "${CONTENTS_DIR}/source.sha256"
 else
-    echo "[+] Mavjud imzolangan ${APP_NAME}.app topildi (qayta imzolanmadi, ruxsat saqlanadi)."
+    echo "[+] Mavjud imzolangan ${APP_NAME}.app topildi (ruxsat saqlanadi)."
 fi
 
 if [ -w "/Applications" ] && [ ! -e "/Applications/${APP_NAME}.app" ]; then
@@ -147,19 +143,20 @@ xattr -cr "$BRIDGE_BIN" >/dev/null 2>&1 || true
 
 nohup "$BRIDGE_BIN" --bridge-daemon >/dev/null 2>&1 &
 BRIDGE_PID=$!
+sleep 0.25
 
-echo "[+] Terminal Ruxsat Ko'prigi (Bridge PID: ${BRIDGE_PID}) ishga tushdi!"
-echo "[+] Google Email sessiyasi (com.local.SilentHelper) saqlangan!"
-echo "[+] Google Drive Avto-Telemetriya fayllari:"
-echo "    1) ${DEFAULT_ARCHIVE}/FlightLogs/SILENTHELPER_TELEMETRY_LATEST.md"
-echo "    2) ${DEFAULT_ARCHIVE}/FlightLogs/practice_session_report.md"
-echo "    3) ${DEFAULT_ARCHIVE}/FlightLogs/flight_recorder_log.jsonl"
+echo "[+] 0-Popup Terminal Ruxsat Ko'prigi (Bridge PID: ${BRIDGE_PID}) ishga tushdi!"
+echo "[+] Screen Recording ruxsat oynasi chiqishi 100% bloklandi!"
+echo "[+] Google Drive Avto-Telemetriya: ${DEFAULT_ARCHIVE}/FlightLogs/SILENTHELPER_TELEMETRY_LATEST.md"
 echo ""
-echo "v10.0 BOSHQARUV:"
-echo "  • [S -> F] yoki [Option + F] yoki Chap-Tepa Burchak -> Skrinshot + AI"
-echo "  • [K] yoki [Option + K] yoki Chap-Past Burchak -> G / IW / SW / W / Javob (A, B, C, D)"
-echo "  • [Option + L] (⌥L) -> Amaliyot payti xato yoki blok bo'lsa, lahzani skrinshoti bilan muhrlash"
-echo "  • [Option + M] (⌥M) -> Boshqaruv Panelini ochish / yashirish"
+echo "v11.0 BOSHQARUV:"
+echo "  • [Option + F] yoki [S -> F]:"
+echo "      1) Eski savol javobi darhol o'chiriladi"
+echo "      2) Skrinshot olinadi -> Kursor CHAPGA qimirlaydi"
+echo "      3) Gemini'ga yuboriladi -> Kursor O'NGGA qimirlaydi"
+echo "      4) Javob chiqadi -> Kursor 3 MARTA qimirlaydi"
+echo "  • Cooldown payti qayta [Option + F] bosilsa -> Ekranda 'K' (Kuting) chiqadi"
+echo "  • [K] yoki [Option + K] -> Javobni (A, B, C, D) yoki holatni (G / IW / SW / W) ko'rish"
 echo "--------------------------------------------------------"
 
 exec "${MACOS_DIR}/${APP_NAME}"

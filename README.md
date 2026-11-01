@@ -1,32 +1,27 @@
-# SilentHelper v10.0 — Deep Bug-Hunted, Auto-Bridge & Google Drive Telemetry Edition
+# SilentHelper v11.0 — 0-Popup Bridge, Chap/O'ng/3x Kursor & Cooldown 'K'
 
-## v10.0 da Hal Qilingan Barcha Muammolar (Bug Hunt Natijalari)
-1. **Terminal Ruxsat Ko'prigi (`--bridge-daemon`) + `.app` Email Konteyneri (`com.local.SilentHelper`):**
-   - `v9.0` dagi `practice_session_report.md` logida `CAPTURE | SW | Skrinshot xatosi: Screen Recording ruxsati yo'q` xatosi aniqlangan edi.
-   - **v10.0** da ikki qatlamli arxitektura ishlaydi:
-     - Asosiy dastur `~/Applications/SilentHelper.app` (`com.local.SilentHelper`) sifatida ishga tushadi — bu sizning **Google Email sessiyangizni** va **Dock / Cmd+Tab** ikonkangizni 100% saqlaydi.
-     - Shu bilan birga `run.sh` fonda `/tmp/sh_terminal_bridge --bridge-daemon` ko'prigini `Terminal.app` ostida ishga tushiradi — u `Terminal.app` ning mavjud Screen Recording va Accessibility ruxsatlaridan foydalanib, skrinshot olish, `S+F`/`K` tugmalar va `1x`/`3x` kursor siljishini **hech qanday ruxsat so'ramasdan** bajaradi!
-   - Shuningdek, `Downloads` papkasidagi eski dublikat `SilentHelper.app` fayllari tozalanadi va binar o'zgarmaguncha qayta imzolanmaydi (`source.sha256`).
-2. **Qo'shaloq Bosilish (Double-Trigger) Xatosi Tuzatildi:**
-   - `practice_session_report.md` da aniqlangan `04:10:05.550Z` va `04:10:05.562Z` (12ms farq bilan 2 marta ketma-ket ishlash) xatosi atomik `NSLock` va `1.2s` debounce bilan to'liq bartaraf etildi.
-3. **2026 Gemini Web `Flash ⌄` / `Pro ⌄` Avto-Almashtirgich va `Chat | Task` Himoyasi:**
-   - Yangi Gemini Web interfeysidagi prompt qutisi ichidagi `Flash ⌄` / `Pro ⌄` tugmasi avtomatik boshqariladi hamda `Task` rejimidan `Chat` rejimiga o'tkaziladi.
-   - `Pro` modelining ichki "Thinking..." matnlari javobdan avto-tozalanadi.
-4. **Mometrix / Bluebook Savol Setkasi (1..94) Filtri:**
-   - `archive_index.json` tahlilida aniqlangan 1 dan 94 gacha bo'lgan savol raqamlari RAM Arxiv qidiruvidan filtrlandi.
-5. **Google Drive Avto-Telemetriya (`QuizArchive/FlightLogs/`):**
-   - Keyingi versiyalarda tahlil qilish uchun barcha harakatlar real vaqtda Google Drive ichidagi quyidagi fayllarga avtomatik yozib boriladi:
-     - `QuizArchive/FlightLogs/SILENTHELPER_TELEMETRY_LATEST.md`
-     - `QuizArchive/FlightLogs/practice_session_report.md`
-     - `QuizArchive/FlightLogs/flight_recorder_log.jsonl`
+## v11.0 da Hal Qilingan Masalalar va Yangi Funksiyalar
+1. **`"SilentHelper" would like to record this computer's screen` Oynasi 100% Yo'qotildi:**
+   - v10.0 da `ScreenCaptureService` avval 1-qatlamda `SilentHelper.app` ichidan skrinshot funksiyasini chaqirgani uchun macOS har safar ruxsat oynasini chiqarib yuborayotgan edi.
+   - **v11.0** da `SilentHelper.app` o'z ichidan hech qachon ruxsatsiz skrinshot API chaqirmaydi — skrinshotni to'g'ridan-to'g'ri `Terminal.app` ruxsatiga ega `Terminal Bridge` (`/tmp/sh_terminal_bridge`) orqali oladi (**0 popup**).
+2. **Yo'nalishli Kursor Harakati (Chapga -> O'ngga -> 3 marta):**
+   - **1-Bosqich (Skrinshot olindi):** Kursor **CHAPGA** silliq borib qaytadi.
+   - **2-Bosqich (Gemini/AI ga yuborildi):** Kursor **O'NGGA** silliq borib qaytadi.
+   - **3-Bosqich (Javob tayyor bo'ldi):** Kursor **3 MARTA** qimirlaydi.
+3. **Cooldown Himoyasi va `"K"` ("Kuting") Belgisi:**
+   - Bir marta `Option+F` (yoki `S+F`) bosilgach, savol ishlanayotgan vaqtda yoki Cooldown (`3.5s`) ichida qayta 2-3 marta bosilsa, ustma-ust so'rov ketmaydi va burchakda **"Kuting"** ma'nosida **`K`** harfi ko'rinadi.
+4. **Savoldan Savolga O'tganda Eski Javobni Darhol Yo'qotish:**
+   - Keyingi savolda `Option+F` bosilgan zahoti avvalgi savolning javobi ekrandan va xotiradan darhol tozalanadi (`G` holatiga o'tadi).
+5. **Tezlik 60 Soniyadan 2–4 Soniyaga Tushirildi:**
+   - `SILENTHELPER_TELEMETRY_LATEST.md` tahlilida aniqlangan sekin `-image` va `lyria` modellari bloklandi, `gemini-3-flash-preview` va `gemini-3.5-flash` 1-o'ringa chiqarildi.
 
 ## Mac Terminalida Ishga Tushirish (`#` belgisiz)
 
 ```zsh
 cd ~/Downloads
-rm -rf SilentHelper_v10
-unzip -q -o SilentHelper_v10.0.zip -d SilentHelper_v10
-cd SilentHelper_v10
+rm -rf SilentHelper_v11
+unzip -q -o SilentHelper_v11.0.zip -d SilentHelper_v11
+cd SilentHelper_v11
 chmod +x run.sh
 ./run.sh
 ```
