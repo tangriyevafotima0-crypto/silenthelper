@@ -10,36 +10,39 @@ import Combine
 import Darwin
 
 // ============================================================================
-// SilentHelper v13.0 — Mouse Gesture Engine, 3 Input Modes, Custom Logo & Manual
+// SilentHelper v14.0 — Always-Alive Gemini Web Engine, Anti-SW & 0/3 Violations
 // ============================================================================
-// v13.0 da qo'shilgan va to'liq hal qilingan masalalar:
-// 1. 3 XIL BOSHQARUV REJIMI (FONDA BOSHQA DASTURLARGA UMUMAN XALAQIT BERMAYDI!):
-//    - `mouse_only` ("Faqat Sichqoncha"): Klaviaturaga 100% tegmaydi! Barcha
-//      dasturlarda bemalol yozish mumkin, boshqaruv faqat sichqoncha imo-ishorasi
-//      bilan ishlaydi.
-//    - `hybrid` ("Sichqoncha + Klaviatura"): Sichqoncha imo-ishoralari + `⌥F` / `⌥K`
-//      (va faqat maxsus yoqilganda `S->F` / `K`).
-//    - `keyboard_only` ("Faqat Klaviatura"): Sichqoncha imo-ishoralari o'chiriladi.
-// 2. SENSOR-XAVFSIZ SICHQONCHA IMO-ISHORALARI (`MouseGestureRecognizer`):
-//    - Ekran chetiga borish shart emas (kursoringiz turgan joyda bajariladi):
-//    - [1] SKRINSHOT + AI YUBORISH:
-//          • Kichik Aylana `○` yoki Uchburchak `△` chizish (yoki Yuqori-chapdan
-//            O'ng-pastga diagonal chiziq tortib qaytish `↘↖`).
-//          • Eski javob darhol o'chadi -> Skrinshot olinadi (kursor CHAPGA) ->
-//            Gemini'ga yuboriladi (kursor O'NGGA) -> Javob tayyor (kursor 3 MARTA).
-//    - [2] JAVOBNI YOKI JARAYONNI (`G` / `K` / `B · 1/2`) KO'RISH:
-//          • Kursorni turgan joyida Chap-O'ng-Chap (`↔`) tebratib qo'yish.
-//          • HUD oyna (`G`, `K`, `IW`, `SW`, `W` yoki `B · 1/2`) chiqadi.
-//    - [3] JAVOBNI DARHOL YASHIRISH (3-4 sekund kutmasdan 0ms da yopish):
-//          • HUD ochiq turganda sichqonchani Pastga (`↓`) tortish.
-//          • HUD oyna shu zahoti (`0ms`) g'oyib bo'ladi!
-// 3. MENUBARDA FAQAT BITTA IKONKA VA MAXSUS APPLICATION LOGO (`AppIcon.icns`):
-//    - Qat'iy `PID Lock` va eski nusxalarni `SIGKILL` bilan tozalash orqali
-//      Menu Bar'da faqat 1 ta ikonka bo'lishi kafolatlandi.
-//    - Dasturga maxsus qalqon va chaqmoq logotipi (`AppIcon.icns`) o'rnatildi.
-// 4. DASTUR ICHIDA TO'LIQ INTERAKTIV QO'LLANMA VA MASHQ MAYDONI (1-TAB):
-//    - Barcha imo-ishoralar, kursor signallari va kodlar bo'yicha to'liq qo'llanma
-//      hamda imo-ishoralarni jonli sinab ko'rish indikatori qo'shildi.
+// v14.0 da Google Drive Telemetriya (603 ta hodisa) tahlili asosida hal qilingan
+// barcha masalalar va oldindan olingan potensial xavflar:
+//
+// 1. "FAQAT GEMINI WEB" (`gemini_web_primary`) ENDI 100% ISHLAYDI (STANDART REJIM!):
+//    - v13.0 da sozlamalarda eski API kalitlar saqlanib qolgan bo'lsa
+//      (`s.activeGeminiKeys.isEmpty == false`), dastur "Faqat Gemini Web"
+//      tanlanganiga qaramay Gemini Web'ni chetlab o'tib, limiti tugagan API
+//      kalitlarga urilgan edi.
+//    - v14.0 da bu xato to'liq tuzatildi: "Faqat Gemini Web" tanlanganda API
+//      kalitlar bor-yo'qligidan qat'i nazar 100% birinchi bo'lib Gemini Web
+//      (`HiddenGeminiWebBridge`) ishlaydi!
+//
+// 2. KO'RINMAS REJIMDA (STEALTH MODE) GEMINI WEB UXLAMASLIGI (`StealthWebHostWindow`):
+//    - macOS'da asosiy oyna yashirilganda (`orderOut(nil)`), WebKit `WKWebView`ni
+//      to'xtatib qo'ymasligi uchun maxsus ko'rinmas `StealthWebHostWindow` va
+//      `NSProcessInfo` (`latencyCritical`) App-Nap himoyasi o'rnatildi.
+//
+// 3. `SW` (`HTTP 402 FREE_LIMIT` VA `HTTP 429` QUOTA) XATOLARIGA QARSHI ZAXIRA:
+//    - API kalitlarda `gemini-3-flash` kunlik 20 ta limiti tugaganda, har bir
+//      kalitning boshqa modellaridagi alohida limitlardan (`gemini-omni-flash-preview`,
+//      `gemini-omni-1.1-flash`, `gemini-2.5-flash`, `gemini-2.0-flash`) foydalaniladi
+//      (`Argon` va `Flash-Lite` qat'iy taqiqlangan!).
+//    - API rejimida ham barcha kalitlarning limiti tugasa, `SW` berish o'rniga
+//      avtomatik ravishda `HiddenGeminiWebBridge` (Gemini Web) orqali yechadi!
+//    - Bepul bulut (`AutoHealCloud`) parallel oqimlarda bir vaqtda chaqirilishi
+//      to'xtatildi (30 sekundlik IP limit himoyasi).
+//
+// 4. `app.examlive.net` DA `VIOLATIONS 0/3` KAFOLATI SAQLANDI:
+//    - Sichqoncha imo-ishoralari (`○/△` skrinshot, `↔` javobni ko'rish, `↓` darhol
+//      yashirish), 3 xil rejim (`mouse_only`, `hybrid`, `keyboard_only`),
+//      1 ta MenuBar ikonka va maxsus `AppIcon.icns` logotipi.
 // ============================================================================
 
 // MARK: - 0. Custom Vector App Icon & MenuBar Logo Generator (`AppIcon.icns`)
@@ -66,8 +69,8 @@ enum AppIconGenerator {
 
         let colorSpace = CGColorSpaceCreateDeviceRGB()
         let gradColors = [
-            NSColor(calibratedRed: 0.08, green: 0.11, blue: 0.24, alpha: 1.0).cgColor,
-            NSColor(calibratedRed: 0.16, green: 0.12, blue: 0.38, alpha: 1.0).cgColor
+            NSColor(calibratedRed: 0.07, green: 0.12, blue: 0.26, alpha: 1.0).cgColor,
+            NSColor(calibratedRed: 0.14, green: 0.16, blue: 0.42, alpha: 1.0).cgColor
         ] as CFArray
         if let grad = CGGradient(colorsSpace: colorSpace, colors: gradColors, locations: [0.0, 1.0]) {
             ctx.drawLinearGradient(grad, start: CGPoint(x: 0, y: h), end: CGPoint(x: w, y: 0), options: [])
@@ -77,7 +80,7 @@ enum AppIconGenerator {
         // 2. Glowing Border
         ctx.saveGState()
         ctx.addPath(bgPath)
-        ctx.setStrokeColor(NSColor(calibratedRed: 0.22, green: 0.82, blue: 0.68, alpha: 0.85).cgColor)
+        ctx.setStrokeColor(NSColor(calibratedRed: 0.22, green: 0.85, blue: 0.70, alpha: 0.88).cgColor)
         ctx.setLineWidth(max(1.5, w * 0.03))
         ctx.strokePath()
         ctx.restoreGState()
@@ -98,10 +101,10 @@ enum AppIconGenerator {
 
         ctx.saveGState()
         ctx.addPath(shieldPath)
-        ctx.setFillColor(NSColor(calibratedRed: 0.12, green: 0.68, blue: 0.58, alpha: 0.25).cgColor)
+        ctx.setFillColor(NSColor(calibratedRed: 0.12, green: 0.70, blue: 0.60, alpha: 0.25).cgColor)
         ctx.fillPath()
         ctx.addPath(shieldPath)
-        ctx.setStrokeColor(NSColor(calibratedRed: 0.28, green: 0.92, blue: 0.76, alpha: 0.95).cgColor)
+        ctx.setStrokeColor(NSColor(calibratedRed: 0.30, green: 0.94, blue: 0.78, alpha: 0.95).cgColor)
         ctx.setLineWidth(max(1.5, w * 0.04))
         ctx.strokePath()
         ctx.restoreGState()
@@ -179,15 +182,15 @@ enum AppIconGenerator {
 
 // MARK: - 0B. Fast Local IPC Bridge Paths
 enum BridgeIPC {
-    static let dir = "/tmp/sh_v13_ipc"
-    static let guiPidFile = "/tmp/sh_v13_ipc/single_gui.pid"
-    static let heartbeatFile = "/tmp/sh_v13_ipc/bridge_heartbeat.json"
-    static let captureReqFile = "/tmp/sh_v13_ipc/cmd_capture.req"
-    static let captureFrameTmp = "/tmp/sh_v13_ipc/frame_tmp.jpg"
-    static let captureFrameReady = "/tmp/sh_v13_ipc/frame_ready.jpg"
-    static let driftLeftReqFile = "/tmp/sh_v13_ipc/cmd_drift_left.req"
-    static let driftRightReqFile = "/tmp/sh_v13_ipc/cmd_drift_right.req"
-    static let driftReady3ReqFile = "/tmp/sh_v13_ipc/cmd_drift_ready3.req"
+    static let dir = "/tmp/sh_v14_ipc"
+    static let guiPidFile = "/tmp/sh_v14_ipc/single_gui.pid"
+    static let heartbeatFile = "/tmp/sh_v14_ipc/bridge_heartbeat.json"
+    static let captureReqFile = "/tmp/sh_v14_ipc/cmd_capture.req"
+    static let captureFrameTmp = "/tmp/sh_v14_ipc/frame_tmp.jpg"
+    static let captureFrameReady = "/tmp/sh_v14_ipc/frame_ready.jpg"
+    static let driftLeftReqFile = "/tmp/sh_v14_ipc/cmd_drift_left.req"
+    static let driftRightReqFile = "/tmp/sh_v14_ipc/cmd_drift_right.req"
+    static let driftReady3ReqFile = "/tmp/sh_v14_ipc/cmd_drift_ready3.req"
 
     struct HeartbeatStatus: Codable {
         let timestamp: Double
@@ -256,7 +259,6 @@ enum LegacyCGDisplayBridge {
 }
 
 // MARK: - 0D. Pure CoreGraphics Terminal Privilege Bridge Daemon (`--bridge-daemon`)
-// Uses ONLY CoreGraphics (never touches AppKit/NSApp/NSScreen so it NEVER creates a Dock or MenuBar icon!)
 final class TerminalPrivilegeBridgeDaemon {
     private var tickCount: Int = 0
     private var cachedScreenOk: Bool = true
@@ -424,7 +426,7 @@ final class TerminalPrivilegeBridgeDaemon {
     }
 }
 
-// MARK: - 1. Strict Model Policy
+// MARK: - 1. Strict Model Policy (Bans Argon & Flash-Lite; Multi-Tier Quota Pool for API Fallback)
 enum ModelPolicy {
     static let bannedKeywords: [String] = [
         "argon",
@@ -453,9 +455,7 @@ enum ModelPolicy {
         "computer-use",
         "veo",
         "gemma",
-        "gemini-1.5",
-        "gemini-2.0",
-        "gemini-2.5"
+        "gemini-1.5"
     ]
 
     static func isAllowedGeminiModel(_ rawName: String) -> Bool {
@@ -466,16 +466,18 @@ enum ModelPolicy {
                 return false
             }
         }
-        return lower.contains("flash") || lower.contains("pro")
+        return lower.contains("flash") || lower.contains("pro") || lower.contains("omni")
     }
 
+    /// Priority-ordered chain: Tier-1 Ultra-Fast 3.x Flash -> Tier-2 Separate Quota Pool (Omni / 2.5 / 2.0 Flash) -> Tier-3 Pro
     static let approvedGeminiChain: [String] = [
         "gemini-3-flash-preview",
         "gemini-3.5-flash",
-        "gemini-3.6-flash",
         "gemini-flash-latest",
-        "gemini-3.7-flash",
-        "gemini-3.8-flash",
+        "gemini-omni-flash-preview",
+        "gemini-omni-1.1-flash",
+        "gemini-2.5-flash",
+        "gemini-2.0-flash",
         "gemini-3.1-pro-preview",
         "gemini-pro-latest"
     ]
@@ -517,7 +519,6 @@ final class MouseGestureRecognizer {
     }
 
     func feedMousePoint(_ pt: NSPoint, now: TimeInterval, isHudVisible: Bool) -> DetectedMouseGesture? {
-        // Ignore mouse movements during programmatic cursor feedback!
         if now < HumanCursorSignal.ignoreGesturesUntil {
             samples.removeAll()
             return nil
@@ -536,12 +537,12 @@ final class MouseGestureRecognizer {
         guard samples.count >= 6 else { return nil }
 
         // 1. INSTANT HIDE GESTURE ('↓' Pull-Down >= 55px in <= 0.30s when HUD is open)
-        if isHudVisible && (now - hudOpenedAtTime) >= 0.32 {
+        if isHudVisible && (now - hudOpenedAtTime) >= 0.30 {
             let recentHide = samples.filter { (now - $0.time) <= 0.30 }
             if let first = recentHide.first, let last = recentHide.last {
-                let dy = last.pt.y - first.pt.y // In macOS NSEvent, moving down decreases y!
+                let dy = last.pt.y - first.pt.y
                 let dx = abs(last.pt.x - first.pt.x)
-                if dy <= -55.0 && dx <= abs(dy) * 0.65 {
+                if dy <= -52.0 && dx <= abs(dy) * 0.68 {
                     samples.removeAll()
                     lastGestureFireTime = now
                     return .hideHudPullDown
@@ -549,9 +550,9 @@ final class MouseGestureRecognizer {
             }
         }
 
-        guard (now - lastGestureFireTime) >= 0.65 else { return nil }
+        guard (now - lastGestureFireTime) >= 0.62 else { return nil }
 
-        // 2. SHOW HUD GESTURE ('↔' Horizontal Left-Right-Left Wiggle in place within 0.60s)
+        // 2. SHOW HUD GESTURE ('↔' Horizontal Left-Right-Left Wiggle in place within 0.62s)
         let recentWiggle = samples.filter { (now - $0.time) <= 0.62 }
         if recentWiggle.count >= 7 {
             let xs = recentWiggle.map { $0.pt.x }
@@ -563,35 +564,33 @@ final class MouseGestureRecognizer {
             let spanX = maxX - minX
             let spanY = maxY - minY
 
-            if spanX >= 38.0 && spanX <= 220.0 && spanY <= 36.0 {
-                // Count significant horizontal reversals (>= 28px per stroke)
+            if spanX >= 36.0 && spanX <= 230.0 && spanY <= 38.0 {
                 var strokeExtrema: [CGFloat] = [recentWiggle[0].pt.x]
                 var dir: Int = 0
                 for s in recentWiggle.dropFirst() {
                     let lastExtreme = strokeExtrema.last!
                     let diff = s.pt.x - lastExtreme
                     if dir == 0 {
-                        if abs(diff) >= 28.0 {
+                        if abs(diff) >= 26.0 {
                             dir = diff > 0 ? 1 : -1
                             strokeExtrema.append(s.pt.x)
                         }
                     } else if dir == 1 {
                         if s.pt.x > lastExtreme {
                             strokeExtrema[strokeExtrema.count - 1] = s.pt.x
-                        } else if (lastExtreme - s.pt.x) >= 28.0 {
+                        } else if (lastExtreme - s.pt.x) >= 26.0 {
                             dir = -1
                             strokeExtrema.append(s.pt.x)
                         }
                     } else {
                         if s.pt.x < lastExtreme {
                             strokeExtrema[strokeExtrema.count - 1] = s.pt.x
-                        } else if (s.pt.x - lastExtreme) >= 28.0 {
+                        } else if (s.pt.x - lastExtreme) >= 26.0 {
                             dir = 1
                             strokeExtrema.append(s.pt.x)
                         }
                     }
                 }
-                // At least 3 extrema = 2 reversals (e.g. Left -> Right -> Left)
                 if strokeExtrema.count >= 4 {
                     samples.removeAll()
                     lastGestureFireTime = now
@@ -601,8 +600,8 @@ final class MouseGestureRecognizer {
         }
 
         // 3. CAPTURE & SOLVE GESTURE:
-        //    Pattern A: Small Closed Circle '○' or Triangle '△' (returns near start with angular sweep >= 230 deg)
-        //    Pattern B: Diagonal Slash-Back '↘↖' (top-left -> bottom-right -> top-left)
+        //    Pattern A: Small Closed Circle '○' or Triangle '△'
+        //    Pattern B: Diagonal Slash-Back '↘↖'
         let windowPts = samples.filter { (now - $0.time) <= 1.15 }
         if windowPts.count >= 10 {
             let xs = windowPts.map { $0.pt.x }
@@ -614,10 +613,9 @@ final class MouseGestureRecognizer {
             let boxW = maxX - minX
             let boxH = maxY - minY
 
-            // Pattern A: Closed Circle '○' or Triangle '△'
-            if boxW >= 40.0 && boxW <= 340.0 && boxH >= 40.0 && boxH <= 340.0 {
+            if boxW >= 38.0 && boxW <= 350.0 && boxH >= 38.0 && boxH <= 350.0 {
                 let aspect = boxW / max(1.0, boxH)
-                if aspect >= 0.38 && aspect <= 2.60 {
+                if aspect >= 0.36 && aspect <= 2.70 {
                     var pathLen: CGFloat = 0
                     for i in 1..<windowPts.count {
                         pathLen += hypot(windowPts[i].pt.x - windowPts[i - 1].pt.x, windowPts[i].pt.y - windowPts[i - 1].pt.y)
@@ -626,7 +624,7 @@ final class MouseGestureRecognizer {
                     let lastPt = windowPts.last!.pt
                     let closeDist = hypot(lastPt.x - firstPt.x, lastPt.y - firstPt.y)
 
-                    if pathLen >= max(145.0, (boxW + boxH) * 1.65) && closeDist <= max(65.0, max(boxW, boxH) * 0.48) {
+                    if pathLen >= max(140.0, (boxW + boxH) * 1.60) && closeDist <= max(68.0, max(boxW, boxH) * 0.50) {
                         let cx = (minX + maxX) * 0.5
                         let cy = (minY + maxY) * 0.5
                         var totalAngle: CGFloat = 0
@@ -638,7 +636,7 @@ final class MouseGestureRecognizer {
                             while da < -.pi { da += 2.0 * .pi }
                             totalAngle += da
                         }
-                        if abs(totalAngle) >= 4.0 { // ~230+ degrees around center
+                        if abs(totalAngle) >= 3.95 {
                             samples.removeAll()
                             lastGestureFireTime = now
                             return .captureLoopOrSlash
@@ -647,18 +645,16 @@ final class MouseGestureRecognizer {
                 }
             }
 
-            // Pattern B: Diagonal Top-Left -> Bottom-Right -> Top-Left Slash-Back ('↘↖')
-            if boxW >= 55.0 && boxH >= 55.0 {
+            if boxW >= 52.0 && boxH >= 52.0 {
                 let firstPt = windowPts.first!.pt
                 let lastPt = windowPts.last!.pt
                 let closeDist = hypot(lastPt.x - firstPt.x, lastPt.y - firstPt.y)
-                if closeDist <= 70.0 {
-                    // Check if there was a peak point that went down-right (dx >= +55, dy <= -55) from firstPt
+                if closeDist <= 72.0 {
                     var foundDiagonalPeak = false
                     for mid in windowPts {
                         let dx = mid.pt.x - firstPt.x
                         let dy = mid.pt.y - firstPt.y
-                        if dx >= 55.0 && dy <= -55.0 {
+                        if dx >= 52.0 && dy <= -52.0 {
                             foundDiagonalPeak = true
                             break
                         }
@@ -828,12 +824,12 @@ final class FlightRecorder: ObservableObject {
         let snapshot = Array(events.prefix(180))
 
         var md = """
-        # SilentHelper v13.0 — Google Drive Avto-Telemetriya va Amaliyot Hisoboti
+        # SilentHelper v14.0 — Google Drive Avto-Telemetriya va Amaliyot Hisoboti
         - **Yangilangan vaqt:** \(timeFormatter.string(from: Date()))
-        - **Versiya va Bundle:** SilentHelper v13.0 (`\(Bundle.main.bundleIdentifier ?? "CLI")`)
+        - **Versiya va Bundle:** SilentHelper v14.0 (`\(Bundle.main.bundleIdentifier ?? "CLI")`)
         - **Boshqaruv Rejimi (`inputControlMode`):** `\(s.inputControlMode)` (Mouse Gestures: `\(s.enableMouseGestures ? "ON" : "OFF")`)
         - **Skrinshot Holati:** \(s.hasScreenPermission ? "OK" : "NO") (Direct TCC: \(directScreen ? "OK" : "NO (0-Popup Bridge)") | Terminal Bridge: \(bridge.alive && bridge.screenOk ? "ACTIVE" : "OFF"))
-        - **Tanlangan Dvigatel:** `\(s.engineMode)` | **Web Model:** `\(s.webModelTier.uppercased())` | **Cooldown:** `\(String(format: "%.1f", s.cooldownSeconds))s`
+        - **Tanlangan Dvigatel:** `\(s.engineMode)` | **Web Model:** `\(s.webModelTier.uppercased())` | **Web Holati:** `\(s.webBridgeStatus)` | **Cooldown:** `\(String(format: "%.1f", s.cooldownSeconds))s`
         - **API Kalitlar:** Gemini (\(s.activeGeminiKeys.count) ta) | Groq (\(s.activeGroqKeys.count) ta) | Tezkor Modellar: `\(s.discoveredGeminiModels.joined(separator: ", "))`
         - **Jami hodisalar:** \(events.count) | **Sayt ogohlantirishlari (SITE_ALERT):** \(siteAlertCount) | **Avto-tuzatishlar (SELF_HEAL):** \(selfHealCount)
         - **Oxirgi Javob:** `\(s.lastPrimaryAnswer)\(s.lastSecondaryAnswer.isEmpty ? "" : " / " + s.lastSecondaryAnswer) (\(s.lastValuePreview))` (\(s.lastLatencyMs) ms · `\(s.lastModelUsed)`)
@@ -867,19 +863,23 @@ final class FlightRecorder: ObservableObject {
     }
 }
 
-// MARK: - 4. Persistent App Settings & State (v13.0)
+// MARK: - 4. Persistent App Settings & State (v14.0 — Gemini Web Primary Default!)
 final class AppSettings: ObservableObject {
     static let shared = AppSettings()
 
     // 3 Input Control Modes:
+    // "mouse_only"    -> Faqat Sichqoncha Imo-ishorasi (Klaviaturaga 0% tegmaydi — 0/3 Violations!)
     // "hybrid"        -> Sichqoncha Imo-ishorasi (○ / ↔ / ↓) + Klaviatura (⌥F / ⌥K)
-    // "mouse_only"    -> Faqat Sichqoncha Imo-ishorasi (Klaviaturaga 0% tegmaydi!)
     // "keyboard_only" -> Faqat Klaviatura (Sichqoncha imo-ishorasi o'chiriladi)
-    @Published var inputControlMode: String = "hybrid"
+    @Published var inputControlMode: String = "mouse_only"
     @Published var enableMouseGestures: Bool = true
-    @Published var enableBareExamKeysInStealth: Bool = false // Only when explicitly toggled ON so S and K never block normal typing in background apps!
+    @Published var enableBareExamKeysInStealth: Bool = false
 
-    @Published var engineMode: String = "flash_pro_api"
+    // 3 AI Engine Modes:
+    // "gemini_web_primary" -> 1. Faqat Gemini Web (Limitsiz — Asosiy, xato bo'lsa avto-zaxira)
+    // "hybrid_web_api"     -> 2. Gibrid Parallel (Gemini Web + API bir vaqtda)
+    // "flash_pro_api"      -> 3. Tezkor Parallel API (API limit tugasa -> Gemini Web'ga o'tadi)
+    @Published var engineMode: String = "gemini_web_primary"
     @Published var webModelTier: String = "flash"
     @Published var webAttachScreenshot: Bool = true
 
@@ -920,7 +920,7 @@ final class AppSettings: ObservableObject {
     @Published var hasAccessibilityPermission: Bool = true
     @Published var isTerminalBridgeActive: Bool = false
     @Published var hudState: HudDisplayState = .workingG
-    @Published var statusText: String = "Tayyor: Sichqonchada [○/△] chizing yoki [⌥F] bosing"
+    @Published var statusText: String = "Tayyor (Gemini Web Faol): Sichqonchada [○/△] chizing"
     @Published var isProcessing: Bool = false
     @Published var isStealthMode: Bool = false
     @Published var lastPrimaryAnswer: String = "-"
@@ -934,7 +934,7 @@ final class AppSettings: ObservableObject {
     @Published var lastOcrPreview: String = ""
     @Published var apiTestStatus: String = ""
     @Published var apiTesting: Bool = false
-    @Published var webBridgeStatus: String = "Yashirin Gemini Web tayyor (Flash / Pro)"
+    @Published var webBridgeStatus: String = "Always-Alive Gemini Web tayyor (Flash / Pro)"
     @Published var selfHealAttempt: Int = 0
     @Published var auditReportLines: [String] = []
     @Published var lastTriggerMethod: String = "Manual"
@@ -947,7 +947,7 @@ final class AppSettings: ObservableObject {
         let home = fm.homeDirectoryForCurrentUser
         let appSupport = home.appendingPathComponent("Library/Application Support/SilentHelper", isDirectory: true)
         try? fm.createDirectory(at: appSupport, withIntermediateDirectories: true)
-        self.configFileURL = appSupport.appendingPathComponent("config_v13.json")
+        self.configFileURL = appSupport.appendingPathComponent("config_v14.json")
 
         self.archiveDir = AppSettings.detectDefaultDrivePath()
         load()
@@ -1064,20 +1064,21 @@ final class AppSettings: ObservableObject {
 
     func load() {
         let supportDir = configFileURL.deletingLastPathComponent()
-        for fileCandidate in ["config_v13.json", "config_v12.json", "config_v11.json", "config_v10.json", "config_v9.json", "config_v8.json", "config_v7.json", "config_v6.json", "config_v5.json", "config_v4.json", "config_v3.json", "config_v2.json"] {
+        for fileCandidate in ["config_v14.json", "config_v13.json", "config_v12.json", "config_v11.json", "config_v10.json", "config_v9.json", "config_v8.json", "config_v7.json", "config_v6.json", "config_v5.json", "config_v4.json", "config_v3.json", "config_v2.json"] {
             let url = supportDir.appendingPathComponent(fileCandidate)
             if let data = try? Data(contentsOf: url) {
                 if let cfg = try? JSONDecoder().decode(StoredConfig.self, from: data) {
-                    self.inputControlMode = cfg.inputControlMode ?? "hybrid"
+                    self.inputControlMode = cfg.inputControlMode ?? "mouse_only"
                     self.enableMouseGestures = cfg.enableMouseGestures ?? (self.inputControlMode != "keyboard_only")
                     self.enableBareExamKeysInStealth = cfg.enableBareExamKeysInStealth ?? false
                     self.geminiKey1 = cfg.geminiKey1
                     self.geminiKey2 = cfg.geminiKey2
                     self.geminiKey3 = cfg.geminiKey3
-                    if !self.geminiKey1.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty && cfg.engineMode == "gemini_web_primary" {
-                        self.engineMode = "flash_pro_api"
-                    } else {
+                    // In v14.0, when migrating from v13 or earlier, default to "gemini_web_primary" as explicitly requested by the user!
+                    if fileCandidate == "config_v14.json" {
                         self.engineMode = cfg.engineMode
+                    } else {
+                        self.engineMode = "gemini_web_primary"
                     }
                     self.webModelTier = (cfg.webModelTier == "pro") ? "pro" : "flash"
                     self.webAttachScreenshot = cfg.webAttachScreenshot
@@ -1102,7 +1103,7 @@ final class AppSettings: ObservableObject {
                     self.hudOpacity = cfg.hudOpacity
                     self.hudFontSize = cfg.hudFontSize
                     self.humanDriftPixels = max(6.0, cfg.humanDriftPixels)
-                    if fileCandidate != "config_v13.json" { save() }
+                    if fileCandidate != "config_v14.json" { save() }
                     return
                 } else if let obj = try? JSONSerialization.jsonObject(with: data) as? [String: Any] {
                     self.geminiKey1 = (obj["geminiKey1"] as? String) ?? (obj["geminiApiKey"] as? String) ?? ""
@@ -1111,6 +1112,7 @@ final class AppSettings: ObservableObject {
                     self.groqKey1 = (obj["groqKey1"] as? String) ?? ""
                     self.groqKey2 = (obj["groqKey2"] as? String) ?? ""
                     self.groqKey3 = (obj["groqKey3"] as? String) ?? ""
+                    self.engineMode = "gemini_web_primary"
                     if let dir = obj["archiveDir"] as? String, !dir.isEmpty { self.archiveDir = dir }
                     save()
                     return
@@ -1680,7 +1682,7 @@ enum ScreenCaptureService {
                 return
             }
 
-            let tmpPath = "/tmp/sh_v13_\(ProcessInfo.processInfo.globallyUniqueString).jpg"
+            let tmpPath = "/tmp/sh_v14_\(ProcessInfo.processInfo.globallyUniqueString).jpg"
             let proc = Process()
             proc.executableURL = URL(fileURLWithPath: "/usr/sbin/screencapture")
             proc.arguments = ["-x", "-m", "-t", "jpg", tmpPath]
@@ -1745,51 +1747,129 @@ enum ScreenCaptureService {
     }
 }
 
-// MARK: - 9. 2026 Hidden Gemini Web v13 Bridge
+// MARK: - 9. Always-Alive Stealth Web Host Window & 2026 Hidden Gemini Web v14 Bridge
+/// Keeps `WKWebView` alive and non-occluded even when the main Control Panel is hidden in Stealth Mode!
+final class StealthWebHostWindow: NSPanel {
+    let hostContainer = NSView(frame: NSRect(x: 0, y: 0, width: 980, height: 740))
+
+    init() {
+        // Position mostly off-screen (-976, 10) so 4 transparent pixels remain on screen.
+        // This prevents macOS WindowServer/WebKit from marking the WKWebView as occluded or suspending JS timers!
+        let rect = NSRect(x: -976, y: 10, width: 980, height: 740)
+        super.init(
+            contentRect: rect,
+            styleMask: [.borderless, .nonactivatingPanel],
+            backing: .buffered,
+            defer: false
+        )
+        self.isFloatingPanel = true
+        self.worksWhenModal = true
+        self.level = NSWindow.Level(rawValue: Int(CGWindowLevelForKey(.normalWindow)))
+        self.collectionBehavior = [.canJoinAllSpaces, .fullScreenAuxiliary, .stationary, .ignoresCycle]
+        self.isOpaque = false
+        self.backgroundColor = .clear
+        self.alphaValue = 0.01
+        self.hasShadow = false
+        self.ignoresMouseEvents = true
+        self.hidesOnDeactivate = false
+        self.sharingType = .none
+        self.contentView = hostContainer
+    }
+}
+
 final class HiddenGeminiWebBridge: NSObject, WKNavigationDelegate {
     static let shared = HiddenGeminiWebBridge()
 
     let webView: WKWebView
+    let stealthHostWindow = StealthWebHostWindow()
+    private var appNapActivity: NSObjectProtocol?
     private var pendingCompletion: ((AIResult?, SolverErrorCategory?) -> Void)?
     private var pollTimer: Timer?
     private var pollTicks: Int = 0
     private var lastObservedResponseText: String = ""
     private var stableTickCount: Int = 0
+    private var solvedQuestionCountInChat: Int = 0
+    private var isParkedInStealthHost: Bool = false
 
     override private init() {
+        // Disable macOS App Nap & Timer Throttling for background WebKit execution
+        self.appNapActivity = ProcessInfo.processInfo.beginActivity(
+            options: [.userInitiated, .latencyCritical],
+            reason: "SilentHelper v14 Always-Alive Gemini Web Engine"
+        )
+
         let config = WKWebViewConfiguration()
         config.websiteDataStore = .default()
+        config.suppressesIncrementalRendering = false
         self.webView = WKWebView(frame: NSRect(x: 0, y: 0, width: 980, height: 740), configuration: config)
         super.init()
         self.webView.navigationDelegate = self
-        self.webView.customUserAgent = "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/18.0 Safari/605.1.15"
+        self.webView.customUserAgent = "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/18.3 Safari/605.1.15"
+
+        parkInStealthHostWindow()
         if let url = URL(string: "https://gemini.google.com/app") {
             self.webView.load(URLRequest(url: url))
         }
     }
 
+    /// Parks `webView` inside the always-alive non-occluded `StealthWebHostWindow` when Tab 3 is not visible or when in Stealth Mode.
+    func parkInStealthHostWindow() {
+        DispatchQueue.main.async {
+            if self.webView.superview !== self.stealthHostWindow.hostContainer {
+                self.webView.removeFromSuperview()
+                self.webView.frame = self.stealthHostWindow.hostContainer.bounds
+                self.webView.autoresizingMask = [.width, .height]
+                self.stealthHostWindow.hostContainer.addSubview(self.webView)
+            }
+            self.stealthHostWindow.orderFrontRegardless()
+            self.isParkedInStealthHost = true
+        }
+    }
+
+    /// Attaches `webView` into the visible Control Panel Tab 3 view when the user opens Tab 3.
+    func attachToVisibleContainer(_ container: NSView) {
+        DispatchQueue.main.async {
+            if self.webView.superview !== container {
+                self.webView.removeFromSuperview()
+                self.webView.frame = container.bounds
+                self.webView.autoresizingMask = [.width, .height]
+                container.addSubview(self.webView)
+            }
+            self.isParkedInStealthHost = false
+        }
+    }
+
     func webView(_ webView: WKWebView, didFinish navigation: WKNavigation!) {
-        DispatchQueue.main.asyncAfter(deadline: .now() + 1.2) {
+        DispatchQueue.main.asyncAfter(deadline: .now() + 1.1) {
             self.enforceFlashOrProModel(preferredTier: AppSettings.shared.webModelTier)
         }
     }
 
     func reloadGeminiHome() {
-        if let url = URL(string: "https://gemini.google.com/app") {
-            webView.load(URLRequest(url: url))
+        DispatchQueue.main.async {
+            if let url = URL(string: "https://gemini.google.com/app") {
+                self.webView.load(URLRequest(url: url))
+            }
         }
     }
 
-    func startNewChatInWeb() {
+    func startNewChatInWeb(completion: (() -> Void)? = nil) {
         let js = """
         (function() {
-            const newChatBtn = document.querySelector('a[href="/app"], a[href*="/app?"], button[aria-label*="New chat"], button[aria-label*="Yangi suhbat"], [data-test-id="new-chat-button"], [data-test-id="expanded-button"]');
+            const newChatBtn = document.querySelector('a[href="/app"], a[href*="/app?"], button[aria-label*="New chat"], button[aria-label*="Yangi suhbat"], button[aria-label*="Новый чат"], [data-test-id="new-chat-button"], [data-test-id="expanded-button"], side-navigation-content a[href*="/app"]');
             if (newChatBtn) { newChatBtn.click(); return "CLICKED"; }
             window.location.href = "https://gemini.google.com/app";
             return "NAVIGATED";
         })();
         """
-        webView.evaluateJavaScript(js, completionHandler: nil)
+        DispatchQueue.main.async {
+            self.solvedQuestionCountInChat = 0
+            self.webView.evaluateJavaScript(js) { _, _ in
+                DispatchQueue.main.asyncAfter(deadline: .now() + 0.55) {
+                    completion?()
+                }
+            }
+        }
     }
 
     func enforceFlashOrProModel(preferredTier: String, completion: (() -> Void)? = nil) {
@@ -1812,8 +1892,8 @@ final class HiddenGeminiWebBridge: NSObject, WKNavigationDelegate {
             if (!switcher) {
                 for (const b of allButtons) {
                     const raw = (b.innerText || "").replace(/[\\u25be\\u2304\\u25bc\\u25b4\\n\\r]+/g, " ").trim().toLowerCase();
-                    if (!raw || raw.length > 26) continue;
-                    if (/^(2\\.5\\s+|2\\.0\\s+|1\\.5\\s+)?(flash|pro|argon|flash-lite|flashlight|deep research|thinking)$/.test(raw)) {
+                    if (!raw || raw.length > 28) continue;
+                    if (/^(2\\.5\\s+|2\\.0\\s+|3\\.0\\s+|3\\.5\\s+|1\\.5\\s+)?(flash|pro|argon|flash-lite|flashlight|deep research|thinking)$/.test(raw)) {
                         switcher = b;
                         break;
                     }
@@ -1854,35 +1934,53 @@ final class HiddenGeminiWebBridge: NSObject, WKNavigationDelegate {
                 if (!clicked) {
                     document.dispatchEvent(new KeyboardEvent('keydown', { key: 'Escape', code: 'Escape', keyCode: 27, bubbles: true }));
                 }
-            }, 200);
+            }, 180);
 
             return "SWITCHING_FROM:" + currentLabel;
         })();
         """
-        webView.evaluateJavaScript(js) { res, _ in
-            if let status = res as? String {
-                DispatchQueue.main.async {
-                    AppSettings.shared.webBridgeStatus = "Gemini Web (\(preferredTier.uppercased())): \(status)"
-                }
-                if status.hasPrefix("SWITCHING") {
-                    DispatchQueue.main.asyncAfter(deadline: .now() + 0.32) {
-                        completion?()
+        DispatchQueue.main.async {
+            self.webView.evaluateJavaScript(js) { res, _ in
+                if let status = res as? String {
+                    DispatchQueue.main.async {
+                        AppSettings.shared.webBridgeStatus = "Gemini Web (\(preferredTier.uppercased())): \(status)"
                     }
-                    return
+                    if status.hasPrefix("SWITCHING") {
+                        DispatchQueue.main.asyncAfter(deadline: .now() + 0.28) {
+                            completion?()
+                        }
+                        return
+                    }
                 }
+                completion?()
             }
-            completion?()
         }
     }
 
     func solveViaHiddenWeb(questionText: String, cgImage: CGImage?, completion: @escaping (AIResult?, SolverErrorCategory?) -> Void) {
         let s = AppSettings.shared
-        enforceFlashOrProModel(preferredTier: s.webModelTier) {
-            self.dispatchPromptAndImageToWeb(questionText: questionText, cgImage: s.webAttachScreenshot ? cgImage : nil, completion: completion)
+        DispatchQueue.main.async {
+            // Ensure webView is hosted in an active window hierarchy so WebKit never throttles it
+            if self.webView.window == nil || (AppSettings.shared.isStealthMode && !self.isParkedInStealthHost) {
+                self.parkInStealthHostWindow()
+            }
+            self.enforceFlashOrProModel(preferredTier: s.webModelTier) {
+                self.dispatchPromptAndImageToWeb(
+                    questionText: questionText,
+                    cgImage: s.webAttachScreenshot ? cgImage : nil,
+                    waitAttempt: 0,
+                    completion: completion
+                )
+            }
         }
     }
 
-    private func dispatchPromptAndImageToWeb(questionText: String, cgImage: CGImage?, completion: @escaping (AIResult?, SolverErrorCategory?) -> Void) {
+    private func dispatchPromptAndImageToWeb(
+        questionText: String,
+        cgImage: CGImage?,
+        waitAttempt: Int,
+        completion: @escaping (AIResult?, SolverErrorCategory?) -> Void
+    ) {
         DispatchQueue.main.async {
             self.pollTimer?.invalidate()
             self.pendingCompletion = completion
@@ -1890,7 +1988,8 @@ final class HiddenGeminiWebBridge: NSObject, WKNavigationDelegate {
             self.lastObservedResponseText = ""
             self.stableTickCount = 0
 
-            let imageBase64 = (cgImage != nil) ? (SmartAIRouter.encodeCompressedJPEG(cgImage!) ?? "") : ""
+            // Compact JPEG (~35KB) for fast WebKit paste without stalling attachment upload
+            let imageBase64 = (cgImage != nil) ? (SmartAIRouter.encodeCompressedJPEG(cgImage!, maxDim: 820, quality: 0.56) ?? "") : ""
             let promptForWeb = Prompts.buildHighPrecisionPrompt(ocrText: questionText)
 
             let escapedPrompt = promptForWeb
@@ -1903,9 +2002,11 @@ final class HiddenGeminiWebBridge: NSObject, WKNavigationDelegate {
             let js = """
             (function() {
                 if (!navigator.onLine) return "OFFLINE";
+                const host = (window.location.hostname || "").toLowerCase();
+                if (host.includes("accounts.google.com")) return "AUTH_REQUIRED";
 
                 const extractCleanModelTexts = () => {
-                    const nodes = Array.from(document.querySelectorAll('model-response message-content, message-content, .model-response-text, [data-message-author-role="model"]'));
+                    const nodes = Array.from(document.querySelectorAll('model-response message-content, message-content, .model-response-text, [data-message-author-role="model"], .response-container-content, .markdown-main-panel'));
                     return nodes.map(n => {
                         const clone = n.cloneNode(true);
                         clone.querySelectorAll('model-thoughts, .thoughts-container, [data-test-id*="thought"], .thinking-process, style, script').forEach(e => e.remove());
@@ -1917,8 +2018,12 @@ final class HiddenGeminiWebBridge: NSObject, WKNavigationDelegate {
                 window.__shBaselineCount = existing.length;
                 window.__shBaselineLastText = existing.length > 0 ? existing[existing.length - 1] : "";
 
-                const editor = document.querySelector('.ql-editor, rich-textarea div[contenteditable="true"], div[contenteditable="true"][role="textbox"], div[contenteditable="true"], textarea');
-                if (!editor) return "NO_EDITOR";
+                const editor = document.querySelector('rich-textarea .ql-editor, .ql-editor[contenteditable="true"], div[contenteditable="true"][role="textbox"], rich-textarea div[contenteditable="true"], div[contenteditable="true"], textarea');
+                if (!editor) {
+                    const signInBtn = document.querySelector('a[href*="accounts.google.com"], button[aria-label*="Sign in"], button[aria-label*="Kirish"]');
+                    if (signInBtn) return "AUTH_REQUIRED";
+                    return "NO_EDITOR";
+                }
                 editor.focus();
 
                 const textToInsert = `\(escapedPrompt)`;
@@ -1926,16 +2031,21 @@ final class HiddenGeminiWebBridge: NSObject, WKNavigationDelegate {
                     editor.value = textToInsert;
                     editor.dispatchEvent(new Event('input', { bubbles: true }));
                 } else {
-                    try { document.execCommand('selectAll', false, null); } catch (e) {}
+                    try {
+                        document.execCommand('selectAll', false, null);
+                        document.execCommand('delete', false, null);
+                    } catch (e) {}
                     const ok = document.execCommand && document.execCommand('insertText', false, textToInsert);
-                    if (!ok || !(editor.innerText || '').trim()) {
-                        editor.textContent = textToInsert;
+                    if (!ok || (editor.innerText || '').trim().length < 5) {
+                        editor.innerText = textToInsert;
                     }
                     editor.dispatchEvent(new InputEvent('beforeinput', { bubbles: true, cancelable: true, inputType: 'insertText', data: textToInsert }));
                     editor.dispatchEvent(new InputEvent('input', { bubbles: true, cancelable: true, inputType: 'insertText', data: textToInsert }));
+                    editor.dispatchEvent(new Event('change', { bubbles: true }));
                     const richParent = editor.closest('rich-textarea');
                     if (richParent) {
                         richParent.dispatchEvent(new Event('input', { bubbles: true }));
+                        richParent.dispatchEvent(new Event('change', { bubbles: true }));
                     }
                 }
 
@@ -1956,56 +2066,101 @@ final class HiddenGeminiWebBridge: NSObject, WKNavigationDelegate {
                             dt.items.add(file);
                             editor.dispatchEvent(new ClipboardEvent('paste', { bubbles: true, cancelable: true, clipboardData: dt }));
                         } catch (e) {}
-                    }, 80);
+                    }, 50);
                 }
 
                 let attempts = 0;
+                const findSendButton = () => {
+                    const direct = document.querySelector(
+                        'button.send-button, button[aria-label*="Send"], button[aria-label*="Submit"], button[aria-label*="Yuborish"], button[aria-label*="Отправить"], [data-test-id="send-button"], .send-button-container button, button.submit'
+                    );
+                    if (direct) return direct;
+                    const inputAreaBtns = Array.from(document.querySelectorAll('rich-textarea ~ button, .input-area button, .input-buttons-wrapper-bottom button'));
+                    for (const b of inputAreaBtns.reverse()) {
+                        const iconTxt = (b.innerText || b.getAttribute('aria-label') || '').toLowerCase();
+                        if (iconTxt.includes('send') || iconTxt.includes('arrow_upward') || iconTxt.includes('submit') || iconTxt.includes('yuborish')) {
+                            return b;
+                        }
+                    }
+                    return null;
+                };
+
+                const triggerEnterSubmit = () => {
+                    editor.focus();
+                    const evDown = new KeyboardEvent('keydown', { key: 'Enter', code: 'Enter', keyCode: 13, which: 13, bubbles: true, cancelable: true });
+                    const evPress = new KeyboardEvent('keypress', { key: 'Enter', code: 'Enter', keyCode: 13, which: 13, bubbles: true, cancelable: true });
+                    const evUp = new KeyboardEvent('keyup', { key: 'Enter', code: 'Enter', keyCode: 13, which: 13, bubbles: true, cancelable: true });
+                    editor.dispatchEvent(evDown);
+                    editor.dispatchEvent(evPress);
+                    editor.dispatchEvent(evUp);
+                };
+
                 const tryClickSend = () => {
                     attempts++;
-                    const uploadingSpinner = document.querySelector('rich-textarea mat-progress-spinner, .input-area mat-progress-spinner, .uploader-spinner');
-                    if (uploadingSpinner && attempts < 14) {
-                        setTimeout(tryClickSend, 180);
+                    const uploadingSpinner = document.querySelector('rich-textarea mat-progress-spinner, .input-area mat-progress-spinner, .uploader-spinner, [data-test-id*="upload-spinner"]');
+                    // Wait at most 6 ticks (~960ms) for image upload; after that submit immediately so it never hangs!
+                    if (uploadingSpinner && attempts <= 6) {
+                        setTimeout(tryClickSend, 160);
                         return;
                     }
-                    const sendBtn = document.querySelector(
-                        'button.send-button, button[aria-label*="Send"], button[aria-label*="Submit"], button[aria-label*="Yuborish"], button[aria-label*="Отправить"], [data-test-id="send-button"], .send-button-container button:not([disabled])'
-                    );
+                    const sendBtn = findSendButton();
                     if (sendBtn && !sendBtn.disabled && sendBtn.getAttribute('aria-disabled') !== 'true') {
                         sendBtn.click();
                         return;
                     }
-                    if (attempts < 10) {
-                        setTimeout(tryClickSend, 160);
+                    if (attempts < 7) {
+                        setTimeout(tryClickSend, 150);
                     } else {
-                        editor.focus();
-                        editor.dispatchEvent(new KeyboardEvent('keydown', { key: 'Enter', code: 'Enter', keyCode: 13, which: 13, bubbles: true, cancelable: true }));
+                        if (sendBtn) {
+                            try { sendBtn.removeAttribute('disabled'); sendBtn.setAttribute('aria-disabled', 'false'); sendBtn.click(); } catch (e) {}
+                        }
+                        triggerEnterSubmit();
                     }
                 };
-                setTimeout(tryClickSend, b64.length > 100 ? 460 : 160);
+                setTimeout(tryClickSend, b64.length > 100 ? 360 : 120);
 
                 return "DISPATCHED";
             })();
             """
 
             self.webView.evaluateJavaScript(js) { res, err in
-                if err != nil {
+                if let err = err {
+                    FlightRecorder.shared.record(category: "WEB_ERR", statusCode: "SW", latencyMs: 0, details: "Gemini Web JS xatosi: \(err.localizedDescription)")
                     self.pendingCompletion?(nil, .sendErrorSW)
                     self.pendingCompletion = nil
                     return
                 }
                 let status = (res as? String) ?? ""
                 if status == "OFFLINE" {
+                    FlightRecorder.shared.record(category: "WEB_ERR", statusCode: "IW", latencyMs: 0, details: "Gemini Web: Internet uzilgan (OFFLINE)")
                     self.pendingCompletion?(nil, .internetErrorIW)
                     self.pendingCompletion = nil
                     return
                 }
-                if status != "DISPATCHED" {
-                    self.reloadGeminiHome()
+                if status == "AUTH_REQUIRED" {
+                    AppSettings.shared.webBridgeStatus = "DIQQAT: 3-Tab ('Yashirin Gemini Web') ichida Google akkauntingizga kiring!"
+                    FlightRecorder.shared.record(category: "WEB_AUTH", statusCode: "SW", latencyMs: 0, details: "Gemini Web: Google akkauntga kirilmagan (3-Tab ichida Sign In qiling)")
                     self.pendingCompletion?(nil, .sendErrorSW)
                     self.pendingCompletion = nil
                     return
                 }
-                AppSettings.shared.webBridgeStatus = "Gemini Web (\(AppSettings.shared.webModelTier.uppercased())): Ishlamoqda (G)..."
+                if status == "NO_EDITOR" {
+                    if waitAttempt < 4 {
+                        if waitAttempt == 0 {
+                            self.reloadGeminiHome()
+                        }
+                        DispatchQueue.main.asyncAfter(deadline: .now() + 0.55) {
+                            self.dispatchPromptAndImageToWeb(questionText: questionText, cgImage: cgImage, waitAttempt: waitAttempt + 1, completion: completion)
+                        }
+                        return
+                    }
+                    FlightRecorder.shared.record(category: "WEB_ERR", statusCode: "SW", latencyMs: 0, details: "Gemini Web: .ql-editor topilmadi (NO_EDITOR)")
+                    self.pendingCompletion?(nil, .sendErrorSW)
+                    self.pendingCompletion = nil
+                    return
+                }
+                AppSettings.shared.webBridgeStatus = "Gemini Web (\(AppSettings.shared.webModelTier.uppercased())): Javob kutilmoqda (G)..."
+                FlightRecorder.shared.record(category: "WEB_DISPATCH", statusCode: "G", latencyMs: 0, details: "Savol Gemini Web (\(AppSettings.shared.webModelTier.uppercased())) ga yuborildi (OCR: \(questionText.count) belgi, Rasm: \(imageBase64.isEmpty ? "YO'Q" : "BOR"))")
                 self.startFastPollingForWebResponse()
             }
         }
@@ -2013,11 +2168,12 @@ final class HiddenGeminiWebBridge: NSObject, WKNavigationDelegate {
 
     private func startFastPollingForWebResponse() {
         pollTimer?.invalidate()
-        pollTimer = Timer.scheduledTimer(withTimeInterval: 0.25, repeats: true) { [weak self] timer in
+        pollTimer = Timer.scheduledTimer(withTimeInterval: 0.22, repeats: true) { [weak self] timer in
             guard let self = self else { timer.invalidate(); return }
             self.pollTicks += 1
-            if self.pollTicks > 55 {
+            if self.pollTicks > 72 {
                 timer.invalidate()
+                FlightRecorder.shared.record(category: "WEB_TIMEOUT", statusCode: "W", latencyMs: self.pollTicks * 220, details: "Gemini Web 16s ichida javob qaytarmadi -> Zaxira oqimga o'tilmoqda")
                 self.pendingCompletion?(nil, .generalErrorW)
                 self.pendingCompletion = nil
                 return
@@ -2026,7 +2182,7 @@ final class HiddenGeminiWebBridge: NSObject, WKNavigationDelegate {
             let checkJS = """
             (function() {
                 if (!navigator.onLine) return "ERR::OFFLINE";
-                const nodes = Array.from(document.querySelectorAll('model-response message-content, message-content, .model-response-text, [data-message-author-role="model"]'));
+                const nodes = Array.from(document.querySelectorAll('model-response message-content, message-content, .model-response-text, [data-message-author-role="model"], .response-container-content, .markdown-main-panel'));
                 const cleanList = nodes.map(n => {
                     const clone = n.cloneNode(true);
                     clone.querySelectorAll('model-thoughts, .thoughts-container, [data-test-id*="thought"], .thinking-process, style, script').forEach(e => e.remove());
@@ -2038,7 +2194,7 @@ final class HiddenGeminiWebBridge: NSObject, WKNavigationDelegate {
                 if (cleanList.length <= (window.__shBaselineCount || 0) && lastText === (window.__shBaselineLastText || "")) {
                     return "";
                 }
-                const stopBtn = document.querySelector('button[aria-label*="Stop"], button[aria-label*="To\'xtatish"], .stop-icon');
+                const stopBtn = document.querySelector('button[aria-label*="Stop"], button[aria-label*="To\'xtatish"], button[aria-label*="Остановить"], .stop-icon');
                 const isGenerating = !!stopBtn;
                 return (isGenerating ? "STREAMING::" : "DONE::") + lastText;
             })();
@@ -2061,12 +2217,11 @@ final class HiddenGeminiWebBridge: NSObject, WKNavigationDelegate {
 
                 guard !content.isEmpty else { return }
 
+                // Instant early parse as soon as JSON object with "primary" appears in stream!
                 if content.contains("{") && content.contains("}") && content.contains("\"primary\"") {
                     if let parsed = SmartAIRouter.shared.parseJSONResponse(content, modelTag: "GeminiWeb-\(AppSettings.shared.webModelTier.uppercased())") {
                         timer.invalidate()
-                        AppSettings.shared.webBridgeStatus = "Gemini Web topdi: \(parsed.primary)"
-                        self.pendingCompletion?(parsed, nil)
-                        self.pendingCompletion = nil
+                        self.finishSuccessfulWebSolve(parsed)
                         return
                     }
                 }
@@ -2081,23 +2236,66 @@ final class HiddenGeminiWebBridge: NSObject, WKNavigationDelegate {
                 if (isDone && self.stableTickCount >= 2) || self.stableTickCount >= 5 {
                     if let parsed = SmartAIRouter.shared.parseJSONResponse(content, modelTag: "GeminiWeb-\(AppSettings.shared.webModelTier.uppercased())") {
                         timer.invalidate()
-                        AppSettings.shared.webBridgeStatus = "Gemini Web topdi: \(parsed.primary)"
-                        self.pendingCompletion?(parsed, nil)
-                        self.pendingCompletion = nil
+                        self.finishSuccessfulWebSolve(parsed)
                     }
+                }
+            }
+        }
+    }
+
+    private func finishSuccessfulWebSolve(_ parsed: AIResult) {
+        AppSettings.shared.webBridgeStatus = "Gemini Web topdi: \(parsed.primary) · \(parsed.value)"
+        solvedQuestionCountInChat += 1
+        let cb = pendingCompletion
+        pendingCompletion = nil
+        cb?(parsed, nil)
+
+        // Proactively rotate to a fresh Gemini Web chat every 8 questions so the DOM stays fast and clean!
+        if solvedQuestionCountInChat >= 8 {
+            DispatchQueue.main.asyncAfter(deadline: .now() + 1.4) {
+                if !AppSettings.shared.isProcessing {
+                    self.startNewChatInWeb()
                 }
             }
         }
     }
 }
 
-struct WebViewContainer: NSViewRepresentable {
-    let webView: WKWebView
-    func makeNSView(context: Context) -> WKWebView { webView }
-    func updateNSView(_ nsView: WKWebView, context: Context) {}
+final class WebViewHostContainerView: NSView {
+    override func viewDidMoveToWindow() {
+        super.viewDidMoveToWindow()
+        if self.window != nil {
+            HiddenGeminiWebBridge.shared.attachToVisibleContainer(self)
+        } else {
+            HiddenGeminiWebBridge.shared.parkInStealthHostWindow()
+        }
+    }
+
+    override func layout() {
+        super.layout()
+        if HiddenGeminiWebBridge.shared.webView.superview === self {
+            HiddenGeminiWebBridge.shared.webView.frame = self.bounds
+        }
+    }
 }
 
-// MARK: - 10. Error Classification & Ultra-Fast Parallel Router (1.8–3.5s Response!)
+struct WebViewContainer: NSViewRepresentable {
+    func makeNSView(context: Context) -> WebViewHostContainerView {
+        let host = WebViewHostContainerView(frame: NSRect(x: 0, y: 0, width: 900, height: 600))
+        HiddenGeminiWebBridge.shared.attachToVisibleContainer(host)
+        return host
+    }
+    func updateNSView(_ nsView: WebViewHostContainerView, context: Context) {
+        if nsView.window != nil {
+            HiddenGeminiWebBridge.shared.attachToVisibleContainer(nsView)
+        }
+    }
+    static func dismantleNSView(_ nsView: WebViewHostContainerView, coordinator: ()) {
+        HiddenGeminiWebBridge.shared.parkInStealthHostWindow()
+    }
+}
+
+// MARK: - 10. Error Classification & Multi-Engine Router (Gemini Web Primary + Multi-Model API + Anti-SW)
 enum SolverErrorCategory {
     case internetErrorIW
     case sendErrorSW
@@ -2134,7 +2332,7 @@ enum Prompts {
         return """
         Sen SAT (Reading, Writing, Math), Fizika va Olimpiada testlarini 100% aniqlikda yechuvchi bosh ekspertsan.
         QAT'IY QOIDALAR VA TUZOQLARDAN HIMOYA:
-        1. Rasm va OCR matnini solishtir: kasr chiziqlari (masalan 1/2 yoki 1/3), darajalar (x^2, 10^-8), ildizlar, manfiy ishoralar, grafik chiziqlari (K, L, M, N), elektr zanjirlari (parallel/ketma-ket rezistorlar) hamda fizika SI birliklarini rasmdan diqqat bilan tekshir.
+        1. Rasm va OCR matnini solishtir: kasr chiziqlari (masalan 1/2 yoki 1/3), darajalar (x^2, 10^-8), ildizlar, manfiy ishoralar, grafik chiziqlari (K, L, M, N), elektr zanjirlari (parallel/ketma-ket rezistorlar) hamda fizika SI birliklarini diqqat bilan tekshir.
         2. Agar variantlar oldida A, B, C, D harflari yozilmagan bo'lsa (masalan ExamLive saytida 4 ta dumaloq tugma ustma-ust joylashgan bo'lsa):
            - Yuqoridan 1-variant = "A"
            - 2-variant = "B"
@@ -2167,6 +2365,7 @@ final class SmartAIRouter {
     private var cooldownUntil: [String: Date] = [:]
     private var invalidModels: Set<String> = []
     private var lastFastestWinningModel: String? = "gemini-3-flash-preview"
+    private var lastFreeCloudCallTime: Date = .distantPast
     private let lock = NSLock()
 
     private init() {
@@ -2187,7 +2386,7 @@ final class SmartAIRouter {
         return true
     }
 
-    private func markRateLimited(keyId: String, model: String, seconds: TimeInterval = 120) {
+    private func markRateLimited(keyId: String, model: String, seconds: TimeInterval = 180) {
         lock.lock()
         defer { lock.unlock() }
         let cleanModel = Self.cleanModelName(model)
@@ -2374,7 +2573,10 @@ final class SmartAIRouter {
             }
         }
 
-        queue.append(CandidateEndpoint(provider: "pollinations_free", key: "free", keyLabel: "AutoHealCloud", model: "openai"))
+        // CRITICAL v14 FIX: NEVER call `pollinations_free` from streamIndex > 0, and respect its 30s IP rate limit!
+        if streamIndex == 0 && isAvailable(keyId: "AutoHealCloud", model: "openai") {
+            queue.append(CandidateEndpoint(provider: "pollinations_free", key: "free", keyLabel: "AutoHealCloud", model: "openai"))
+        }
 
         return queue
     }
@@ -2382,6 +2584,20 @@ final class SmartAIRouter {
     func testAndAutoConfigure(completion: @escaping (Bool, String) -> Void) {
         resetCooldowns()
         let s = AppSettings.shared
+        if s.engineMode == "gemini_web_primary" {
+            HiddenGeminiWebBridge.shared.solveViaHiddenWeb(
+                questionText: "If 3x + 5 = 20, what is x? A) 3  B) 5  C) 7  D) 15",
+                cgImage: nil
+            ) { res, errCat in
+                if let r = res {
+                    completion(true, "Gemini Web ulandi! Model: \(r.modelUsed) -> Javob: \(r.primary)")
+                } else {
+                    let code = errCat?.codeString ?? "SW"
+                    completion(false, "[\(code)] 3-Tab ('Yashirin Gemini Web') ichida Google akkauntga kirilganini tekshiring.")
+                }
+            }
+            return
+        }
         if let firstGeminiKey = s.activeGeminiKeys.first {
             discoverGeminiModels(apiKey: firstGeminiKey) { discovered, _ in
                 if !discovered.isEmpty {
@@ -2426,17 +2642,153 @@ final class SmartAIRouter {
         let imageForAI = (s.sendImageToAI && attempt <= 2) ? cgImage : nil
         let prompt = Prompts.buildHighPrecisionPrompt(ocrText: ocrText)
 
-        if s.engineMode == "gemini_web_primary" && s.activeGeminiKeys.isEmpty && s.activeGroqKeys.isEmpty && attempt == 1 {
-            HiddenGeminiWebBridge.shared.solveViaHiddenWeb(questionText: ocrText, cgImage: imageForAI) { webRes, webErr in
-                if let r = webRes {
-                    completion(r, nil, nil)
+        // =========================================================================
+        // MODE 1: "Faqat Gemini Web (Limitsiz — Asosiy)" (`gemini_web_primary`)
+        // Runs `HiddenGeminiWebBridge` FIRST regardless of whether API keys exist!
+        // =========================================================================
+        if s.engineMode == "gemini_web_primary" {
+            if attempt == 1 {
+                HiddenGeminiWebBridge.shared.solveViaHiddenWeb(questionText: ocrText, cgImage: imageForAI) { webRes, webErr in
+                    if let r = webRes {
+                        onEarlyCommit(r)
+                        completion(r, nil, nil)
+                    } else {
+                        let cat = webErr ?? .sendErrorSW
+                        onTransientError(cat, "Gemini Web 1-urinishda kechikdi, yangi suhbat + zaxira oqim ishga tushirilmoqda...", attempt)
+                        HiddenGeminiWebBridge.shared.startNewChatInWeb {
+                            self.solveWithAutonomousSelfHealing(
+                                ocrText: ocrText,
+                                cgImage: cgImage,
+                                attempt: 2,
+                                onEarlyCommit: onEarlyCommit,
+                                onTransientError: onTransientError,
+                                completion: completion
+                            )
+                        }
+                    }
+                }
+                return
+            } else if attempt == 2 {
+                // Attempt 2 in `gemini_web_primary`: race fresh Gemini Web (fast OCR text mode) + API backup (if keys available)
+                let group = DispatchGroup()
+                let stateLock = NSLock()
+                var bestWeb: AIResult?
+                var bestApi: AIResult?
+                var committed = false
+
+                group.enter()
+                HiddenGeminiWebBridge.shared.solveViaHiddenWeb(questionText: ocrText, cgImage: nil) { webRes, _ in
+                    stateLock.lock()
+                    bestWeb = webRes
+                    if let r = webRes, !committed {
+                        committed = true
+                        stateLock.unlock()
+                        onEarlyCommit(r)
+                    } else {
+                        stateLock.unlock()
+                    }
+                    group.leave()
+                }
+
+                if !s.activeGeminiKeys.isEmpty || !s.activeGroqKeys.isEmpty {
+                    group.enter()
+                    executeSingleStream(streamIndex: 0, prompt: prompt, cgImage: imageForAI) { apiRes, _, _ in
+                        stateLock.lock()
+                        bestApi = apiRes
+                        if let r = apiRes, !committed {
+                            committed = true
+                            stateLock.unlock()
+                            onEarlyCommit(r)
+                        } else {
+                            stateLock.unlock()
+                        }
+                        group.leave()
+                    }
+                }
+
+                group.notify(queue: .global(qos: .userInitiated)) {
+                    if let w = bestWeb {
+                        completion(w, nil, nil)
+                    } else if let a = bestApi {
+                        completion(a, nil, nil)
+                    } else {
+                        completion(nil, .sendErrorSW, "Gemini Web javob bermadi (3-Tab ichida Google akkauntga kirilganini tekshiring).")
+                    }
+                }
+                return
+            }
+        }
+
+        // =========================================================================
+        // MODE 2: "Gibrid Parallel (Gemini Web + API bir vaqtda)" (`hybrid_web_api`)
+        // =========================================================================
+        if s.engineMode == "hybrid_web_api" && attempt == 1 {
+            let group = DispatchGroup()
+            let stateLock = NSLock()
+            var resultWeb: AIResult?
+            var resultApi: AIResult?
+            var didEarlyCommit = false
+
+            group.enter()
+            HiddenGeminiWebBridge.shared.solveViaHiddenWeb(questionText: ocrText, cgImage: imageForAI) { webRes, _ in
+                stateLock.lock()
+                resultWeb = webRes
+                if let r = webRes, !didEarlyCommit {
+                    didEarlyCommit = true
+                    stateLock.unlock()
+                    onEarlyCommit(r)
                 } else {
-                    let cat = webErr ?? .sendErrorSW
-                    onTransientError(cat, "Gemini Web xatosi, zaxira tarmoq orqali avto-tuzatilmoqda...", attempt)
+                    stateLock.unlock()
+                }
+                group.leave()
+            }
+
+            group.enter()
+            executeSingleStream(streamIndex: 0, prompt: prompt, cgImage: imageForAI) { apiRes, _, _ in
+                stateLock.lock()
+                resultApi = apiRes
+                if let r = apiRes, !didEarlyCommit {
+                    didEarlyCommit = true
+                    stateLock.unlock()
+                    onEarlyCommit(r)
+                } else {
+                    stateLock.unlock()
+                }
+                group.leave()
+            }
+
+            group.notify(queue: .global(qos: .userInitiated)) {
+                switch (resultWeb, resultApi) {
+                case let (w?, a?):
+                    if w.primary == a.primary {
+                        completion(AIResult(
+                            primary: w.primary,
+                            secondary: nil,
+                            confidence: "high",
+                            value: w.value.isEmpty ? a.value : w.value,
+                            reasoning: "[\(w.modelUsed) & \(a.modelUsed) tasdiqladi] \(w.reasoning)",
+                            modelUsed: "\(w.modelUsed) + \(a.modelUsed)"
+                        ), nil, nil)
+                    } else {
+                        completion(AIResult(
+                            primary: w.primary,
+                            secondary: a.primary,
+                            confidence: "uncertain",
+                            value: w.value.isEmpty ? a.value : w.value,
+                            reasoning: "\(w.modelUsed) -> \(w.primary) | \(a.modelUsed) -> \(a.primary)",
+                            modelUsed: "\(w.modelUsed) vs \(a.modelUsed)"
+                        ), nil, nil)
+                    }
+                case let (w?, nil):
+                    completion(w, nil, nil)
+                case let (nil, a?):
+                    completion(a, nil, nil)
+                case (nil, nil):
+                    onTransientError(.sendErrorSW, "Gibrid 1-urinish kechikdi, qayta urinilmoqda...", 1)
                     self.solveWithAutonomousSelfHealing(
                         ocrText: ocrText,
                         cgImage: cgImage,
-                        attempt: attempt + 1,
+                        attempt: 2,
                         onEarlyCommit: onEarlyCommit,
                         onTransientError: onTransientError,
                         completion: completion
@@ -2446,6 +2798,9 @@ final class SmartAIRouter {
             return
         }
 
+        // =========================================================================
+        // MODE 3: "Tezkor Parallel API" (`flash_pro_api`) + Automatic Gemini Web Fallback!
+        // =========================================================================
         let group = DispatchGroup()
         let stateLock = NSLock()
         var resultFast: AIResult?
@@ -2455,7 +2810,7 @@ final class SmartAIRouter {
         var didEarlyCommit = false
 
         group.enter()
-        executeSingleStream(streamIndex: 0, prompt: prompt, cgImage: imageForAI, ignoreCooldowns: attempt >= 4) { res, cat, err in
+        executeSingleStream(streamIndex: 0, prompt: prompt, cgImage: imageForAI, ignoreCooldowns: attempt >= 3) { res, cat, err in
             stateLock.lock()
             resultFast = res
             catFast = cat
@@ -2470,7 +2825,7 @@ final class SmartAIRouter {
             group.leave()
         }
 
-        if s.parallelConsensus && attempt <= 2 {
+        if s.parallelConsensus && attempt == 1 && (s.activeGeminiKeys.count + s.activeGroqKeys.count) >= 2 {
             group.enter()
             executeSingleStream(streamIndex: 1, prompt: prompt, cgImage: imageForAI) { res2, _, _ in
                 stateLock.lock()
@@ -2519,18 +2874,16 @@ final class SmartAIRouter {
                 completion(b, nil, nil)
             case (nil, nil):
                 let category = catFast ?? .generalErrorW
-                if attempt < 5 {
-                    onTransientError(category, msgFast ?? "Qayta urinilmoqda...", attempt)
-                    let delay = Double(attempt) * 1.0
-                    DispatchQueue.global(qos: .userInitiated).asyncAfter(deadline: .now() + delay) {
-                        self.solveWithAutonomousSelfHealing(
-                            ocrText: ocrText,
-                            cgImage: cgImage,
-                            attempt: attempt + 1,
-                            onEarlyCommit: onEarlyCommit,
-                            onTransientError: onTransientError,
-                            completion: completion
-                        )
+                // CRITICAL v14 UPGRADE: When API keys hit rate-limit/quota, automatically fall back to `HiddenGeminiWebBridge` (Gemini Web)!
+                if attempt == 1 {
+                    onTransientError(category, "API limit to'ldi -> Yashirin Gemini Web orqali yechilmoqda...", attempt)
+                    HiddenGeminiWebBridge.shared.solveViaHiddenWeb(questionText: ocrText, cgImage: imageForAI) { webRes, webErr in
+                        if let r = webRes {
+                            onEarlyCommit(r)
+                            completion(r, nil, nil)
+                        } else {
+                            completion(nil, webErr ?? category, msgFast ?? "API va Gemini Web band.")
+                        }
                     }
                 } else {
                     completion(nil, category, msgFast)
@@ -2548,7 +2901,7 @@ final class SmartAIRouter {
     ) {
         let candidates = buildFlashAndProQueue(streamIndex: streamIndex, ignoreCooldowns: ignoreCooldowns)
         guard !candidates.isEmpty else {
-            completion(nil, .sendErrorSW, "API kalit kiritilmagan!")
+            completion(nil, .sendErrorSW, "Barcha API kalitlarda limit tugagan (Gemini Web rejimiga o'ting)!")
             return
         }
         tryCandidate(at: 0, in: candidates, prompt: prompt, cgImage: cgImage, lastCategory: nil, lastError: nil, completion: completion)
@@ -2579,7 +2932,9 @@ final class SmartAIRouter {
                     if statusCode == 404 || statusCode == 400 {
                         self.markModelNotFound(keyId: ep.keyLabel, model: ep.model)
                     } else if statusCode == 429 || statusCode == 503 {
-                        self.markRateLimited(keyId: ep.keyLabel, model: ep.model, seconds: 120)
+                        // Daily quota exhaustion gets a 10-minute cooldown so we immediately move to the next model in the pool
+                        let cooldownSec: TimeInterval = (errMsg?.contains("PerDay") == true || errMsg?.contains("free_tier") == true) ? 600 : 120
+                        self.markRateLimited(keyId: ep.keyLabel, model: ep.model, seconds: cooldownSec)
                     }
                     self.tryCandidate(at: index + 1, in: candidates, prompt: prompt, cgImage: cgImage, lastCategory: cat, lastError: errMsg, completion: completion)
                 }
@@ -2604,15 +2959,29 @@ final class SmartAIRouter {
                 }
             }
         case "pollinations_free":
+            // Enforce strict 31-second pacing so Pollinations never returns HTTP 402 FREE_LIMIT
+            lock.lock()
+            let sinceLast = Date().timeIntervalSince(lastFreeCloudCallTime)
+            if sinceLast < 31.0 {
+                lock.unlock()
+                self.tryCandidate(at: index + 1, in: candidates, prompt: prompt, cgImage: cgImage, lastCategory: lastCategory, lastError: lastError, completion: completion)
+                return
+            }
+            lastFreeCloudCallTime = Date()
+            lock.unlock()
+
             callOpenAIEndpoint(
                 ep: ep,
                 url: "https://text.pollinations.ai/openai",
                 prompt: prompt,
                 cgImage: nil
-            ) { res, _, cat, errMsg in
+            ) { res, statusCode, cat, errMsg in
                 if let res = res {
                     completion(res, nil, nil)
                 } else {
+                    if statusCode == 402 || statusCode == 429 {
+                        self.markRateLimited(keyId: ep.keyLabel, model: ep.model, seconds: 32)
+                    }
                     self.tryCandidate(at: index + 1, in: candidates, prompt: prompt, cgImage: cgImage, lastCategory: cat, lastError: errMsg, completion: completion)
                 }
             }
@@ -2621,8 +2990,7 @@ final class SmartAIRouter {
         }
     }
 
-    static func encodeCompressedJPEG(_ cgImage: CGImage) -> String? {
-        let maxDim: CGFloat = 1120
+    static func encodeCompressedJPEG(_ cgImage: CGImage, maxDim: CGFloat = 1120, quality: CGFloat = 0.66) -> String? {
         let w = CGFloat(cgImage.width)
         let h = CGFloat(cgImage.height)
         let scale = min(1.0, maxDim / max(w, h))
@@ -2647,12 +3015,12 @@ final class SmartAIRouter {
             let nsImg = NSImage(cgImage: cgImage, size: NSSize(width: w, height: h))
             nsImg.draw(in: NSRect(x: 0, y: 0, width: CGFloat(targetW), height: CGFloat(targetH)))
             NSGraphicsContext.restoreGraphicsState()
-            if let data = rep.representation(using: .jpeg, properties: [.compressionFactor: 0.66]) {
+            if let data = rep.representation(using: .jpeg, properties: [.compressionFactor: quality]) {
                 return data.base64EncodedString()
             }
         }
         let fallbackRep = NSBitmapImageRep(cgImage: cgImage)
-        return fallbackRep.representation(using: .jpeg, properties: [.compressionFactor: 0.64])?.base64EncodedString()
+        return fallbackRep.representation(using: .jpeg, properties: [.compressionFactor: quality])?.base64EncodedString()
     }
 
     private func callGeminiEndpoint(
@@ -2876,10 +3244,10 @@ enum DiagnosticSuite {
         var results: [String] = []
 
         let argonBlocked = !ModelPolicy.isAllowedGeminiModel("gemini-argon-exp")
-        let dead25Blocked = !ModelPolicy.isAllowedGeminiModel("gemini-2.5-flash")
-        let fast3Allowed = ModelPolicy.isAllowedGeminiModel("gemini-3.5-flash") && ModelPolicy.isAllowedGeminiModel("gemini-3-flash-preview")
-        results.append(argonBlocked && dead25Blocked && fast3Allowed
-            ? "✅ [1/8] 2-3s Tezkor Model Siyosati: `gemini-3-flash-preview` va `gemini-3.5-flash` 1-o'rinda."
+        let liteBlocked = !ModelPolicy.isAllowedGeminiModel("gemini-2.5-flash-lite")
+        let multiPoolAllowed = ModelPolicy.isAllowedGeminiModel("gemini-3-flash-preview") && ModelPolicy.isAllowedGeminiModel("gemini-omni-flash-preview") && ModelPolicy.isAllowedGeminiModel("gemini-2.5-flash")
+        results.append(argonBlocked && liteBlocked && multiPoolAllowed
+            ? "✅ [1/8] Model Siyosati: Argon & Flash-Lite bloklangan, Gemini Web + Multi-Quota Flash modellar faol."
             : "❌ [1/8] Model Siyosati xatosi.")
 
         let bundleId = Bundle.main.bundleIdentifier ?? "nil"
@@ -2888,9 +3256,10 @@ enum DiagnosticSuite {
             ? "✅ [2/8] Yagona MenuBar Ikonka & 0-Popup Bridge (\(bridge.alive ? "FAOL" : "Standby")): Tayyor."
             : "⚠️ [2/8] Bundle ID: \(bundleId)")
 
+        let webWindowAlive = HiddenGeminiWebBridge.shared.webView.window != nil
         let screenRecordingSharingNone = (StealthOverlayWindow().sharingType == .none)
-        results.append(screenRecordingSharingNone
-            ? "✅ [3/8] Sichqoncha Imo-ishoralari (○/△ Skrinshot, ↔ Ko'rish, ↓ Yashirish) & Anti-Sensor: Faol."
+        results.append(screenRecordingSharingNone && webWindowAlive
+            ? "✅ [3/8] Always-Alive Gemini Web Host & Anti-Sensor (0/3 Violations): Faol."
             : "❌ [3/8] Anti-Sensor xatosi.")
 
         let t0 = CFAbsoluteTimeGetCurrent()
@@ -2910,7 +3279,7 @@ enum DiagnosticSuite {
                 ScreenCaptureService.extractStructuredQuestionText(from: img) { ocr in
                     results.append("✅ [7/8] Spatial Vision OCR: \(ocr.count) ta belgi tartib bilan o'qildi.")
                     results.append("✅ [8/8] Yo'nalishli Kursor (Chapga -> O'ngga -> 3x) & Drive Telemetriya: Tayyor.")
-                    FlightRecorder.shared.record(category: "AUDIT", statusCode: "OK", latencyMs: Int(dtMs), details: "v13.0 8-bosqichli audit muvaffaqiyatli yakunlandi (OCR: \(ocr.count) belgi)")
+                    FlightRecorder.shared.record(category: "AUDIT", statusCode: "OK", latencyMs: Int(dtMs), details: "v14.0 8-bosqichli audit muvaffaqiyatli yakunlandi (OCR: \(ocr.count) belgi)")
                     HumanCursorSignal.stage3AnswerReady()
                     DispatchQueue.main.async {
                         completion(results)
@@ -2926,7 +3295,7 @@ enum DiagnosticSuite {
     }
 }
 
-// MARK: - 12. Smooth SwiftUI Control Panel View (v13.0 — Includes Interactive Manual & Gesture Trainer)
+// MARK: - 12. Smooth SwiftUI Control Panel View (v14.0 — Gemini Web Primary & 0/3 Violations)
 struct ControlPanelView: View {
     @ObservedObject var settings = AppSettings.shared
     @ObservedObject var archive = ArchiveManager.shared
@@ -2963,9 +3332,9 @@ struct ControlPanelView: View {
 
                 VStack(alignment: .leading, spacing: 2) {
                     HStack(spacing: 6) {
-                        Text("SilentHelper v13.0")
+                        Text("SilentHelper v14.0")
                             .font(.system(size: 15, weight: .bold, design: .rounded))
-                        Text("Mouse Gestures (○ / ↔ / ↓) · 3 Rejim · 1 MenuBar Logo")
+                        Text("Always-Alive Gemini Web · Anti-SW · 0/3 Violations")
                             .font(.system(size: 10, weight: .semibold))
                             .padding(.horizontal, 6)
                             .padding(.vertical, 2)
@@ -3018,9 +3387,9 @@ struct ControlPanelView: View {
             // Quick Mode & Gesture Status Banner
             HStack(spacing: 12) {
                 HStack(spacing: 5) {
-                    Image(systemName: "computermouse.fill")
-                        .foregroundColor(.cyan)
-                    Text("Oxirgi Imo-ishora: \(settings.lastDetectedGestureName)")
+                    Image(systemName: "globe.desk.fill")
+                        .foregroundColor(.green)
+                    Text("Dvigatel: \(engineDisplayName)  |  Imo-ishora: \(settings.lastDetectedGestureName)")
                         .font(.system(size: 11, weight: .semibold))
                 }
 
@@ -3057,7 +3426,7 @@ struct ControlPanelView: View {
                 TabButton(title: "1. Sichqoncha & Qo'llanma", icon: "computermouse.fill", isSelected: selectedTab == 0) {
                     withAnimation(.easeInOut(duration: 0.16)) { selectedTab = 0 }
                 }
-                TabButton(title: "2. 2-3s Tezkor API", icon: "cpu.fill", isSelected: selectedTab == 1) {
+                TabButton(title: "2. AI Dvigatel (Web / API)", icon: "cpu.fill", isSelected: selectedTab == 1) {
                     withAnimation(.easeInOut(duration: 0.16)) { selectedTab = 1 }
                 }
                 TabButton(title: "3. Yashirin Gemini Web", icon: "globe.desk.fill", isSelected: selectedTab == 2) {
@@ -3120,6 +3489,14 @@ struct ControlPanelView: View {
         .frame(minWidth: 840, minHeight: 640)
     }
 
+    private var engineDisplayName: String {
+        switch settings.engineMode {
+        case "gemini_web_primary": return "Faqat Gemini Web (\(settings.webModelTier.uppercased()))"
+        case "hybrid_web_api": return "Gibrid (Gemini Web + API)"
+        default: return "Tezkor API (+ Web Zaxira)"
+        }
+    }
+
     private var hudPreviewText: String {
         switch settings.hudState {
         case .workingG: return "G"
@@ -3136,7 +3513,7 @@ struct ControlPanelView: View {
         }
     }
 
-    // MARK: - Tab 1: 3 Input Modes, Mouse Gestures, & Complete Built-in Manual
+    // MARK: - Tab 1: 3 Input Modes, Engine Quick Switch, Mouse Gestures, & Built-in Manual
     private var mouseGesturesAndManualSection: some View {
         VStack(alignment: .leading, spacing: 14) {
             if !settings.auditReportLines.isEmpty {
@@ -3151,9 +3528,23 @@ struct ControlPanelView: View {
                 }
             }
 
-            // 1. 3-Mode Input Selector (Never blocks background apps!)
-            GroupBox(label: Label("1. Boshqaruv Rejimini Tanlash (Fonda Boshqa Dasturlarga Xalaqit Bermaydi!)", systemImage: "slider.horizontal.below.rectangle").font(.headline)) {
+            // 1. Direct AI Engine & Input Control Selector
+            GroupBox(label: Label("1. Asosiy AI Dvigatel va Boshqaruv Rejimi (0/3 Violations)", systemImage: "bolt.shield.fill").font(.headline)) {
                 VStack(alignment: .leading, spacing: 10) {
+                    Picker("AI Dvigatel:", selection: Binding(
+                        get: { settings.engineMode },
+                        set: { val in
+                            settings.engineMode = val
+                            settings.save()
+                            flightRecorder.rebuildMarkdownReport()
+                        }
+                    )) {
+                        Text("🌐 Faqat Gemini Web (Limitsiz — Asosiy)").tag("gemini_web_primary")
+                        Text("⚡ Gibrid (Gemini Web + API birga)").tag("hybrid_web_api")
+                        Text("🔑 Tezkor API (Limit tugasa -> Web)").tag("flash_pro_api")
+                    }
+                    .pickerStyle(.segmented)
+
                     Picker("Boshqaruv Usuli:", selection: Binding(
                         get: { settings.inputControlMode },
                         set: { val in
@@ -3163,14 +3554,14 @@ struct ControlPanelView: View {
                             onInputModeChanged()
                         }
                     )) {
-                        Text("🖱️ + ⌨️ Ikkisi ham (Sichqoncha + Klaviatura)").tag("hybrid")
-                        Text("🖱️ Faqat Sichqoncha (Klaviaturaga 0% tegmaydi)").tag("mouse_only")
-                        Text("⌨️ Faqat Klaviatura (Sichqoncha o'chiq)").tag("keyboard_only")
+                        Text("🖱️ Faqat Sichqoncha (0% Klaviatura — Tavsiya)").tag("mouse_only")
+                        Text("🖱️ + ⌨️ Ikkisi ham (Sichqoncha + ⌥F/⌥K)").tag("hybrid")
+                        Text("⌨️ Faqat Klaviatura").tag("keyboard_only")
                     }
                     .pickerStyle(.segmented)
 
                     if settings.inputControlMode != "mouse_only" {
-                        Toggle("Ko'rinmas rejimda Alt bosmasdan [S keyin F] va [K] klavishlarini ham yoqish (Faqat imtihon vaqtida yoqing, matn yozishda o'chirib qo'ying)", isOn: Binding(
+                        Toggle("Ko'rinmas rejimda Alt bosmasdan [S keyin F] va [K] klavishlarini ham yoqish (Faqat imtihon vaqtida yoqing)", isOn: Binding(
                             get: { settings.enableBareExamKeysInStealth },
                             set: { val in
                                 settings.enableBareExamKeysInStealth = val
@@ -3220,7 +3611,7 @@ struct ControlPanelView: View {
                                 .foregroundColor(.green)
                             Text("• ⬅️ Chapga siljish (1-Bosqich): Skrinshot olindi va eski savol javobi tozalandi.")
                                 .font(.system(size: 11))
-                            Text("• ➡️ O'ngga siljish (2-Bosqich): Savol Gemini AI'ga muvaffaqiyatli yuborildi.")
+                            Text("• ➡️ O'ngga siljish (2-Bosqich): Savol Gemini Web / AI'ga muvaffaqiyatli yuborildi.")
                                 .font(.system(size: 11))
                             Text("• 🔄 3 marta qimirlash (3-Bosqich): Javob tayyor bo'ldi!")
                                 .font(.system(size: 11))
@@ -3284,24 +3675,47 @@ struct ControlPanelView: View {
         }
     }
 
-    // MARK: - Tab 2: Flash & Pro API Keys
+    // MARK: - Tab 2: AI Engine & Backup API Keys
     private var flashProApiSection: some View {
         VStack(alignment: .leading, spacing: 14) {
-            GroupBox(label: Label("Tezkor 2–3s Parallel Gemini 3.0 / 3.5 Flash Dvigateli", systemImage: "lock.shield.fill").font(.headline)) {
+            GroupBox(label: Label("v14.0 AI Dvigatel Boshqaruvi (Gemini Web Asosiy + Zaxira API)", systemImage: "lock.shield.fill").font(.headline)) {
                 VStack(alignment: .leading, spacing: 10) {
                     Picker("Dvigatel:", selection: Binding(
                         get: { settings.engineMode },
-                        set: { val in settings.engineMode = val; settings.save() }
+                        set: { val in
+                            settings.engineMode = val
+                            settings.save()
+                            flightRecorder.rebuildMarkdownReport()
+                        }
                     )) {
-                        Text("Tezkor Parallel API (2–3s Tavsiya etiladi)").tag("flash_pro_api")
-                        Text("Gibrid Parallel").tag("hybrid_web_api")
-                        Text("Faqat Gemini Web").tag("gemini_web_primary")
+                        Text("🌐 Faqat Gemini Web (Limitsiz — Asosiy)").tag("gemini_web_primary")
+                        Text("⚡ Gibrid Parallel (Web + API)").tag("hybrid_web_api")
+                        Text("🔑 Tezkor API (Limit tugasa -> Web)").tag("flash_pro_api")
                     }
                     .pickerStyle(.segmented)
 
+                    HStack(spacing: 18) {
+                        Picker("Gemini Web Modeli:", selection: Binding(
+                            get: { settings.webModelTier },
+                            set: { val in
+                                settings.webModelTier = val
+                                settings.save()
+                                HiddenGeminiWebBridge.shared.enforceFlashOrProModel(preferredTier: val)
+                            }
+                        )) {
+                            Text("⚡ Flash (2-4s Tezkor)").tag("flash")
+                            Text("🧠 Pro (Chuqur Tahlil)").tag("pro")
+                        }
+                        .pickerStyle(.segmented)
+                        .frame(width: 320)
+
+                        Toggle("Web'ga rasmni ham biriktirish", isOn: $settings.webAttachScreenshot)
+                            .font(.system(size: 12, weight: .medium))
+                    }
+
                     Toggle("Speculative Early-Commit (1-chi javob tayyor bo'lgan zahoti darhol bildirish)", isOn: $settings.speculativeEarlyCommit)
                         .font(.system(size: 12.5, weight: .medium))
-                    Toggle("Parallel Consensus (2 ta kalitda 2 xil modelni parallel ishga tushirish)", isOn: $settings.parallelConsensus)
+                    Toggle("Parallel Consensus (API rejimida 2 ta kalitni parallel ishlatish)", isOn: $settings.parallelConsensus)
                         .font(.system(size: 12.5, weight: .medium))
                 }
                 .padding(8)
@@ -3313,7 +3727,7 @@ struct ControlPanelView: View {
                         Button(action: {
                             settings.save()
                             settings.apiTesting = true
-                            settings.apiTestStatus = "Tezkor modellar tekshirilmoqda..."
+                            settings.apiTestStatus = "Tanlangan dvigatel tekshirilmoqda..."
                             SmartAIRouter.shared.testAndAutoConfigure { ok, msg in
                                 DispatchQueue.main.async {
                                     settings.apiTesting = false
@@ -3327,7 +3741,7 @@ struct ControlPanelView: View {
                                 } else {
                                     Image(systemName: "bolt.badge.checkmark.fill")
                                 }
-                                Text("Saqlash va Tezlikni Tekshirish")
+                                Text("Tanlangan Dvigatelni Sinash")
                                     .fontWeight(.semibold)
                             }
                             .padding(.horizontal, 10)
@@ -3335,12 +3749,10 @@ struct ControlPanelView: View {
                         }
                         .disabled(settings.apiTesting)
 
-                        if !settings.discoveredGeminiModels.isEmpty {
-                            Text("Faol modellar: \(settings.discoveredGeminiModels.prefix(5).joined(separator: ", "))")
-                                .font(.caption)
-                                .foregroundColor(.green)
-                                .lineLimit(1)
-                        }
+                        Text(settings.webBridgeStatus)
+                            .font(.caption)
+                            .foregroundColor(.green)
+                            .lineLimit(1)
                         Spacer()
                     }
 
@@ -3353,11 +3765,11 @@ struct ControlPanelView: View {
                 .padding(6)
             }
 
-            GroupBox(label: Label("Google Gemini API Kalitlari", systemImage: "sparkles").font(.headline)) {
+            GroupBox(label: Label("Google Gemini Zaxira API Kalitlari (Ixtiyoriy — Gibrid yoki Zaxira uchun)", systemImage: "sparkles").font(.headline)) {
                 VStack(alignment: .leading, spacing: 8) {
                     HStack {
                         Text("Gemini Kalit #1:").frame(width: 110, alignment: .leading)
-                        SecureField("AIzaSy...", text: $settings.geminiKey1).textFieldStyle(.roundedBorder)
+                        SecureField("AIzaSy... (ixtiyoriy)", text: $settings.geminiKey1).textFieldStyle(.roundedBorder)
                     }
                     HStack {
                         Text("Gemini Kalit #2:").frame(width: 110, alignment: .leading)
@@ -3375,7 +3787,7 @@ struct ControlPanelView: View {
                 VStack(alignment: .leading, spacing: 8) {
                     HStack {
                         Text("Groq Kalit #1:").frame(width: 110, alignment: .leading)
-                        SecureField("gsk_...", text: $settings.groqKey1).textFieldStyle(.roundedBorder)
+                        SecureField("gsk_... (ixtiyoriy)", text: $settings.groqKey1).textFieldStyle(.roundedBorder)
                     }
                     HStack {
                         Text("Groq Kalit #2:").frame(width: 110, alignment: .leading)
@@ -3387,7 +3799,7 @@ struct ControlPanelView: View {
         }
     }
 
-    // MARK: - Tab 3: Full-Control Hidden Gemini Web Browser
+    // MARK: - Tab 3: Full-Control Always-Alive Hidden Gemini Web Browser
     private var hiddenWebBrowserSection: some View {
         VStack(spacing: 6) {
             HStack(spacing: 10) {
@@ -3451,7 +3863,7 @@ struct ControlPanelView: View {
                                 settings.lastSecondaryAnswer = r.secondary ?? ""
                                 settings.lastValuePreview = r.value
                                 settings.hudState = .answer(primary: r.primary, secondary: r.secondary, valuePreview: r.value)
-                                settings.statusText = "Gemini Web sinovi muvaffaqiyatli: \(r.primary)"
+                                settings.statusText = "Gemini Web sinovi muvaffaqiyatli: \(r.primary) · \(r.value)"
                                 FlightRecorder.shared.record(category: "WEB_TEST", statusCode: r.primary, latencyMs: 0, details: "Gemini Web sinovi: \(r.primary) (\(r.modelUsed))")
                                 HumanCursorSignal.stage3AnswerReady()
                             } else if let cat = errCat {
@@ -3468,7 +3880,7 @@ struct ControlPanelView: View {
 
             HStack {
                 Image(systemName: "checkmark.shield.fill").foregroundColor(.green)
-                Text("Google Email sessiyangiz `com.local.SilentHelper` konteynerida doimiy saqlanadi.")
+                Text("Always-Alive Web Engine: Ko'rinmas rejimda ham `gemini.google.com` fonda to'xtamasdan ishlaydi.")
                     .font(.system(size: 11))
                     .foregroundColor(.secondary)
                 Spacer()
@@ -3478,7 +3890,7 @@ struct ControlPanelView: View {
             }
             .padding(.horizontal, 14)
 
-            WebViewContainer(webView: HiddenGeminiWebBridge.shared.webView)
+            WebViewContainer()
                 .frame(maxWidth: .infinity, maxHeight: .infinity)
                 .cornerRadius(8)
                 .padding(.horizontal, 12)
@@ -3562,7 +3974,7 @@ struct ControlPanelView: View {
             GroupBox(label: Label("Google Drive Avto-Telemetriya va Amaliyot Qora Qutisi", systemImage: "waveform.path.ecg").font(.headline)) {
                 VStack(alignment: .leading, spacing: 8) {
                     Text("""
-                    Barcha harakatlar, sichqoncha imo-ishoralari, javob tezligi (ms), cooldown 'K' va xatolar (IW / SW / W) real vaqtda Google Drive'dagi `QuizArchive/FlightLogs/practice_session_report.md` hamda `SILENTHELPER_TELEMETRY_LATEST.md` fayllariga avtomatik yozib boriladi.
+                    Barcha harakatlar, Gemini Web yuborishlari (`WEB_DISPATCH`), javob tezligi (ms), cooldown 'K' va xatolar (IW / SW / W) real vaqtda Google Drive'dagi `QuizArchive/FlightLogs/practice_session_report.md` hamda `SILENTHELPER_TELEMETRY_LATEST.md` fayllariga avtomatik yozib boriladi.
                     """)
                     .font(.caption)
                     .foregroundColor(.secondary)
@@ -3700,7 +4112,7 @@ private func carbonHotKeyHandler(nextHandler: EventHandlerCallRef?, event: Event
     return noErr
 }
 
-// MARK: - 14. Main Application Controller (v13.0 — Single MenuBar Icon, Custom Logo & Gesture Engine)
+// MARK: - 14. Main Application Controller (v14.0 — Always-Alive Gemini Web & Single MenuBar Icon)
 final class AppController: NSObject, NSApplicationDelegate {
     let settings = AppSettings.shared
     let archive = ArchiveManager.shared
@@ -3737,13 +4149,13 @@ final class AppController: NSObject, NSApplicationDelegate {
         BridgeIPC.ensureDir()
         let myPID = ProcessInfo.processInfo.processIdentifier
 
-        // 1. Kill any previous PID recorded in single_gui.pid
-        if let oldPidStr = try? String(contentsOfFile: BridgeIPC.guiPidFile, encoding: .utf8).trimmingCharacters(in: .whitespacesAndNewlines),
-           let oldPid = Int32(oldPidStr), oldPid > 0, oldPid != myPID {
-            kill(oldPid, SIGKILL)
+        for pidFile in [BridgeIPC.guiPidFile, "/tmp/sh_v13_ipc/single_gui.pid", "/tmp/sh_v12_ipc/single_gui.pid"] {
+            if let oldPidStr = try? String(contentsOfFile: pidFile, encoding: .utf8).trimmingCharacters(in: .whitespacesAndNewlines),
+               let oldPid = Int32(oldPidStr), oldPid > 0, oldPid != myPID {
+                kill(oldPid, SIGKILL)
+            }
         }
 
-        // 2. Force-terminate any other running com.local.SilentHelper app bundles
         let existing = NSRunningApplication.runningApplications(withBundleIdentifier: "com.local.SilentHelper")
         for app in existing where app.processIdentifier != myPID {
             if !app.forceTerminate() {
@@ -3758,7 +4170,6 @@ final class AppController: NSObject, NSApplicationDelegate {
         Self.enforceSingleGUIInstance()
         globalAppController = self
 
-        // Set Custom Vector Shield Application Icon in Dock & Cmd+Tab!
         NSApp.applicationIconImage = AppIconGenerator.makeShieldLogoImage(size: NSSize(width: 512, height: 512))
 
         _ = HiddenGeminiWebBridge.shared
@@ -3776,7 +4187,7 @@ final class AppController: NSObject, NSApplicationDelegate {
             category: "SESSION",
             statusCode: "START",
             latencyMs: 0,
-            details: "SilentHelper v13.0 ishga tushdi (Mode: \(settings.inputControlMode) | Bridge: \(bridge.alive ? "ACTIVE" : "STANDBY"))"
+            details: "SilentHelper v14.0 ishga tushdi (Engine: \(settings.engineMode) | Input: \(settings.inputControlMode) | Bridge: \(bridge.alive ? "ACTIVE" : "STANDBY"))"
         )
 
         if let firstKey = settings.activeGeminiKeys.first {
@@ -3832,7 +4243,6 @@ final class AppController: NSObject, NSApplicationDelegate {
     @objc private func menuStealth() { enterStealthMode() }
     @objc private func menuQuit() { NSApp.terminate(nil) }
 
-    /// Configures hotkeys strictly according to `inputControlMode` so background apps are NEVER disrupted!
     func applyInputControlModeHotKeys() {
         if hotKeyHandlerRef == nil {
             var eventType = EventTypeSpec(eventClass: OSType(kEventClassKeyboard), eventKind: UInt32(kEventHotKeyPressed))
@@ -3844,27 +4254,23 @@ final class AppController: NSObject, NSApplicationDelegate {
         if let r3 = hotKeyRefPanel { UnregisterEventHotKey(r3); hotKeyRefPanel = nil }
         if let r7 = hotKeyRefIncident { UnregisterEventHotKey(r7); hotKeyRefIncident = nil }
 
-        // Option + M (Panel toggle) is always available so the user can always bring back the window
         let id3 = EventHotKeyID(signature: OSType(0x53485639), id: 3)
         RegisterEventHotKey(UInt32(kVK_ANSI_M), UInt32(optionKey), id3, GetApplicationEventTarget(), 0, &hotKeyRefPanel)
 
-        // Only register Option+F, Option+K, Option+L if NOT in "mouse_only" mode!
         if settings.inputControlMode != "mouse_only" {
-            let id1 = EventHotKeyID(signature: OSType(0x53485639), id: 1) // Option + F
+            let id1 = EventHotKeyID(signature: OSType(0x53485639), id: 1)
             RegisterEventHotKey(UInt32(kVK_ANSI_F), UInt32(optionKey), id1, GetApplicationEventTarget(), 0, &hotKeyRefCapture)
 
-            let id2 = EventHotKeyID(signature: OSType(0x53485639), id: 2) // Option + K
+            let id2 = EventHotKeyID(signature: OSType(0x53485639), id: 2)
             RegisterEventHotKey(UInt32(kVK_ANSI_K), UInt32(optionKey), id2, GetApplicationEventTarget(), 0, &hotKeyRefOverlay)
 
-            let id7 = EventHotKeyID(signature: OSType(0x53485639), id: 7) // Option + L
+            let id7 = EventHotKeyID(signature: OSType(0x53485639), id: 7)
             RegisterEventHotKey(UInt32(kVK_ANSI_L), UInt32(optionKey), id7, GetApplicationEventTarget(), 0, &hotKeyRefIncident)
         }
 
         updateStealthDirectCarbonKeys(active: settings.isStealthMode)
     }
 
-    /// Bare `S -> F` and `K` keys are ONLY registered when Stealth Mode is active AND `enableBareExamKeysInStealth` is explicitly turned ON!
-    /// This guarantees that normal typing in background apps is NEVER blocked!
     private func updateStealthDirectCarbonKeys(active: Bool) {
         disarmFWorkItem?.cancel()
         if let refS = stealthHotKeyS { UnregisterEventHotKey(refS); stealthHotKeyS = nil }
@@ -3992,7 +4398,7 @@ final class AppController: NSObject, NSApplicationDelegate {
             backing: .buffered,
             defer: false
         )
-        win.title = "SilentHelper v13.0 — Sichqoncha Imo-ishoralari (○ / ↔ / ↓), 3 Rejim & Qo'llanma"
+        win.title = "SilentHelper v14.0 — Always-Alive Gemini Web, Sichqoncha Imo-ishoralari (○ / ↔ / ↓) & 0/3 Violations"
         win.center()
         win.contentView = NSHostingView(rootView: contentView)
         win.isReleasedWhenClosed = false
@@ -4027,11 +4433,13 @@ final class AppController: NSObject, NSApplicationDelegate {
     func enterStealthMode() {
         DispatchQueue.main.async {
             self.settings.isStealthMode = true
-            self.settings.statusText = "Ko'rinmas rejim faol: [○/△] = Skrinshot | [↔] = Ko'rish | [↓] = Yashirish"
+            self.settings.statusText = "Ko'rinmas rejim (Gemini Web Faol): [○/△] = Skrinshot | [↔] = Ko'rish | [↓] = Yashirish"
+            // Park WKWebView into the Always-Alive non-occluded StealthWebHostWindow BEFORE hiding controlWindow!
+            HiddenGeminiWebBridge.shared.parkInStealthHostWindow()
             self.controlWindow?.orderOut(nil)
             NSApp.setActivationPolicy(.accessory)
             self.updateStealthDirectCarbonKeys(active: true)
-            self.flightRecorder.record(category: "MODE", statusCode: "STEALTH", latencyMs: 0, details: "Ko'rinmas rejim yoqildi (Input Mode: \(self.settings.inputControlMode))")
+            self.flightRecorder.record(category: "MODE", statusCode: "STEALTH", latencyMs: 0, details: "Ko'rinmas rejim yoqildi (Engine: \(self.settings.engineMode) | Input: \(self.settings.inputControlMode))")
         }
     }
 
@@ -4144,7 +4552,6 @@ final class AppController: NSObject, NSApplicationDelegate {
 
         let startTime = now
 
-        // Immediately wipe the previous question's answer and hide HUD!
         DispatchQueue.main.async {
             self.cooldownRestoreWorkItem?.cancel()
             self.hudAutoHideWorkItem?.cancel()
@@ -4167,7 +4574,7 @@ final class AppController: NSObject, NSApplicationDelegate {
             self.statusItem?.button?.title = "G"
         }
 
-        flightRecorder.record(category: "TRIGGER", statusCode: "G", latencyMs: 0, details: "Yangi savol skrinshoti boshlandi (Usul: \(triggerUsed))")
+        flightRecorder.record(category: "TRIGGER", statusCode: "G", latencyMs: 0, details: "Yangi savol skrinshoti boshlandi (Usul: \(triggerUsed) | Engine: \(settings.engineMode))")
 
         DispatchQueue.global(qos: .userInitiated).asyncAfter(deadline: .now() + 0.03) {
             ScreenCaptureService.captureMainDisplay { cgImage in
@@ -4196,7 +4603,7 @@ final class AppController: NSObject, NSApplicationDelegate {
 
                     DispatchQueue.main.async {
                         self.settings.lastOcrPreview = cleanText
-                        self.settings.statusText = "2/3 O'ngga: Tezkor AI ga yuborildi (G)..."
+                        self.settings.statusText = "2/3 O'ngga: Gemini (\(self.settings.engineMode)) ga yuborildi (G)..."
                     }
 
                     self.flightRecorder.inspectOcrForSiteWarnings(ocrText: cleanText, cgImage: cgImage, triggerMethod: triggerUsed)

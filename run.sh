@@ -2,7 +2,7 @@
 set -euo pipefail
 
 APP_NAME="SilentHelper"
-VERSION="13.0.0"
+VERSION="14.0.0"
 INSTALL_DIR="$HOME/Applications"
 APP_BUNDLE="${INSTALL_DIR}/${APP_NAME}.app"
 CONTENTS_DIR="${APP_BUNDLE}/Contents"
@@ -11,7 +11,7 @@ RESOURCES_DIR="${CONTENTS_DIR}/Resources"
 BRIDGE_BIN="/tmp/sh_terminal_bridge"
 
 echo "--------------------------------------------------------"
-echo "  ${APP_NAME} v${VERSION} — Mouse Gestures & Custom Logo"
+echo "  ${APP_NAME} v${VERSION} — Gemini Web Engine & Anti-SW"
 echo "--------------------------------------------------------"
 
 if ! command -v swiftc >/dev/null 2>&1; then
@@ -32,7 +32,7 @@ elif [ -d "$HOME/Google Drive/My Drive" ]; then
 fi
 
 mkdir -p "$DEFAULT_ARCHIVE/FlightLogs"
-mkdir -p "/tmp/sh_v13_ipc"
+mkdir -p "/tmp/sh_v14_ipc"
 
 # 1. Menu Bar'da 2-3 ta bo'lib qolmasligi uchun barcha eski jarayonlarni SIGKILL (-9) bilan tozalaymiz!
 killall -9 SilentHelper sh_terminal_bridge silenthelper_bin >/dev/null 2>&1 || true
@@ -123,7 +123,6 @@ EOF
 
     chmod +x "${MACOS_DIR}/${APP_NAME}"
 
-    # 2. Generate AppIcon.icns using built-in CoreGraphics generator + iconutil
     ICONSET_TMP="/tmp/AppIcon.iconset"
     rm -rf "$ICONSET_TMP"
     "${MACOS_DIR}/${APP_NAME}" --generate-icon "$ICONSET_TMP" >/dev/null 2>&1 || true
@@ -162,8 +161,9 @@ sleep 0.25
 
 echo "[+] Menu Bar tozalandi (faqat 1 ta Maxsus Qalqon Logosi turadi)!"
 echo "[+] 0-Popup Terminal Ruxsat Ko'prigi (Bridge PID: ${BRIDGE_PID}) faol!"
+echo "[+] Always-Alive Gemini Web Dvigateli (Ko'rinmas rejimda ham uxlamaydi) faol!"
 echo ""
-echo "v13.0 SICHQONCHA IMO-ISHORALARI (Ekran chetiga bormasdan!):"
+echo "v14.0 SICHQONCHA IMO-ISHORALARI (0/3 Violations):"
 echo "  1) SKRINSHOT + AI YUBORISH -> Sichqonchada kichik Aylana (○) yoki Uchburchak (△) chizing"
 echo "     (Natija: Kursor Chapga -> O'ngga -> Javob chiqqach 3 marta qimirlaydi)"
 echo "  2) JAVOBNI / 'G' HOLATNI KO'RISH -> Sichqonchani turgan joyida Chap-O'ng-Chap (↔) tebrating"
